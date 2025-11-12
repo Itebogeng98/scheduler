@@ -1,0 +1,160 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body class="bg-light">
+    <div class="container mt-5">
+        <h2 class="text-center text-primary mb-4">Courses for Vendor {{ vendor_id }}</h2>
+
+        <div id="alert-container"></div>
+
+        <!-- Import Courses Form -->
+        <form id="import-courses-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mb-3">
+                <input type="file" name="excel_file" id="excel_file" accept=".xlsx,.xls" class="form-control" required>
+            </div>
+            <button type="submit" class="btn btn-success">Import Courses</button>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+        {% endif %}
+
+        <!-- Courses Table -->
+        {% if courses %}
+        <div class="card shadow p-4 mt-4">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Course Code</th>
+                        <th>Description</th>
+                        <th>Exam</th>
+                        <th>Duration</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="courses-table-body">
+                    {% for course in courses %}
+                    <tr data-id="{{ course.id }}">
+                        <td>{{ course.course_code|default:"-" }}</td>
+                        <td>{{ course.course_description|default:"-" }}</td>
+                        <td>{{ course.exam|default:"NA" }}</td>
+                        <td>{{ course.duration|default:"-" }}</td>
+                        <td>{{ course.price|default:"0.00" }}</td>
+                        <td class="status">{% if course.is_active %}Active{% else %}Inactive{% endif %}</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a href="{% url 'edit_course' course.id %}" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                <button class="btn btn-sm btn-outline-warning deactivate-btn">
+                                    {% if course.is_active %}Deactivate{% else %}Activate{% endif %}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="alert alert-info mt-3">No courses found for this vendor.</div>
+        {% endif %}
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const vendorId = {{ vendor_id }};
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Refresh courses table
+            function refreshCourses() {
+                $.get(`/scheduler_api/create_course_api/${vendorId}/`, function (response) {
+                    if (response.status === "success") {
+                        let rows = "";
+                        response.data.forEach(course => {
+                            rows += `<tr data-id="${course.id}">
+                                <td>${course.course_code || "-"}</td>
+                                <td>${course.course_description || "-"}</td>
+                                <td>${course.exam || "NA"}</td>
+                                <td>${course.duration || "-"}</td>
+                                <td>${course.price || "0.00"}</td>
+                                <td class="status">${course.is_active ? "Active" : "Inactive"}</td>
+                                <td>
+                                    <div class="d-flex gap-1">
+                                        <a href="/scheduler/edit_course/${course.id}/" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                        <button class="btn btn-sm btn-outline-warning deactivate-btn">
+                                            ${course.is_active ? "Deactivate" : "Activate"}
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>`;
+                        });
+                        $("#courses-table-body").html(rows);
+                    }
+                });
+            }
+
+            // Handle Excel import
+            $("#import-courses-form").submit(function (e) {
+                e.preventDefault();
+                const fileInput = $("#excel_file")[0];
+                if (!fileInput.files.length) {
+                    $("#alert-container").html('<div class="alert alert-danger">Please select a file!</div>');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append("excel_file", fileInput.files[0]);
+                formData.append("csrfmiddlewaretoken", csrftoken);
+
+                $.ajax({
+                    url: `/scheduler/import_courses/${vendorId}/`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $("#alert-container").html(`<div class="alert alert-success">✅ ${response.message}</div>`);
+                        refreshCourses();
+                    },
+                    error: function (xhr) {
+                        let msg = xhr.responseJSON?.message || "Error importing courses.";
+                        $("#alert-container").html(`<div class="alert alert-danger">❌ ${msg}</div>`);
+                    }
+                });
+            });
+
+            // Activate / Deactivate
+            $(document).on("click", ".deactivate-btn", function () {
+                const row = $(this).closest("tr");
+                const courseId = row.data("id");
+                const currentStatus = row.find(".status").text() === "Active";
+
+                $.ajax({
+                    url: `/scheduler_api/course/${courseId}/toggle_status/`,
+                    type: "PATCH",
+                    headers: { "X-CSRFToken": csrftoken },
+                    data: JSON.stringify({ is_active: !currentStatus }),
+                    contentType: "application/json",
+                    success: function () {
+                        $("#alert-container").html('<div class="alert alert-success">✅ Status updated</div>');
+                        refreshCourses();
+                    },
+                    error: function () {
+                        $("#alert-container").html('<div class="alert alert-danger">❌ Failed to update status</div>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

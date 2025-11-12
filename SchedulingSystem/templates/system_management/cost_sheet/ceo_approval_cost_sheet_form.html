@@ -1,0 +1,141 @@
+
+{% load static %}
+{% load custom_filters %} {# For get_attr filter #}
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">CEO Cost Sheet Approval</h2>
+
+    {% if sheets %}
+        {% for sheet in sheets %}
+        <div class="cost-sheet-card mb-4 p-3 shadow-sm border rounded">
+            <h4>Cost Sheet ID: {{ sheet.id }} | Client: {{ sheet.client_type.client_name }} | Created: {{ sheet.created_at|date:"Y-m-d H:i" }}</h4>
+
+            <form class="cost-sheet-view-form" data-sheet-id="{{ sheet.id }}">
+                {% csrf_token %}
+
+                <!-- Classroom Section -->
+                <div class="form-section mb-3">
+                    <h5>Classroom</h5>
+                    {% for field in ["daily_venue_cost", "refreshment", "consumables", "instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee", "qcto_seta_consumables", "assessor_fees", "welcome_packs", "sme_hour", "recruitment", "labs", "travel_flights", "accomodation", "per_diem", "international", "driving_travel"] %}
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
+                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- LMS Section -->
+                <div class="form-section mb-3">
+                    <h5>LMS</h5>
+                    {% for field in ["set_up_fee", "license_fee", "per_user_fee", "marketing_fee"] %}
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
+                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Content Development Section -->
+                <div class="form-section mb-3">
+                    <h5>Content Development</h5>
+                    {% for field in ["consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware", "corporate_cost_content_dev", "corporate_costs_content_dev"] %}
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
+                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Totals & Learner Info -->
+                <div class="form-section mb-3">
+                    <h5>Totals</h5>
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">Total Cost:</label>
+                        <input type="number" class="form-control" value="{{ sheet.total_cost }}" readonly>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">Per Learner:</label>
+                        <input type="number" class="form-control" value="{{ sheet.per_learner }}" readonly>
+                    </div>
+                    <div class="form-group mb-2">
+                        <label class="fw-bold">Days:</label>
+                        <input type="number" class="form-control" value="{{ sheet.days }}" readonly>
+                    </div>
+                </div>
+
+                <!-- Status -->
+                <p>Status: 
+                    {% if sheet.is_approved %}
+                        <span class="badge bg-success">Approved</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% endif %}
+                </p>
+
+                <!-- Approve Button -->
+                {% if not sheet.is_approved %}
+                <button type="button" class="btn btn-success approve-btn" data-id="{{ sheet.id }}">
+                    Approve Cost Sheet
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-secondary" disabled>
+                    Already Approved
+                </button>
+                {% endif %}
+            </form>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning text-center">
+            No cost sheets found for this client.
+        </div>
+    {% endif %}
+</div>
+
+<!-- Approve AJAX Script -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const buttons = document.querySelectorAll(".approve-btn");
+
+    buttons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            const sheetId = this.dataset.id;
+            if (!confirm("Are you sure you want to approve this cost sheet?")) return;
+
+            fetch("", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "{{ csrf_token }}"
+                },
+                body: JSON.stringify({ sheet_id: sheetId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === "success") {
+                    const form = document.querySelector(`.cost-sheet-view-form[data-sheet-id="${sheetId}"]`);
+                    form.querySelector(".badge").className = "badge bg-success";
+                    form.querySelector(".badge").textContent = "Approved";
+                    btn.className = "btn btn-secondary";
+                    btn.textContent = "Already Approved";
+                    btn.disabled = true;
+                    alert(data.message);
+                } else {
+                    alert("❌ " + data.message);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Error approving cost sheet.");
+            });
+        });
+    });
+});
+</script>
+
+<style>
+.cost-sheet-card {
+    background-color: #f9f9f9;
+}
+</style>
+

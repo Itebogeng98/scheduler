@@ -1,0 +1,487 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netcampus Group - Login</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #ff6600;
+      --primary-light: #ffB533;
+      --primary-dark: #cc5200;
+      --light-bg: #fff9f5;
+      --dark-text: #333;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: var(--dark-text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      margin: 0;
+      padding: 0;
+    }
+
+    .login-container {
+      display: flex;
+      width: 100%;
+      min-height: 100vh;
+    }
+
+    .login-left {
+      flex: 1;
+      background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+      url('{% static "images/ai_pic.png" %}') no-repeat center center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+
+    .login-right {
+      flex: 1;
+      background-color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 30px;
+    }
+
+    .login-form {
+      width: 100%;
+      max-width: 400px;
+      padding: 20px;
+    }
+
+    .logo {
+      height: 60px;
+      margin-bottom: 30px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-title {
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .form-subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    .form-control {
+      padding: 12px 15px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 0.2rem rgba(255, 102, 0, 0.25);
+    }
+
+    .input-group {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .input-group-prepend {
+      display: flex;
+    }
+
+   .input-group-text {
+          height: 45px !important; /* Match exact input height */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0 0.75rem;
+          background-color: #f8f9fa;
+          border: 1px solid #ced4da;
+          border-right: none;
+          border-radius: 8px 0 0 8px;
+        }
+
+        .form-control {
+          height: 45px !important; /* Force equal height */
+          border-radius: 0 8px 8px 0;
+          line-height: 1.5;
+          font-size: 1rem;
+          box-shadow: none;
+        }
+
+
+
+
+    .input-group .form-control {
+      border-left: none;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .btn-login {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: all 0.3s;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .btn-login:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 25px 0;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .divider span {
+      padding: 0 15px;
+      color: #777;
+      font-size: 14px;
+    }
+
+    .social-login {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .social-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .social-btn:hover {
+      background-color: #f8f9fa;
+      transform: translateY(-2px);
+    }
+
+    .login-links {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .login-links a {
+      color: var(--primary);
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .login-links a:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    .features-list {
+      list-style: none;
+      padding: 0;
+      margin-top: 30px;
+      max-width: 400px;
+    }
+
+    .features-list li {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+
+    .features-list i {
+      color: var(--primary);
+      margin-right: 10px;
+      font-size: 18px;
+    }
+
+    .form-check-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .form-check {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+    }
+
+    .form-check-input {
+      margin-right: 0.5rem;
+    }
+
+    .forgot-password {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .forgot-password:hover {
+      color: var(--primary-dark);
+      text-decoration: underline;
+    }
+
+    /* Loading overlay styles */
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    #loadingOverlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .blurred {
+      filter: blur(5px);
+      transition: filter 0.3s ease;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 992px) {
+      .login-container {
+        flex-direction: column;
+      }
+
+      .login-left {
+        min-height: 40vh;
+        padding: 40px 20px;
+      }
+
+      .login-right {
+        min-height: 60vh;
+        padding: 40px 20px;
+      }
+
+      .features-list {
+        max-width: 100%;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .social-login {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .login-form {
+        padding: 10px;
+      }
+
+      .form-check-container {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .forgot-password {
+        margin-top: 10px;
+        align-self: flex-end;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Loading Overlay - Initially hidden -->
+  <div id="loadingOverlay"
+    style="display: none; position: fixed; top:0; left:0; right:0; bottom:0;
+       background: rgba(0,0,0,0.7); z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+    <div class="text-center">
+      <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <h3 class="mt-3 text-light">Logging in...</h3>
+    </div>
+  </div>
+
+  <div class="login-container">
+    <!-- Left side -->
+    <div class="login-left">
+      <h2>Netcampus Training Scheduler</h2>
+      <ul class="features-list">
+        <li><i class="fas fa-check-circle"></i> Access all scheduled courses in one place</li>
+        <li><i class="fas fa-check-circle"></i> Track scheduled courses</li>
+      </ul>
+    </div>
+
+    <!-- Right side with login form -->
+    <div class="login-right">
+      <div class="login-form">
+        <img src="{% static 'images/logo.png' %}" alt="Netcampus Logo" class="logo">
+        <h2 class="form-title">Welcome Back</h2>
+        <p class="form-subtitle">Please sign in to access your account</p>
+
+        <form id="loginForm">
+          {% csrf_token %}
+          <div id="loginError" style="display: none;"></div>
+
+          <div class="container mt-5" style="max-width: 400px;">
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="fas fa-user"></i>
+                </span>
+                <input type="text" class="form-control" id="username" placeholder="Enter your username" required>
+              </div>
+            </div>
+          </div>
+
+
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="fas fa-lock"></i></span>
+              <input type="password" class="form-control" id="password" placeholder="Enter your password" required>
+            </div>
+          </div>
+        
+
+          <div class="form-check-container mb-3 d-flex justify-content-between">
+            <a href="#" class="forgot-password">Forgot password?</a>
+            <a href="{% url 'sign_up_view' %}" class="forgot-password">Sign-up</a>
+          </div>
+
+          <button type="submit" class="btn btn-login">Sign In</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS imports -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Fixed Login Script -->
+  <script>$(document).ready(function () {
+  $('#loginForm').on('submit', function (event) {
+    event.preventDefault();
+
+    $('#loadingOverlay').addClass('show');
+    $('.login-container').addClass('blurred');
+
+    $.ajax({
+      url: "{% url 'login_view' %}",
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        username: $('#username').val(),
+        password: $('#password').val()
+      }),
+      headers: { 'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val() },
+      dataType: 'json',
+      success: function (response) {
+        if (response.status === "success") {
+          localStorage.setItem('access_token', response.token);
+          localStorage.setItem('user_id', response.user_id);
+          localStorage.setItem('user_role', JSON.stringify(response.user_role));
+
+          $('#loadingOverlay').html(`
+            <div class="text-center text-light">
+              <i class="fas fa-check-circle" style="font-size: 3rem; color: #28a745;"></i>
+              <h3 class="mt-3">Login Successful!</h3>
+              <p>Redirecting...</p>
+            </div>
+          `);
+
+          setTimeout(function () {
+            window.location.href = response.redirect_url;
+          }, 1500);
+        } else {
+          $('#loadingOverlay').removeClass('show');
+          $('.login-container').removeClass('blurred');
+          showError(response.error || 'Invalid login');
+        }
+      },
+      error: function (xhr) {
+        $('#loadingOverlay').removeClass('show');
+        $('.login-container').removeClass('blurred');
+        const errorMsg = xhr.responseJSON?.error || 'Login failed. Please try again.';
+        showError(errorMsg);
+      }
+    });
+
+    function showError(message) {
+      $('#loginError').html(`
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>${message}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      `).show();
+      $('#password').val('');
+    }
+  });
+
+  // Toggle password visibility
+  $('#togglePassword').on('click', function () {
+    const passwordInput = $('#password');
+    const icon = $(this).find('i');
+
+    if (passwordInput.attr('type') === 'password') {
+      passwordInput.attr('type', 'text');
+      icon.removeClass('fa-eye').addClass('fa-eye-slash');
+    } else {
+      passwordInput.attr('type', 'password');
+      icon.removeClass('fa-eye-slash').addClass('fa-eye');
+    }
+  });
+});
+
+  </script>
+</body>
+
+</html>

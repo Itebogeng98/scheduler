@@ -1,0 +1,540 @@
+{% load static %}
+
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <title>Admin Registration</title>
+    <style>
+        /* ======= COLOR CUSTOMIZATION ======= */
+        :root {
+            --primary: #FFB533;
+            --primary-light: #FFB533;
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --radius: 12px;
+        }
+
+body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+        min-height: 100vh;
+    }
+
+    .registration-container {
+        max-width: 600px;
+        margin: 0 auto; /* center horizontally */
+        padding: 2rem;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+        position: relative;
+        top: 20px; /* small space from very top */
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-header h2 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .form-header p {
+        color: #666;
+        margin: 0.3rem 0 0;
+    }
+
+    .btn-register {
+        background: #0d6efd;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        padding: 0.8rem;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .btn-register:hover {
+        background: #0b5ed7;
+    }
+    
+        .form-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .form-body {
+            padding: 2rem;
+        }
+
+        .form-floating {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .form-control {
+            height: 56px;
+            padding: 0 1rem;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: white;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+            outline: none;
+        }
+
+        .form-floating>label {
+            padding: 0 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+            transform-origin: 0 0;
+            transition: all 0.2s ease;
+            background: transparent;
+            height: auto;
+        }
+
+        .form-floating>.form-control:focus~label,
+        .form-floating>.form-control:not(:placeholder-shown)~label {
+            transform: scale(0.8) translateY(-1.2rem) translateX(0.5rem);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .form-control:not(:placeholder-shown) {
+            padding-top: 1.2rem;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.2s;
+            z-index: 5;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            border: none;
+            height: 56px;
+            font-weight: 600;
+            border-radius: var(--radius);
+            transition: all 0.3s;
+            font-size: 1rem;
+            color: white;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(124, 58, 237, 0.2);
+        }
+
+        .btn-register:active {
+            transform: translateY(0);
+        }
+
+        .alert {
+            border-radius: var(--radius);
+            padding: 1rem;
+            font-size: 0.95rem;
+            border: none;
+        }
+
+        .form-select {
+            height: 56px;
+            padding-top: 1rem;
+            padding-left: 1rem;
+            font-size: 1rem;
+            border-radius: var(--radius);
+            border: 2px solid var(--border);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%237c3aed' stroke='%237c3aed' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+            background-position: right 1rem center;
+            background-size: 16px 12px;
+        }
+
+        .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.1);
+        }
+
+        .form-control::placeholder {
+            color: transparent;
+        }
+
+        .form-control:focus,
+        .form-control:not(:placeholder-shown) {
+            padding-top: 1.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .is-invalid+label {
+            color: #dc3545 !important;
+        }
+
+        /* Password strength indicator */
+          .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+    }
+
+    /* password requirements */
+
+    .password-strength {
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .password-strength .requirement {
+        color: #777;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-strength .requirement.valid {
+        color: green;
+    }
+
+    .password-strength i {
+        margin-right: 6px;
+    }
+
+    </style>
+</head>
+
+<body>
+    <div class="registration-container">
+        <div class="form-header">
+            <h2>Admin Registration</h2>
+            <p>Create privileged administrator accounts</p>
+        </div>
+
+        <div class="form-body">
+            <form id="registrationForm">
+                {% csrf_token %}
+                <div id="errorContainer" class="mb-4"></div>
+                <div id="successContainer" class="mb-4"></div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="first_name" name="first_name" placeholder=" "
+                                required>
+                            <label for="first_name">First Name</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" id="last_name" name="last_name" placeholder=" "
+                                required>
+                            <label for="last_name">Last Name</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="email" class="form-control" id="work_email" name="work_email" placeholder=" " required>
+                    <label for="work_email">Work Email Address</label>
+                </div>
+
+                <div class="form-floating mb-4 position-relative">
+                    <input type="password" class="form-control" id="password" name="password" placeholder=" " required>
+                    <label for="password">Password</label>
+                    <i class="bi bi-eye-slash password-toggle" id="togglePassword"></i>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="requirement" id="lengthReq">
+                            <i class="bi bi-circle"></i>
+                            <span>At least 8 characters</span>
+                        </div>
+                        <div class="requirement" id="upperReq">
+                            <i class="bi bi-circle"></i>
+                            <span>At least 1 uppercase letter</span>
+                        </div>
+                        <div class="requirement" id="numberReq">
+                            <i class="bi bi-circle"></i>
+                            <span>At least 1 number</span>
+                        </div>
+                        <div class="requirement" id="specialReq">
+                            <i class="bi bi-circle"></i>
+                            <span>At least 1 special character</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-floating mb-4 position-relative">
+                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                        placeholder=" " required>
+                    <label for="confirmPassword">Confirm Password</label>
+                    <i class="bi bi-eye-slash password-toggle" id="toggleConfirmPassword"></i>
+                </div>
+
+                <div class="form-floating mb-4">
+                    <input type="tel" class="form-control" id="phone_number" name="phone_number" placeholder=" ">
+                    <label for="phone_number">Phone Number</label>
+                </div>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="form-floating">
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="" selected></option>
+                                {% for role in roles %}
+                                <option value="{{ role.id }}">{{ role.role }}</option>
+                                {% endfor %}
+                            </select>
+                            <label for="role">Role</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="d-grid mt-2">
+                    <button type="submit" class="btn btn-register">
+                        <i class="bi bi-person-plus"></i> Create Admin
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Get CSRF token function
+        function getCSRFToken() {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, 10) === ('csrftoken=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(10));
+                        break;
+                    }
+                }
+            }
+            return cookieValue || "{{ csrf_token }}";
+        }
+
+        // Password toggle functionality
+        $('#togglePassword').on('click', function () {
+            const passwordInput = $('#password');
+            const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+            passwordInput.attr('type', type);
+            $(this).toggleClass('bi-eye-slash bi-eye');
+        });
+
+        $('#toggleConfirmPassword').on('click', function () {
+            const confirmPasswordInput = $('#confirmPassword');
+            const type = confirmPasswordInput.attr('type') === 'password' ? 'text' : 'password';
+            confirmPasswordInput.attr('type', type);
+            $(this).toggleClass('bi-eye-slash bi-eye');
+        });
+
+        // Password strength validation
+        function checkPasswordStrength(password) {
+            const hasMinLength = password.length >= 8;
+            $('#lengthReq').toggleClass('valid', hasMinLength);
+            $('#lengthReq i').toggleClass('bi-circle bi-check-circle', hasMinLength);
+
+            const hasUpperCase = /[A-Z]/.test(password);
+            $('#upperReq').toggleClass('valid', hasUpperCase);
+            $('#upperReq i').toggleClass('bi-circle bi-check-circle', hasUpperCase);
+
+            const hasNumber = /[0-9]/.test(password);
+            $('#numberReq').toggleClass('valid', hasNumber);
+            $('#numberReq i').toggleClass('bi-circle bi-check-circle', hasNumber);
+
+            const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            $('#specialReq').toggleClass('valid', hasSpecialChar);
+            $('#specialReq i').toggleClass('bi-circle bi-check-circle', hasSpecialChar);
+
+            return hasMinLength && hasUpperCase && hasNumber && hasSpecialChar;
+        }
+
+        // Password validation
+        function validatePassword() {
+            const password = $('#password').val();
+            const confirmPassword = $('#confirmPassword').val();
+            const isStrong = checkPasswordStrength(password);
+
+            if (!isStrong) {
+                $('#password')[0].setCustomValidity("Password doesn't meet requirements");
+                $('#password').addClass('is-invalid');
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                $('#confirmPassword')[0].setCustomValidity("Passwords don't match");
+                $('#confirmPassword').addClass('is-invalid');
+                return false;
+            }
+
+            $('#password')[0].setCustomValidity('');
+            $('#password').removeClass('is-invalid');
+            $('#confirmPassword')[0].setCustomValidity('');
+            $('#confirmPassword').removeClass('is-invalid');
+            return true;
+        }
+
+        $('#password').on('input', function () {
+            checkPasswordStrength($(this).val());
+            validatePassword();
+        });
+
+        $('#password, #confirmPassword').on('input', validatePassword);
+
+        // Form submission
+        $('#registrationForm').submit(function (e) {
+            e.preventDefault();
+            $('#errorContainer').empty().hide();
+            $('#successContainer').empty().hide();
+
+            if (!validatePassword()) {
+                if (!$('#password').val()) {
+                    showError("Please enter a password");
+                } else {
+                    showError("Password doesn't meet all requirements");
+                }
+                return;
+            }
+
+            const formData = {
+                work_email: $('#work_email').val().trim(),
+                first_name: $('#first_name').val().trim(),
+                last_name: $('#last_name').val().trim(),
+                password: $('#password').val(),
+                phone_number: $('#phone_number').val().trim() || null,
+                role: parseInt($('#role').val())
+            };
+
+            // Validate required fields
+            const requiredFields = ['work_email', 'first_name', 'last_name', 'password', 'role'];
+            const missingFields = requiredFields.filter(field => !formData[field]);
+            if (missingFields.length > 0) {
+                showError(`Missing or invalid required fields: ${missingFields.join(', ')}`);
+                return;
+            }
+
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(formData.work_email)) {
+                showError("Please enter a valid work email address");
+                return;
+            }
+
+            const btn = $(this).find('button[type="submit"]');
+            const originalText = btn.html();
+            btn.html(`<span class="spinner-border spinner-border-sm me-2"></span>Creating...`).prop('disabled', true);
+            $('body').css('cursor', 'wait');
+
+            $.ajax({
+                url: "{% url 'sign_up_view' %}",
+                type: "POST",
+                headers: {
+                    "X-CSRFToken": getCSRFToken(),
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (response) {
+                    btn.html(originalText).prop('disabled', false);
+                    $('body').css('cursor', '');
+
+                    if (response.status === 'success') {
+                        $('#successContainer').html(`
+                            <div class="alert alert-success d-flex align-items-start">
+                                <i class="bi bi-check-circle-fill me-2 mt-1"></i>
+                                <div>
+                                    <strong>Success!</strong> Account created successfully.
+                                    <div class="mt-1 text-muted small">
+                                        ID: ${response.data.id || 'N/A'} • ${response.data.work_email}
+                                    </div>
+                                </div>
+                            </div>
+                        `).show();
+                        $('#registrationForm')[0].reset();
+
+                        setTimeout(function () {
+                            window.location.href = "{% url 'login_view' %}";
+                        }, 2000);
+                    } else {
+                        showError(response.error || 'An unexpected error occurred during registration');
+                    }
+                },
+                error: function (xhr) {
+                    btn.html(originalText).prop('disabled', false);
+                    $('body').css('cursor', '');
+                    let errorMsg = 'An error occurred during registration';
+
+                    if (xhr.responseJSON) {
+                        if (xhr.responseJSON.errors) {
+                            errorMsg = Object.entries(xhr.responseJSON.errors)
+                                .map(([field, errors]) =>
+                                    `<b>${field.replace('_', ' ')}:</b> ${Array.isArray(errors) ? errors.join(', ') : errors}`
+                                )
+                                .join('<br>');
+                        } else if (xhr.responseJSON.error) {
+                            errorMsg = xhr.responseJSON.error;
+                        } else if (xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                    }
+
+                    if (xhr.status === 403) {
+                        errorMsg = 'Session expired. Please refresh the page and try again.';
+                    } else if (xhr.status === 400) {
+                        errorMsg = 'Invalid data submitted. Please check all fields.';
+                    } else if (xhr.status === 500) {
+                        errorMsg = 'Server error. Please try again later.';
+                    }
+
+                    showError(errorMsg);
+                }
+            });
+        });
+
+        function showError(message) {
+            $('#errorContainer').html(`
+                <div class="alert alert-danger d-flex align-items-start">
+                    <i class="bi bi-exclamation-octagon-fill me-2 mt-1"></i>
+                    <div>${message}</div>
+                </div>
+            `).show();
+
+            $('html, body').animate({
+                scrollTop: $('#errorContainer').offset().top - 100
+            }, 300);
+        }
+    });
+</script>
+
+</body>
+
+</html>

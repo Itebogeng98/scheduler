@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pending Sales Approvals</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .stats-card {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .stats-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+        }
+
+        .stats-icon.pending {
+            background-color: var(--warning-color);
+        }
+
+        .stats-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stats-number {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .stats-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f1f5f9;
+            border-bottom: 2px solid var(--border-color);
+            font-weight: 600;
+            color: #2c3e50;
+            padding: 15px 12px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table tbody td {
+            padding: 15px 12px;
+            vertical-align: middle;
+            border-color: var(--border-color);
+        }
+
+        .table tbody tr {
+            transition: background-color 0.2s;
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(52, 152, 219, 0.05);
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+            display: inline-block;
+            font-size: 0.9rem;
+            color: white;
+            /* default text color white */
+        }
+
+        .status-badge.status-approved {
+            background-color: green;
+        }
+
+        .status-badge.status-pending {
+            background-color: rgb(0, 0, 0);
+        }
+
+        .status-badge.status-partial {
+            background-color: #f0ad4e;
+            /* yellow/orange */
+        }
+
+        .status-badge.status-rejected {
+            background-color: red;
+        }
+
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-approved {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-rejected {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .btn-view {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-view:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .stats-card {
+                margin-top: 15px;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Pending Sales Approvals</h2>
+            <div class="stats-card">
+                <div class="stats-icon pending">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                        viewBox="0 0 16 16">
+                        <path
+                            d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                    </svg>
+                </div>
+                <div class="stats-text">
+                    <div class="stats-number">{{ pending_sales_count }}</div>
+                    <div class="stats-label">Pending Approvals</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select class="filter-select">
+                <option>All Companies</option>
+                <option>Company A</option>
+                <option>Company B</option>
+                <option>Company C</option>
+            </select>
+            <select class="filter-select">
+                <option>All Courses</option>
+                <option>Course A</option>
+                <option>Course B</option>
+                <option>Course C</option>
+            </select>
+            <select class="filter-select">
+                <option>All Sales People</option>
+                <option>John Doe</option>
+                <option>Jane Smith</option>
+                <option>Robert Johnson</option>
+            </select>
+            <select class="filter-select">
+                <option>All Statuses</option>
+                <option>Pending</option>
+                <option>Approved</option>
+                <option>Rejected</option>
+                <option>Partially_Approved</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Company</th>
+                        <th>Course</th>
+                        <th>Sales Person</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sale in sales %}
+                    <tr>
+                        <td>{{ sale.company }}</td>
+                        <td>{{ sale.course_code }}</td>
+                        <td>{{ sale.sales_person }}</td>
+                        <td>
+    <span class="status-badge 
+        {% if sale.status == 'approved' %}status-approved
+        {% elif sale.status == 'pending' %}status-pending
+        {% elif sale.status == 'partially_approved' %}status-partial
+        {% elif sale.status == 'rejected' %}status-rejected
+        {% endif %}">
+
+    </span>
+    &nbsp; <!-- small space -->
+    <strong>{{ sale.status }}</strong>
+</td>
+
+                        <td>
+                            {% if sale.status != 'approved' %}
+                            <a href="{% url 'approve_sale_view' sale.id %}" class="btn-view">View / Approve</a>
+                            {% endif %}
+                        </td>
+
+
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" fill="currentColor"
+                                    viewBox="0 0 16 16">
+                                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                                    <path
+                                        d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z" />
+                                </svg>
+                                <h4>No pending sales approvals</h4>
+                                <p>All sales requests have been processed or there are no pending requests at this time.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="text-muted">
+                Showing {% if sales %} {{ sales|length }} {% else %} 0 {% endif %} of {% if sales %} {{ sales|length }}
+                {% else %} 0 {% endif %} records
+            </div>
+            <nav>
+                <ul class="pagination">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

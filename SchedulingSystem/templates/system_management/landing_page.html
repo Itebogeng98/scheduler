@@ -1,0 +1,397 @@
+{% load static %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netcampus Group - Education & Technology Solutions</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #ff6600;
+      --primary-light: #ff8533;
+      --primary-dark: #cc5200;
+      --light-bg: #fff9f5;
+      --dark-text: #333;
+    }
+    
+    body {
+      background-color: #fff;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: var(--dark-text);
+      overflow-x: hidden;
+    }
+    
+    /* Navbar */
+    .navbar {
+      background-color: var(--primary);
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1.5rem;
+    }
+    
+    .logo {
+      height: 40px;
+      margin-right: 10px;
+    }
+    
+    .nav-link {
+      font-weight: 500;
+      margin: 0 10px;
+      transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+      transform: translateY(-2px);
+    }
+    
+    /* Hero Section */
+    .hero {
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                  url( 'static/images/ai_pic.png') no-repeat center center/cover;
+
+      color: white;
+      text-align: center;
+      position: relative;
+    }
+    
+    .hero-content {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .hero h1 {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 1.5rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    }
+    
+    .hero p {
+      font-size: 1.3rem;
+      margin-bottom: 2rem;
+    }
+    
+    /* Buttons */
+    .btn-custom {
+      background-color: white;
+      color: var(--primary);
+      border: none;
+      padding: 12px 30px;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(255, 102, 0, 0.3);
+    }
+    
+    .btn-custom:hover {
+      background-color: var(--primary-light);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(255, 102, 0, 0.4);
+    }
+    
+    .btn-outline-custom {
+      background-color: transparent;
+      color: white;
+      border: 2px solid white;
+      padding: 10px 28px;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.3s;
+    }
+    
+    .btn-outline-custom:hover {
+      background-color: white;
+      color: var(--primary);
+      transform: translateY(-3px);
+    }
+    
+    /* Section Styling */
+    .section {
+      padding: 80px 0;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+      color: var(--dark-text);
+    }
+    
+    .section-title h2 {
+      font-weight: 700;
+      position: relative;
+      padding-bottom: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .section-title h2:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 3px;
+      background-color: var(--primary);
+    }
+    
+    /* Features */
+    .feature-box {
+      text-align: center;
+      padding: 30px;
+      border-radius: 10px;
+      transition: all 0.3s;
+      margin-bottom: 30px;
+      background: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+    
+    .feature-box:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .feature-icon {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+    }
+    
+    
+    /* Testimonials */
+    .testimonial-card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      margin: 15px;
+    }
+    
+    /* .testimonial-img {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 15px;
+    } */
+    
+   
+    /* Footer */
+    .footer {
+      background-color: #333;
+      color: white;
+      padding: 60px 0 30px;
+    }
+    
+    .footer-title {
+      font-weight: 700;
+      margin-bottom: 25px;
+      position: relative;
+      padding-bottom: 10px;
+    }
+    
+    .footer-title:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 50px;
+      height: 2px;
+      background-color: var(--primary);
+    }
+    
+    .footer-links {
+      list-style: none;
+      padding: 0;
+    }
+    
+    .footer-links li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-links a {
+      color: #ccc;
+      transition: all 0.3s;
+      text-decoration: none;
+    }
+    
+    .footer-links a:hover {
+      color: white;
+      padding-left: 5px;
+    }
+    
+    .social-icons a {
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      background: rgba(255,255,255,0.1);
+      text-align: center;
+      line-height: 40px;
+      border-radius: 50%;
+      color: white;
+      margin-right: 10px;
+      transition: all 0.3s;
+    }
+    
+    .social-icons a:hover {
+      background: var(--primary);
+      transform: translateY(-5px);
+    }
+    
+    .copyright {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 20px;
+      margin-top: 30px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">
+        <img src="{% static 'images/logo.png' %}" alt="Church Logo" height="50"
+                        class="me-2 d-inline-block align-text-top ">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
+              data-bs-target="#navbarNav" aria-controls="navbarNav" 
+              aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Home</a>
+          </li>
+          
+          <li class="nav-item">
+            <a class="nav-link" href="#services">Services</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#contact">Support</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link btn btn-outline-light btn-sm ms-2" href="{% url 'login_view' %}">Login</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <h1>Unlocking Potential</h1>
+        <p>Netcampus Group provides cutting-edge educational solutions and technology services to institutions worldwide.</p>
+        <div class="d-flex gap-3 justify-content-center flex-wrap">
+          <a href="#" class="btn btn-custom btn-lg">Get Started</a>
+          <a href="#services" class="btn btn-outline-custom btn-lg">Our Services</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="services">
+    <div class="container">
+      <div class="section-title">
+        <h2>Our Services</h2>
+        <p>Comprehensive solutions for modern educational institutions</p>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <i class="fas fa-laptop-code"></i>
+            </div>
+            <h3>Learning Management Systems</h3>
+            <p>Custom LMS solutions tailored to your institution's needs with advanced tracking and reporting.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <i class="fas fa-calendar-alt"></i>
+            </div>
+            <h3>Smart Scheduling</h3>
+            <p>Intelligent scheduling systems that optimize resources and minimize conflicts for educational institutions.</p>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="feature-box">
+            <div class="feature-icon">
+              <i class="fas fa-chalkboard-teacher"></i>
+            </div>
+            <h3>IT Portal</h3>
+            <p>Interactive online learning environments with real-time collaboration tools.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer" id="contact">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-4 col-md-6">
+          <h4 class="footer-title">Netcampus Group</h4>
+          <p>Transforming education through innovative technology solutions and services.</p>
+          <div class="social-icons mt-4">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="col-lg-2 col-md-6">
+          <h4 class="footer-title">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#">Home</a></li>
+      
+            <li><a href="#services">Services</a></li>
+        
+            <li><a href="#contact">Support</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="footer-title">Services</h4>
+          <ul class="footer-links">
+            <li><a href="#">Scheduling Systems</a></li>
+            <li><a href="#">Analytics</a></li>
+            <li><a href="#">IT Consulting</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-6">
+          <h4 class="footer-title">Contact Us</h4>
+          <ul class="footer-links">
+            <li><i class="fas fa-map-marker-alt me-2"></i> Block 4,Lords Office Estate,276 West Ave, Centurion, 0163</li>
+            <li><i class="fas fa-phone me-2"> (012) 6631 593</i></li>
+            <li><i class="fas fa-envelope me-2"></i> info@netcampus.com</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 1997 Netcampus Group. All Rights Reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

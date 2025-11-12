@@ -1,0 +1,804 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Create Sale</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body class="bg-light">
+  <div class="container mt-4">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h4>Create Sale</h4>
+      </div>
+      <div class="card-body">
+        {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {% endif %}
+
+        <h2>Sales Person Info</h2>
+        <div class="row g-3">
+          <!-- Email address -->
+          <div class="col-md-6">
+            <label class="form-label">Email address of the person creating sales</label>
+            <input type="text" name="email" class="form-control" value="{{ user_email }}" readonly>
+          </div>
+
+          <!-- Sales Person -->
+          <div class="col-md-6">
+            <label class="form-label">Sales Person(s)</label>
+            <div id="sales-person-container">
+              <input type="text" name="sales_person[]" class="form-control mb-2" placeholder="Enter sales person"
+                required>
+            </div>
+            <button type="button" id="add-sales-person" class="btn btn-sm btn-outline-primary mt-1">Add another</button>
+          </div>
+
+
+        </div>
+
+        <h2 class="mt-4">Sales Details</h2>
+        <form id="sale-form">
+          <div class="row g-3">
+            <!-- Company -->
+            <div class="col-md-6">
+              <label class="form-label">Company</label>
+              <input type="text" name="company" class="form-control" required>
+            </div>
+
+            <!-- Client Type -->
+            <div class="col-md-6">
+              <label class="form-label">Client Type</label>
+              <select name="client_type" class="form-select" required>
+                <option value="">Select Client Type</option>
+                {% for ct in client_types %}
+                <option value="{{ ct.id }}">{{ ct.client_name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Class Type -->
+            <div class="col-md-6">
+              <label class="form-label">Class Type</label>
+              <select id="class_type_select" name="class_type" class="form-select" required>
+                <option value="">Select Class Type</option>
+                <option value="Virtual">Virtual</option>
+                <option value="On Premise">On Premise</option>
+                <option value="Off Site">Off Site</option>
+                <option value="Blended">Blended</option>
+              </select>
+            </div>
+
+            <!-- Training Location Container -->
+            <div class="col-md-6" id="training_location_container">
+              <label class="form-label">Training Location</label>
+              <!-- Dropdown for On Premise and Blended -->
+              <select id="training_location_select" name="training_location" class="form-select" style="display: none;">
+                <option value="">Select Training Location</option>
+                <option value="Centurion">Centurion NetCampus</option>
+                <option value="Cape Town">Cape Town NetCampus</option>
+                <option value="Fourways">Fourways NetCampus</option>
+              </select>
+
+              <!-- Text input for Off Site and Virtual -->
+              <input type="text" id="training_location_input" name="training_location_text" class="form-control"
+                style="display: none;" placeholder="Specify location">
+
+              <!-- Additional input for Blended online part -->
+              <input type="text" id="online_part_input" name="online_part" class="form-control mt-2"
+                style="display: none;" placeholder="Online part location">
+            </div>
+
+            <!-- Vendor -->
+            <div class="col-md-6">
+              <label class="form-label">Vendor</label>
+              <select name="vendor" class="form-select" required>
+                <option value="">Select Vendor</option>
+                {% for v in vendors %}
+                <option value="{{ v.id }}">{{ v.name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Course Name -->
+            <div class="col-md-6">
+              <label class="form-label">Course Name</label>
+              <select id="course_select" name="course_name" class="form-select" required>
+                <option value="">Select Course</option>
+                {% for c in courses %}
+                <option value="{{ c.course_description }}" data-course-code="{{ c.course_code }}">
+                  {{ c.course_description }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <!-- Course Code -->
+            <div class="col-md-6">
+              <label class="form-label">Course Code</label>
+              <input type="text" id="course_code" name="course_code" class="form-control" readonly>
+            </div>
+
+            <!-- Number of Students -->
+            <div class="col-md-6">
+              <label class="form-label">Number of Students</label>
+              <input type="number" name="number_of_students" class="form-control" min="1" required>
+            </div>
+
+            <!-- Proposed Date (Training Start Date) -->
+            <div class="col-md-6">
+              <label class="form-label">Training Start Date</label>
+              <input type="date" name="proposed_date" class="form-control" required>
+            </div>
+
+            <!-- Training End Date -->
+            <div class="col-md-6">
+              <label class="form-label">Training End Date</label>
+              <input type="date" name="training_end_date" class="form-control" required>
+            </div>
+          </div>
+
+          <h2 class="mt-4">Financial Information</h2>
+          <div class="row g-3">
+            <!-- Accepted Pricing -->
+            <div class="col-md-6">
+              <label class="form-label">Accepted Pricing</label>
+              <input type="text" name="accepted_pricing" class="form-control">
+            </div>
+
+            <!-- Order Purchased -->
+            <div class="col-md-6">
+              <label class="form-label">Order Purchased</label>
+              <input type="text" name="order_purchased" class="form-control">
+            </div>
+
+            <!-- Pricing Approved By -->
+            <div class="col-md-6">
+              <label class="form-label">Pricing Approved By</label>
+              <input type="text" name="pricing_approved_by" class="form-control">
+            </div>
+
+            <!-- Total Cost (calculated automatically) -->
+            <div class="col-md-6">
+              <label class="form-label">Total Cost</label>
+              <input type="number" step="0.01" name="total_cost" id="total_cost" class="form-control" readonly>
+            </div>
+
+            <!-- Revenue (calculated automatically) -->
+            <div class="col-md-6">
+              <label class="form-label">Revenue</label>
+              <input type="number" step="0.01" name="revenue" id="revenue" class="form-control" readonly>
+            </div>
+            <!-- GP (calculated automatically) -->
+            <div class="col-md-6">
+              <label class="form-label">GP in %</label>
+              <input type="number" step="0.01" name="gp" id="gp" class="form-control" readonly>
+            </div>
+          </div>
+
+          <h2 class="mt-4">Additional Information</h2>
+          <div class="row g-3">
+            <!-- Is Training Scheduled -->
+            <div class="col-md-6">
+              <label class="form-label">Is Training Scheduled</label>
+              <input type="text" name="is_training_scheduled" class="form-control">
+            </div>
+
+            <!-- Dietary Option -->
+            <div class="col-md-6">
+              <label class="form-label">Dietary Option</label>
+              <input type="text" name="dietary_option" class="form-control">
+            </div>
+
+            <!-- Specify -->
+            <div class="col-md-6">
+              <label class="form-label">Specify</label>
+              <input type="text" name="specify" class="form-control">
+            </div>
+          </div>
+
+          <!-- Checkboxes -->
+          <h2 class="mt-4">Status Options</h2>
+          <div class="row g-3">
+            <div class="col-md-12">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="sales_pack_uploaded">
+                <label class="form-check-label">Sales Pack Uploaded</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="existing_account">
+                <label class="form-check-label">Existing Account</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="confirmed_training">
+                <label class="form-check-label">Confirmed Training</label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="proof_of_payment">
+                <label class="form-check-label">Proof of Payment</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- User ID (hidden field) -->
+          <input type="hidden" name="user" value="{{ user.id }}">
+
+          <div class="mt-4">
+            <button type="submit" class="btn btn-success">Submit Sale</button>
+          </div>
+        </form>
+        <div id="message" class="mt-3"></div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      const apiUrl = "{{ api_url }}";
+      let courseId = null;
+      let isSubmitting = false;
+
+      // -------------------------
+      // Create confirmation modal
+      // -------------------------
+      function createConfirmationModal() {
+        if ($("#confirmationModal").length === 0) {
+          $("body").append(`
+                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning">
+                                <h5 class="modal-title" id="confirmationModalLabel">
+                                    <i class="fas fa-exclamation-triangle"></i> Confirm Sale Submission
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to submit this sale?</p>
+                                <div class="alert alert-info">
+                                    <strong>Please review your information:</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>Company: <span id="review-company"></span></li>
+                                        <li>Course: <span id="review-course"></span></li>
+                                        <li>Students: <span id="review-students"></span></li>
+                                        <li>Start Date: <span id="review-start-date"></span></li>
+                                        <li>Revenue: R<span id="review-revenue"></span></li>
+                                        <li>GP: <span id="review-gp"></span>%</li>
+                                    </ul>
+                                </div>
+                                <div id="negative-values-warning" class="alert alert-warning d-none">
+                                    <i class="fas fa-exclamation-triangle"></i> Warning: Negative revenue or GP values detected!
+                                </div>
+                                <p class="text-muted mt-3">This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-success" id="confirmSubmit">
+                                    <i class="fas fa-check"></i> Yes, Submit Sale
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+      }
+
+      // -------------------------
+      // Loader overlay
+      // -------------------------
+      function createLoaderOverlay() {
+        if ($("#loader-overlay").length === 0) {
+          $("body").append(`
+            <div id="loader-overlay" style="
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                display: none;
+                justify-content: center;
+                align-items: center;
+                z-index: 9999;
+                flex-direction: column;
+            ">
+                <div class="spinner-border text-primary" style="width: 4rem; height: 4rem; border-width: 0.3em;" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <div class="text-white mt-4 fs-5 fw-bold">Processing Your Sale...</div>
+            </div>
+        `);
+        }
+      }
+
+      function showLoader() {
+        $("#loader-overlay").css("display", "flex").hide().fadeIn(200); // ensure flex centering
+        $("button[type=submit]").prop("disabled", true).html(`
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Processing...
+    `);
+      }
+
+      function hideLoader() {
+        $("#loader-overlay").fadeOut(200);
+        $("button[type=submit]").prop("disabled", false).html("Submit Sale");
+      }
+
+      // -------------------------
+      // Training location fields
+      // -------------------------
+      function updateLocationField() {
+        const classType = $("#class_type_select").val();
+        $("#training_location_select, #training_location_input, #online_part_input").hide().val("");
+
+        if (classType === "On Premise") {
+          $("#training_location_select").show().attr("required", "required");
+        } else if (classType === "Off Site") {
+          $("#training_location_input").show().attr("placeholder", "Specify offsite location").attr("required", "required");
+        } else if (classType === "Virtual") {
+          $("#training_location_input").show().attr("placeholder", "Specify virtual platform/location").attr("required", "required");
+        } else if (classType === "Blended") {
+          $("#training_location_select").show().attr("required", "required");
+          $("#online_part_input").show().attr("placeholder", "Online part location");
+        }
+      }
+
+      // -------------------------
+      // Sales Person Management
+      // -------------------------
+      function addSalesPerson() {
+        $("#sales-person-container").append(
+          '<div class="input-group mb-2">' +
+          '<input type="text" name="sales_person[]" class="form-control" placeholder="Enter sales person name">' +
+          '<button type="button" class="btn btn-outline-danger remove-sales-person" title="Remove">' +
+          '<i class="fas fa-times"></i>' +
+          '</button>' +
+          '</div>'
+        );
+      }
+
+      function removeSalesPerson(button) {
+        $(button).closest('.input-group').remove();
+      }
+
+      function getSalesPersons() {
+        let salesPersons = [];
+        $("input[name='sales_person[]']").each(function () {
+          const value = $(this).val().trim();
+          if (value !== "") {
+            salesPersons.push(value);
+          }
+        });
+        return salesPersons;
+      }
+
+      // -------------------------
+      // Update costs from backend
+      // -------------------------
+      function updateCostAndRevenue() {
+        const clientTypeId = $("select[name=client_type]").val();
+        const numStudents = $("input[name=number_of_students]").val();
+
+        if (clientTypeId && numStudents && courseId) {
+          $.ajax({
+            url: `/scheduler/get_costsheet/${clientTypeId}/${courseId}/?num_students=${numStudents}`,
+            method: "GET",
+            success: function (res) {
+              $("#total_cost").val(parseFloat(res.total_cost || 0).toFixed(2));
+              $("#revenue").val(parseFloat(res.revenue || 0).toFixed(2));
+              $("#gp").val(parseFloat(res.gp_percent || 0).toFixed(2));
+
+              // Show warning for negative values
+              const revenue = parseFloat(res.revenue || 0);
+              const gp = parseFloat(res.gp_percent || 0);
+              if (revenue < 0 || gp < 0) {
+                $("#revenue-warning").removeClass("d-none");
+              } else {
+                $("#revenue-warning").addClass("d-none");
+              }
+            },
+            error: function () {
+              $("#total_cost").val("0.00");
+              $("#revenue").val("0.00");
+              $("#gp").val("0.00");
+              $("#revenue-warning").addClass("d-none");
+            }
+          });
+        } else {
+          $("#total_cost").val("0.00");
+          $("#revenue").val("0.00");
+          $("#gp").val("0.00");
+          $("#revenue-warning").addClass("d-none");
+        }
+      }
+
+      // -------------------------
+      // Validate form data before submission
+      // -------------------------
+      function validateFormData(formData) {
+        const errors = [];
+
+        // Check for negative values
+        const revenue = parseFloat(formData.revenue || 0);
+        const gp = parseFloat(formData.gp || 0);
+        if (revenue < 0) {
+          errors.push("Revenue cannot be negative");
+        }
+        if (gp < 0) {
+          errors.push("Gross Profit percentage cannot be negative");
+        }
+
+        // Validate numeric fields
+        const numStudents = parseInt(formData.number_of_students || 0);
+        if (numStudents <= 0) {
+          errors.push("Number of students must be greater than 0");
+        }
+
+        // Validate dates
+        const startDate = new Date(formData.proposed_date);
+        const endDate = new Date(formData.training_end_date);
+        if (endDate < startDate) {
+          errors.push("Training end date cannot be before start date");
+        }
+
+        return errors;
+      }
+
+      // -------------------------
+      // Clean form data for submission
+      // -------------------------
+      function cleanFormData(formData) {
+        const cleaned = { ...formData };
+
+        // Convert boolean-like strings to actual booleans
+        // if (typeof cleaned.is_training_scheduled === 'string') {
+        //   cleaned.is_training_scheduled = cleaned.is_training_scheduled === 'true' || cleaned.is_training_scheduled === '1';
+        // }
+        if (typeof cleaned.is_training_scheduled !== 'string') {
+          cleaned.is_training_scheduled = String(cleaned.is_training_scheduled);
+        }
+
+
+        // Ensure numeric fields are properly formatted
+        cleaned.number_of_students = parseInt(cleaned.number_of_students) || 0;
+        cleaned.total_cost = parseFloat(cleaned.total_cost) || 0.00;
+        cleaned.revenue = parseFloat(cleaned.revenue) || 0.00;
+        cleaned.gp = parseFloat(cleaned.gp) || 0.00;
+        cleaned.accepted_pricing = parseFloat(cleaned.accepted_pricing) || 0.00;
+
+        // Remove empty fields that might cause validation issues
+        if (!cleaned.specify || cleaned.specify === '66') {
+          delete cleaned.specify;
+        }
+
+        // Ensure dietary_option is valid or remove it
+        if (!cleaned.dietary_option || cleaned.dietary_option === '797') {
+          delete cleaned.dietary_option;
+        }
+
+        return cleaned;
+      }
+
+      // -------------------------
+      // Submit form
+      // -------------------------
+      function submitFormData(formData) {
+        isSubmitting = true;
+        showLoader();
+
+        // Clean the form data first
+        const cleanedData = cleanFormData(formData);
+
+        // Validate the cleaned data
+        const validationErrors = validateFormData(cleanedData);
+        if (validationErrors.length > 0) {
+          $("#message").html(`
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Validation Error!</strong><br>
+                    ${validationErrors.join('<br>')}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+          hideLoader();
+          isSubmitting = false;
+          $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
+          return;
+        }
+
+        // Ensure all required fields are present
+        if (!cleanedData.course_name) {
+          $("#message").html(`
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Error!</strong> Please select a course.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+          hideLoader();
+          isSubmitting = false;
+          return;
+        }
+
+        console.log("Submitting cleaned data:", cleanedData);
+
+        $.ajax({
+          url: apiUrl,
+          method: "POST",
+          data: JSON.stringify(cleanedData),
+          contentType: "application/json",
+          headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+          },
+          complete: function () {
+            hideLoader();
+            isSubmitting = false;
+          },
+          success: function (res) {
+            $("#message").html(`
+                    <div class="alert alert-success alert-dismissible fade show">
+                        <strong>Success!</strong> ${res.message || 'Sale created successfully! waiting for admin approval.'}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+            $("#sale-form")[0].reset();
+            $("#course_code").val("");
+            courseId = null;
+            updateLocationField();
+            updateCostAndRevenue();
+            $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
+          },
+          error: function (xhr) {
+            let err = "Error submitting sale";
+            try {
+              const response = JSON.parse(xhr.responseText);
+              err = response.message || response.error || err;
+              // Show field-specific errors if available
+              if (response.errors) {
+                err += "<br>" + Object.entries(response.errors).map(([field, messages]) =>
+                  `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+                ).join('<br>');
+              }
+            } catch (e) {
+              err = xhr.statusText || "Unknown error occurred";
+            }
+
+            $("#message").html(`
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        <strong>Error!</strong> ${err}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+            $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
+          }
+        });
+      }
+
+      // -------------------------
+      // Form submit handler
+      // -------------------------
+      $("#sale-form").on("submit", function (e) {
+        e.preventDefault();
+        if (isSubmitting) {
+          console.log("Already submitting, please wait...");
+          return;
+        }
+
+        // Basic form validation
+        const requiredFields = ['company', 'client_type', 'class_type', 'vendor', 'course_name', 'number_of_students', 'proposed_date', 'training_end_date'];
+        let isValid = true;
+        let firstInvalidField = null;
+
+        requiredFields.forEach(field => {
+          const value = $(`[name="${field}"]`).val();
+          if (!value) {
+            isValid = false;
+            if (!firstInvalidField) {
+              firstInvalidField = $(`[name="${field}"]`);
+            }
+            $(`[name="${field}"]`).addClass('is-invalid');
+          } else {
+            $(`[name="${field}"]`).removeClass('is-invalid');
+          }
+        });
+
+        // Validate training location based on class type
+        const classType = $("#class_type_select").val();
+        let trainingLocation = "";
+
+        if (classType === "On Premise") {
+          trainingLocation = $("#training_location_select").val();
+          if (!trainingLocation) {
+            isValid = false;
+            $("#training_location_select").addClass('is-invalid');
+          } else {
+            $("#training_location_select").removeClass('is-invalid');
+          }
+        } else if (classType === "Off Site" || classType === "Virtual") {
+          trainingLocation = $("#training_location_input").val();
+          if (!trainingLocation) {
+            isValid = false;
+            $("#training_location_input").addClass('is-invalid');
+          } else {
+            $("#training_location_input").removeClass('is-invalid');
+          }
+        } else if (classType === "Blended") {
+          trainingLocation = $("#training_location_select").val();
+          const onlinePart = $("#online_part_input").val();
+          if (!trainingLocation || !onlinePart) {
+            isValid = false;
+            if (!trainingLocation) $("#training_location_select").addClass('is-invalid');
+            if (!onlinePart) $("#online_part_input").addClass('is-invalid');
+          } else {
+            $("#training_location_select").removeClass('is-invalid');
+            $("#online_part_input").removeClass('is-invalid');
+          }
+        }
+
+        if (!isValid) {
+          $("#message").html(`
+                <div class="alert alert-danger alert-dismissible fade show">
+                    <strong>Error!</strong> Please fill in all required fields.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `);
+          if (firstInvalidField) {
+            $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 500);
+            firstInvalidField.focus();
+          }
+          return;
+        }
+
+        // Prepare form data
+        const formData = {};
+        $(this).serializeArray().forEach(item => {
+          formData[item.name] = item.value;
+        });
+        formData['gp'] = parseFloat($("#gp").val() || 0).toFixed(2);
+
+        // Handle checkboxes properly
+        $("#sale-form input[type=checkbox]").each(function () {
+          formData[this.name] = this.checked;
+        });
+
+        // Get sales persons
+        const salesPersons = getSalesPersons();
+        formData['sales_person'] = salesPersons.join(', ');
+
+        // Combine training location fields
+        if (classType === "On Premise") {
+          formData['training_location'] = $("#training_location_select").val();
+        } else if (classType === "Off Site" || classType === "Virtual") {
+          formData['training_location'] = $("#training_location_input").val();
+        } else if (classType === "Blended") {
+          formData['training_location'] = `${$("#training_location_select").val()} (Blended with ${$("#online_part_input").val()})`;
+        }
+
+        // Remove unused fields
+        delete formData['training_location_text'];
+        delete formData['online_part'];
+
+        // Ensure course_id is set correctly
+        if (courseId) {
+          formData['course_id'] = courseId;
+        }
+
+        console.log("Form data prepared:", formData);
+
+        // Update modal review info
+        $("#review-company").text(formData.company || "Not specified");
+        $("#review-course").text($("select[name=course_name] option:selected").text() || "Not selected");
+        $("#review-students").text(formData.number_of_students || "0");
+        $("#review-start-date").text(formData.proposed_date || "Not set");
+        $("#review-revenue").text(parseFloat(formData.revenue || 0).toFixed(2));
+        $("#review-gp").text(parseFloat(formData.gp || 0).toFixed(2));
+
+        // Show warning for negative values
+        const revenue = parseFloat(formData.revenue || 0);
+        const gp = parseFloat(formData.gp || 0);
+        if (revenue < 0 || gp < 0) {
+          $("#negative-values-warning").removeClass("d-none");
+        } else {
+          $("#negative-values-warning").addClass("d-none");
+        }
+
+        // Show confirmation modal
+        const confirmationModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+        confirmationModal.show();
+
+        // Confirm submission
+        $("#confirmSubmit").off('click').on('click', function () {
+          confirmationModal.hide();
+          submitFormData(formData);
+        });
+      });
+
+      // -------------------------
+      // Load vendors, clients, courses
+      // -------------------------
+      function loadPopulaters(vendorId = null, initialLoad = false) {
+        let url = "/scheduler_api/create_sale_api/";
+        if (vendorId) url += `?vendor_id=${vendorId}`;
+
+        $.getJSON(url, function (data) {
+          const populaters = data.populaters;
+
+          if (initialLoad) {
+            const clientTypeSelect = $("select[name=client_type]").empty().append(`<option value="">Select Client Type</option>`);
+            $.each(populaters.client_types, (i, ct) => clientTypeSelect.append(`<option value="${ct.id}">${ct.client_name}</option>`));
+
+            const vendorSelect = $("select[name=vendor]").empty().append(`<option value="">Select Vendor</option>`);
+            $.each(populaters.vendors, (i, v) => vendorSelect.append(`<option value="${v.id}">${v.name}</option>`));
+          }
+
+          const courseSelect = $("#course_select").empty().append(`<option value="">Select Course</option>`);
+          $.each(populaters.courses, (i, c) => courseSelect.append(`<option value="${c.id}" data-course-code="${c.course_code}">${c.course_description}</option>`));
+        }).fail(function () {
+          console.error("Failed to load populaters data");
+        });
+      }
+
+      // -------------------------
+      // Course selection handler
+      // -------------------------
+      function handleCourseSelection() {
+        const selectedOption = $(this).find(":selected");
+        courseId = selectedOption.val();
+        $("#course_code").val(selectedOption.data("course-code") || "");
+        updateCostAndRevenue();
+        console.log("Course selected - ID:", courseId, "Code:", $("#course_code").val());
+      }
+
+      // -------------------------
+      // Initial setup
+      // -------------------------
+      createConfirmationModal();
+      createLoaderOverlay();
+      updateLocationField();
+      loadPopulaters(null, true);
+
+      // Add warning element for negative values
+      if ($("#revenue-warning").length === 0) {
+        $("#revenue").after(`
+          <div id="revenue-warning" class="alert alert-warning d-none mt-2">
+            <i class="fas fa-exclamation-triangle"></i> Warning: Negative revenue or GP values detected. Please check your inputs.
+          </div>
+        `);
+      }
+
+      // Event listeners
+      $("#class_type_select").on("change", updateLocationField);
+      $("select[name=client_type], input[name=number_of_students]").on("change keyup", updateCostAndRevenue);
+      $("select[name=vendor]").on("change", function () {
+        loadPopulaters($(this).val(), false);
+      });
+
+      // Course selection - using direct event handler
+      $(document).on("change", "#course_select", handleCourseSelection);
+
+      // Sales person event listeners
+      $("#add-sales-person").on("click", addSalesPerson);
+      $(document).on("click", ".remove-sales-person", function () {
+        removeSalesPerson(this);
+      });
+
+      // Remove invalid class when user starts typing/selecting
+      $("input, select").on("input change", function () {
+        if ($(this).val()) {
+          $(this).removeClass('is-invalid');
+        }
+      });
+
+      console.log("Form initialization complete");
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

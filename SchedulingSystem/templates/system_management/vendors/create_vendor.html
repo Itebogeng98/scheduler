@@ -1,0 +1,74 @@
+{% load static %}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-3">
+        <div class="card-header bg-orange text-white">
+            <h4 class="mb-0">Create Vendor</h4>
+        </div>
+        <div class="card-body">
+            <form id="vendorForm">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Vendor Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+
+                <button type="submit" class="btn btn-orange w-100">Save Vendor</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="alertBox" class="alert mt-3 d-none"></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $("#vendorForm").submit(function(e) {
+        e.preventDefault();
+
+        var formData = {
+            name: $("#name").val(),
+            is_active: true,
+        };
+
+        var $alertBox = $("#alertBox");
+        const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+        $alertBox.addClass("d-none").removeClass("alert-success alert-danger");
+
+        $.ajax({
+            url: "/scheduler/vendors_create/",  // Adjusted URL to match the updated API endpoint
+            type: "POST",
+            contentType: "application/json",
+            headers: {
+                    'X-CSRFToken': csrfToken
+                },
+            data: JSON.stringify(formData),
+            success: function(data, textStatus, xhr) {
+                if (xhr.status === 201) {
+                    $alertBox
+                        .removeClass("d-none")
+                        .addClass("alert alert-success")
+                        .text("✅ Vendor created successfully!");
+                    $("#vendorForm")[0].reset();
+                } else {
+                    $alertBox
+                        .removeClass("d-none")
+                        .addClass("alert alert-danger")
+                        .text(data.error || "❌ Failed to create vendor.");
+                }
+            },
+            error: function(xhr) {
+                var errMsg = "⚠️ API connection error";
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errMsg = xhr.responseJSON.error;
+                }
+                $alertBox
+                    .removeClass("d-none")
+                    .addClass("alert alert-danger")
+                    .text(errMsg);
+            }
+        });
+    });
+});
+</script>

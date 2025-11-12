@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netcampus Cost Sheet Selector</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #fff7e6, #ffedcc);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: #ff7700;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .description {
+            font-size: 16px;
+            max-width: 800px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .template-options {
+            padding: 25px;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .option-card {
+            background: #fffaf0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            border: 1px solid #ffdd99;
+            cursor: pointer;
+        }
+        
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(255, 119, 0, 0.15);
+            border-color: #ff7700;
+        }
+        
+        .option-header {
+            background: #ff9900;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        
+        .option-content {
+            padding: 20px;
+        }
+        
+        .option-content p {
+            margin-bottom: 15px;
+            color: #666;
+        }
+        
+        .select-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #ff7700;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            transition: background 0.3s ease;
+            margin-top: 15px;
+        }
+        
+        .select-btn:hover {
+            background: #e65c00;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 14px;
+            padding: 20px;
+            border-top: 1px solid #ffdd99;
+            background: #fffaf0;
+        }
+        
+        @media (max-width: 768px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Netcampus Cost Sheet Selector</h1>
+            <p class="description">Choose the appropriate billing template for your project</p>
+        </header>
+        
+        <div class="template-options">
+            <div class="options-grid">
+                <div class="option-card" onclick="selectTemplate('Corporate Proj Virtual')">
+                    <div class="option-header">Corporate Project Virtual</div>
+                    <div class="option-content">
+                        <p>Virtual corporate training with instructor costs, LMS licensing, and content development.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Corporate Proj')">
+                    <div class="option-header">Corporate Project</div>
+                    <div class="option-content">
+                        <p>In-person corporate training with venue costs, refreshments, and instructor fees.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Projects Youth Virtual')">
+                    <div class="option-header">Projects Youth Virtual</div>
+                    <div class="option-content">
+                        <p>Virtual youth programs with QCTO/SETA consumables and welcome packs.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Projects Youth')">
+                    <div class="option-header">Projects Youth</div>
+                    <div class="option-content">
+                        <p>In-person youth training with assessor fees and recruitment costs.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Offsite')">
+                    <div class="option-header">Offsite</div>
+                    <div class="option-content">
+                        <p>Offsite training with travel, accommodation, and per diem calculations.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Virtual')">
+                    <div class="option-header">Virtual</div>
+                    <div class="option-content">
+                        <p>Fully virtual training with marketing fees and e-learning development.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Onsite')">
+                    <div class="option-header">Onsite</div>
+                    <div class="option-content">
+                        <p>Onsite client training with venue costs and travel considerations.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('Exams Cost Sheet')">
+                    <div class="option-header">Exams Cost Sheet</div>
+                    <div class="option-content">
+                        <p>Examination-only costing with exam and administrative fees.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+                
+                <div class="option-card" onclick="selectTemplate('External Cost Sheet')">
+                    <div class="option-header">External Cost Sheet</div>
+                    <div class="option-content">
+                        <p>External training providers with travel, accommodation, and manual costs.</p>
+                        <button class="select-btn">Select Template</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 Netcampus - Select the appropriate template for your billing needs</p>
+        </footer>
+    </div>
+
+    <script>
+        function selectTemplate(templateName) {
+            alert(`You have selected the ${templateName} template. This would open the appropriate cost sheet.`);
+            // In a real implementation, this would redirect to the actual template
+            // For example: window.location.href = `path/to/${templateName}.xlsx`;
+        }
+    </script>
+</body>
+</html>

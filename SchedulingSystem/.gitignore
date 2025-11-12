@@ -1,0 +1,88 @@
+# ==========================
+# Django & Python
+# ==========================
+__pycache__/
+*.py[cod]
+*$py.class
+db.sqlite3
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.so
+
+# ==========================
+# Environment & Secrets
+# ==========================
+.env
+.env.local
+.env.*.local
+*.env
+
+# ==========================
+# Virtual Environments
+# ==========================
+venv/
+env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ==========================
+# IDEs & Editors
+# ==========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ==========================
+# Django Migrations (optional)
+# Comment out if you want to keep migrations
+# ==========================
+# */migrations/
+# !*/migrations/__init__.py
+
+# ==========================
+# Static & Media files
+# (generated during collectstatic)
+# ==========================
+staticfiles/
+media/
+static/
+
+# ==========================
+# Node & Frontend Builds
+# ==========================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# ==========================
+# Mac & OS files
+# ==========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================
+# Coverage / Testing
+# ==========================
+.coverage
+htmlcov/
+.tox/
+.nox/
+.pytest_cache/
+coverage.xml
+nosetests.xml
+test_*.xml
+
+# ==========================
+# PyCharm
+# ==========================
+*.iml
+.idea/

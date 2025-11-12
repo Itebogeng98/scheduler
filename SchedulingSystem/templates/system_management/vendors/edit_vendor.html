@@ -1,0 +1,8 @@
+<h4>Edit Vendor: {{ vendor.name }}</h4>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a href="{% url 'vendors_view' %}" class="btn btn-secondary">Cancel</a>
+</form>

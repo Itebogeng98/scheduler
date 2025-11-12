@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Sheet Form - Net Campus</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary: #ff6600;
+            --primary-light: #ffb533;
+            --primary-dark: #cc5200;
+            --net-campus-blue: #ff6600;
+            --net-campus-light-blue: #e6f0ff;
+            --net-campus-gray: #f5f5f5;
+            --net-campus-dark: #333;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--net-campus-dark);
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: var(--net-campus-blue);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: var(--net-campus-blue);
+            border-bottom: 2px solid var(--net-campus-blue);
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        
+        .form-section {
+            background-color: var(--net-campus-gray);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+        
+        .form-group {
+            flex: 1 1 calc(33.333% - 15px);
+            min-width: 200px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--net-campus-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 86, 179, 0.2);
+        }
+        
+        .total-section {
+            background-color: var(--net-campus-light-blue);
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            border-left: 4px solid var(--net-campus-blue);
+        }
+        
+        .total-section label {
+            font-size: 18px;
+            color: var(--net-campus-blue);
+        }
+        
+        .total-section input {
+            font-size: 18px;
+            font-weight: bold;
+            background-color: white;
+        }
+        
+        button {
+            background-color: var(--net-campus-blue);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: block;
+            margin: 30px auto 0;
+        }
+        
+        button:hover {
+            background-color: #004494;
+        }
+        
+        #message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .form-group {
+                flex: 1 1 100%;
+            }
+        }
+        
+        .hidden-field {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Cost Sheet - Net Campus</h1>
+        
+        <form id="cost-sheet-form">
+            {% csrf_token %}
+            
+            <!-- Hidden fields for all possible form fields with default value of 0 -->
+            <input type="hidden" name="daily_venue_cost" value="0">
+            <input type="hidden" name="refreshment" value="0">
+            <input type="hidden" name="consumables" value="0">
+            <input type="hidden" name="instructor_cost" value="0">
+            <input type="hidden" name="courseware" value="0">
+            <input type="hidden" name="exam" value="0">
+            <input type="hidden" name="lab_fees" value="0">
+            <input type="hidden" name="lms_license" value="0">
+            <input type="hidden" name="data" value="0">
+            <input type="hidden" name="project_man_fee" value="0">
+            <input type="hidden" name="qcto_seta_consumables" value="0">
+            <input type="hidden" name="assessor_fees" value="0">
+            <input type="hidden" name="welcome_packs" value="0">
+            <input type="hidden" name="travel_flights" value="0">
+            <input type="hidden" name="accomodation" value="0">
+            <input type="hidden" name="per_diem" value="0">
+            <input type="hidden" name="international" value="0">
+            <input type="hidden" name="driving_travel" value="0">
+            <input type="hidden" name="sme_hour" value="0">
+            <input type="hidden" name="recruitment" value="0">
+            <input type="hidden" name="labs" value="0">
+            <input type="hidden" name="marketing_fee" value="0">
+            <input type="hidden" name="corporate_cost_content_dev" value="0">
+            <input type="hidden" name="admin_cost" value="0">
+            <input type="hidden" name="set_up_fee" value="0">
+            <input type="hidden" name="license_fee" value="0">
+            <input type="hidden" name="per_user_fee" value="0">
+            <input type="hidden" name="consulting" value="0">
+            <input type="hidden" name="analysis" value="0">
+            <input type="hidden" name="design" value="0">
+            <input type="hidden" name="development" value="0">
+            <input type="hidden" name="implementation" value="0">
+            <input type="hidden" name="evaluation" value="0">
+            <input type="hidden" name="e_learning_courseware" value="0">
+            <input type="hidden" name="corporate_costs_content_dev" value="0">
+            
+            <div class="form-section">
+                <h2>Classroom</h2>
+                <div class="form-row">
+                    {% if "daily_venue_cost" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Daily Venue Cost:</label>
+                        <input type="number" name="daily_venue_cost_visible" step="0.01" value="" class="cost-field" data-target="daily_venue_cost">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "refreshment" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Refreshment:</label>
+                        <input type="number" name="refreshment_visible" step="0.01" value="" class="cost-field" data-target="refreshment">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "consumables" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Consumables:</label>
+                        <input type="number" name="consumables_visible" step="0.01" value="" class="cost-field" data-target="consumables">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "instructor_cost" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Instructor Cost:</label>
+                        <input type="number" name="instructor_cost_visible" step="0.01" value="" class="cost-field" data-target="instructor_cost">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "courseware" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Courseware:</label>
+                        <input type="number" name="courseware_visible" step="0.01" value="" class="cost-field" data-target="courseware">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "exam" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Exam:</label>
+                        <input type="number" name="exam_visible" step="0.01" value="" class="cost-field" data-target="exam">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "lab_fees" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Lab Fees:</label>
+                        <input type="number" name="lab_fees_visible" step="0.01" value="" class="cost-field" data-target="lab_fees">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "lms_license" in allowed_fields %}
+                    <div class="form-group">
+                        <label>LMS License:</label>
+                        <input type="number" name="lms_license_visible" step="0.01" value="" class="cost-field" data-target="lms_license">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "data" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Data:</label>
+                        <input type="number" name="data_visible" step="0.01" value="" class="cost-field" data-target="data">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "project_man_fee" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Project Management Fee:</label>
+                        <input type="number" name="project_man_fee_visible" step="0.01" value="" class="cost-field" data-target="project_man_fee">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "qcto_seta_consumables" in allowed_fields %}
+                    <div class="form-group">
+                        <label>QCTO/SETA Consumables:</label>
+                        <input type="number" name="qcto_seta_consumables_visible" step="0.01" value="" class="cost-field" data-target="qcto_seta_consumables">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "assessor_fees" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Assessor Fees:</label>
+                        <input type="number" name="assessor_fees_visible" step="0.01" value="" class="cost-field" data-target="assessor_fees">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "welcome_packs" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Welcome Packs:</label>
+                        <input type="number" name="welcome_packs_visible" step="0.01" value="" class="cost-field" data-target="welcome_packs">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "travel_flights" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Travel Flights:</label>
+                        <input type="number" name="travel_flights_visible" step="0.01" value="" class="cost-field" data-target="travel_flights">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "accomodation" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Accommodation:</label>
+                        <input type="number" name="accomodation_visible" step="0.01" value="" class="cost-field" data-target="accomodation">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "per_diem" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Per Diem:</label>
+                        <input type="number" name="per_diem_visible" step="0.01" value="" class="cost-field" data-target="per_diem">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "international" in allowed_fields %}
+                    <div class="form-group">
+                        <label>International ($50):</label>
+                        <input type="number" name="international_visible" step="0.01" value="" class="cost-field" data-target="international">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "driving_travel" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Driving Travel (R4.89 p/km):</label>
+                        <input type="number" name="driving_travel_visible" step="0.01" value="" class="cost-field" data-target="driving_travel">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "sme_hour" in allowed_fields %}
+                    <div class="form-group">
+                        <label>SME Hour:</label>
+                        <input type="number" name="sme_hour_visible" step="0.01" value="" class="cost-field" data-target="sme_hour">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "recruitment" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Recruitment:</label>
+                        <input type="number" name="recruitment_visible" step="0.01" value="" class="cost-field" data-target="recruitment">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "labs" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Labs:</label>
+                        <input type="number" name="labs_visible" step="0.01" value="" class="cost-field" data-target="labs">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "marketing_fee" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Marketing Fee:</label>
+                        <input type="number" name="marketing_fee_visible" step="0.01" value="" class="cost-field" data-target="marketing_fee">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "corporate_cost_content_dev" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Corporate Cost Content Dev:</label>
+                        <input type="number" name="corporate_cost_content_dev_visible" step="0.01" value="" class="cost-field" data-target="corporate_cost_content_dev">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "admin_cost" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Admin Cost:</label>
+                        <input type="number" name="admin_cost_visible" step="0.01" value="" class="cost-field" data-target="admin_cost">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>LMS</h2>
+                <div class="form-row">
+                    {% if "set_up_fee" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Set-up Fee:</label>
+                        <input type="number" name="set_up_fee_visible" step="0.01" value="" class="cost-field" data-target="set_up_fee">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "license_fee" in allowed_fields %}
+                    <div class="form-group">
+                        <label>License Fee:</label>
+                        <input type="number" name="license_fee_visible" step="0.01" value="" class="cost-field" data-target="license_fee">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "per_user_fee" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Per User Fee:</label>
+                        <input type="number" name="per_user_fee_visible" step="0.01" value="" class="cost-field" data-target="per_user_fee">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-section">
+                <h2>Content Development</h2>
+                <div class="form-row">
+                    {% if "consulting" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Consulting:</label>
+                        <input type="number" name="consulting_visible" step="0.01" value="" class="cost-field" data-target="consulting">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "analysis" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Analysis:</label>
+                        <input type="number" name="analysis_visible" step="0.01" value="" class="cost-field" data-target="analysis">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "design" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Design:</label>
+                        <input type="number" name="design_visible" step="0.01" value="" class="cost-field" data-target="design">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "development" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Development:</label>
+                        <input type="number" name="development_visible" step="0.01" value="" class="cost-field" data-target="development">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "implementation" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Implementation:</label>
+                        <input type="number" name="implementation_visible" step="0.01" value="" class="cost-field" data-target="implementation">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "evaluation" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Evaluation:</label>
+                        <input type="number" name="evaluation_visible" step="0.01" value="" class="cost-field" data-target="evaluation">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "e_learning_courseware" in allowed_fields %}
+                    <div class="form-group">
+                        <label>E-learning Courseware:</label>
+                        <input type="number" name="e_learning_courseware_visible" step="0.01" value="" class="cost-field" data-target="e_learning_courseware">
+                    </div>
+                    {% endif %}
+                    
+                    {% if "corporate_costs_content_dev" in allowed_fields %}
+                    <div class="form-group">
+                        <label>Corporate Costs Content Dev:</label>
+                        <input type="number" name="corporate_costs_content_dev_visible" step="0.01" value="" class="cost-field" data-target="corporate_costs_content_dev">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="total-section">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Total Cost:</label>
+                        <input type="number" name="total_cost" step="0.01" value="0" readonly>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Per Learner:</label>
+                        <input type="number" name="per_learner" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Days:</label>
+                        <input type="number" name="days" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit">Submit Cost Sheet</button>
+        </form>
+        
+        <div id="message"></div>
+    </div>
+<script>
+    $(document).ready(function () {
+        const pathArray = window.location.pathname.split('/');
+        const clientId = pathArray[pathArray.length - 2];
+        const apiUrl = `/scheduler/client_type_cost_sheet/${clientId}/`;
+
+        function calculateTotal() {
+            let total = 0;
+            $(".cost-field").each(function () {
+                const val = parseFloat($(this).val()) || 0;
+                total += val;
+
+                // Update the corresponding hidden field
+                const targetField = $(this).data('target');
+                $(`input[name="${targetField}"]`).val(val);
+            });
+
+            // ✅ Ensure total_cost input gets updated in real time
+            $("input[name='total_cost']").val(total.toFixed(2));
+        }
+
+        // Initialize all hidden fields with 0
+        $(".cost-field").each(function () {
+            const targetField = $(this).data('target');
+            $(`input[name="${targetField}"]`).val(0);
+        });
+
+        $(".cost-field").on("input", calculateTotal);
+        calculateTotal(); // initial call
+
+        $("#cost-sheet-form").submit(function (e) {
+            e.preventDefault();
+
+            // ✅ Ensure total_cost is recalculated before submit
+            calculateTotal();
+
+            // Prepare form data
+            const formData = {
+                daily_venue_cost: parseFloat($("input[name='daily_venue_cost']").val()) || 0,
+                refreshment: parseFloat($("input[name='refreshment']").val()) || 0,
+                consumables: parseFloat($("input[name='consumables']").val()) || 0,
+                instructor_cost: parseFloat($("input[name='instructor_cost']").val()) || 0,
+                courseware: parseFloat($("input[name='courseware']").val()) || 0,
+                exam: parseFloat($("input[name='exam']").val()) || 0,
+                lab_fees: parseFloat($("input[name='lab_fees']").val()) || 0,
+                lms_license: parseFloat($("input[name='lms_license']").val()) || 0,
+                data: parseFloat($("input[name='data']").val()) || 0,
+                project_man_fee: parseFloat($("input[name='project_man_fee']").val()) || 0,
+                qcto_seta_consumables: parseFloat($("input[name='qcto_seta_consumables']").val()) || 0,
+                assessor_fees: parseFloat($("input[name='assessor_fees']").val()) || 0,
+                welcome_packs: parseFloat($("input[name='welcome_packs']").val()) || 0,
+                travel_flights: parseFloat($("input[name='travel_flights']").val()) || 0,
+                accomodation: parseFloat($("input[name='accomodation']").val()) || 0,
+                per_diem: parseFloat($("input[name='per_diem']").val()) || 0,
+                international: parseFloat($("input[name='international']").val()) || 0,
+                driving_travel: parseFloat($("input[name='driving_travel']").val()) || 0,
+                sme_hour: parseFloat($("input[name='sme_hour']").val()) || 0,
+                recruitment: parseFloat($("input[name='recruitment']").val()) || 0,
+                labs: parseFloat($("input[name='labs']").val()) || 0,
+                marketing_fee: parseFloat($("input[name='marketing_fee']").val()) || 0,
+                corporate_cost_content_dev: parseFloat($("input[name='corporate_cost_content_dev']").val()) || 0,
+                admin_cost: parseFloat($("input[name='admin_cost']").val()) || 0,
+                set_up_fee: parseFloat($("input[name='set_up_fee']").val()) || 0,
+                license_fee: parseFloat($("input[name='license_fee']").val()) || 0,
+                per_user_fee: parseFloat($("input[name='per_user_fee']").val()) || 0,
+                consulting: parseFloat($("input[name='consulting']").val()) || 0,
+                analysis: parseFloat($("input[name='analysis']").val()) || 0,
+                design: parseFloat($("input[name='design']").val()) || 0,
+                development: parseFloat($("input[name='development']").val()) || 0,
+                implementation: parseFloat($("input[name='implementation']").val()) || 0,
+                evaluation: parseFloat($("input[name='evaluation']").val()) || 0,
+                e_learning_courseware: parseFloat($("input[name='e_learning_courseware']").val()) || 0,
+                corporate_costs_content_dev: parseFloat($("input[name='corporate_costs_content_dev']").val()) || 0,
+
+                // ✅ Make sure this value is updated
+                total_cost: parseFloat($("input[name='total_cost']").val()) || 0,
+
+                per_learner: parseInt($("input[name='per_learner']").val()) || 0,
+                days: parseInt($("input[name='days']").val()) || 0
+            };
+
+            $.ajax({
+                url: apiUrl,
+                method: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(formData),
+                success: function (res) {
+                    $("#message").html(`<p class="text-success">✅ ${res.message}</p>`);
+                },
+                error: function (xhr) {
+                    $("#message").html(`<p class="text-danger">❌ Error: ${xhr.responseJSON?.message || "Something went wrong."}</p>`);
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sale Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-gray: #f8f9fa;
+            --border-color: #dee2e6;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h2 {
+            color: #2c3e50;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-pending {
+            background-color: rgba(243, 156, 18, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-approved {
+            background-color: rgba(46, 204, 113, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-rejected {
+            background-color: rgba(231, 76, 60, 0.1);
+            color: var(--danger-color);
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+
+        .form-section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section:last-of-type {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .form-control,
+        .form-select {
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 10px 12px;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+
+        .form-control[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 0 -10px;
+        }
+
+        .form-group {
+            flex: 1 0 300px;
+            padding: 0 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(46, 204, 113, 0.3);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+        }
+
+        .required::after {
+            content: " *";
+            color: var(--danger-color);
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .approval-section {
+            background-color: rgba(52, 152, 219, 0.05);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .form-group {
+                flex: 1 0 100%;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Sale Details</h2>
+            <div class="status-badge status-pending">{{ sale.status }}</div>
+        </div>
+
+        <form method="post" action="{% url 'approve_or_reject_sale' sale.id %}">
+            {% csrf_token %}
+
+            <div class="form-container">
+                <!-- Company & Course Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Company & Course Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Company</label>
+                            <input type="text" name="company" class="form-control" value="{{ sale.company }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Course Name</label>
+                            <input type="text" name="course_name" class="form-control" value="{{ sale.course_name }}"
+                                readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Number of Students</label>
+                            <input type="number" name="number_of_students" class="form-control"
+                                value="{{ sale.number_of_students }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Sales Person</label>
+                            <input type="text" name="sales_person" class="form-control" value="{{ sale.sales_person }}"
+                                readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Training Schedule -->
+                <div class="form-section">
+                    <h3 class="section-title">Training Schedule</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Proposed Start Date</label>
+                            <input type="date" name="proposed_date" class="form-control"
+                                value="{{ sale.proposed_date|date:'Y-m-d' }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Training End Date</label>
+                            <input type="date" name="training_end_date" class="form-control"
+                                value="{{ sale.training_end_date }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Trainer</label>
+                            <select name="trainer" class="form-select" {% if user.role.role != "Training Manager" and user.role.role != "CEO" %}disabled{% endif %}>
+            <option value="">Select Trainer</option>
+            {% for trainer in trainers %}
+                <option value="{{ trainer.id }}" {% if sale.trainer and sale.trainer.id == trainer.id %}selected{% endif %}>
+                    {{ trainer.first_name }} {{ trainer.last_name }}
+                </option>
+            {% endfor %}
+        </select>
+                            {% if user.role.role != "Training Manager" and user.role.role != "CEO" %}
+                            <div class="help-text">Only Training Manager or CEO can assign trainers</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Branch / Training Platform</label>
+                            <input type="text" name="branch" class="form-control" value="{{ sale.training_location }}"
+                                readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Financial Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Financial Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Pricing Accepted</label>
+                            <input type="text" name="pricing_accepted" class="form-control"
+                                value="{{ sale.accepted_pricing }}" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Pricing Approved By</label>
+                            <input type="text" name="pricing_approved_by" class="form-control"
+                                value="{{ sale.pricing_approved_by }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Revenue</label>
+                            <div class="input-group">
+                                <span class="input-group-text">R</span>
+                                <input type="number" step="0.01" name="revenue" class="form-control"
+                                    value="{{ sale.revenue }}" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Proof of Payment</label>
+                            <input type="text" name="proof_of_payment" class="form-control"
+                                value="{{ sale.proof_of_payment }}" readonly>
+                            <div class="help-text">Reference number or document ID</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Information -->
+                <div class="form-section">
+                    <h3 class="section-title">Additional Information</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Status</label>
+                            <input type="text" readonly class="form-control" value="{{ sale.status|title }}">
+                            <div class="help-text">Current approval status</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1 0 100%">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control" rows="4" readonly>{{ sale.notes }}</textarea>
+                            <div class="help-text">Additional information or requirements</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approval Section -->
+                {% if user.role.role == "Training Manager" or user.role.role == "CEO" %}
+                <div class="approval-section">
+                    <div class="form-row">
+                        <div class="form-group" style="flex: 1 0 100%">
+                            <label class="form-label">Approval Notes/Actions</label>
+                            <textarea name="approval_notes" class="form-control" rows="3"
+                                placeholder="Add approval notes (optional)..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="btn-group mt-3">
+                        {% if user.role.role == "Training Manager" %}
+                        <button type="submit" name="action" value="approve" class="btn btn-success">
+                            Approve Sale
+                        </button>
+                        {% elif user.role.role == "CEO" %}
+                        <button type="submit" name="action" value="approve" class="btn btn-primary">
+                            CEO Approve Sale
+                        </button>
+                        {% endif %}
+
+                        {% if user.role.role == "Training Manager" or user.role.role == "CEO" %}
+                        <button type="submit" name="action" value="reject" class="btn btn-danger">
+                            Reject Sale
+                        </button>
+                        {% endif %}
+
+                        <a href="{% url 'list_sales_for_approval' %}" class="btn btn-outline-secondary">
+                            Back to List
+                        </a>
+                    </div>
+
+                </div>
+                {% else %}
+                <div class="btn-group mt-3">
+                    <a href="{% url 'list_sales_for_approval' %}" class="btn btn-outline-secondary">Back to List</a>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

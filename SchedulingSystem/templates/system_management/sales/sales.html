@@ -1,0 +1,387 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+
+    <style>
+        :root {
+            --net-orange: #FF6B35;
+            --net-orange-light: #FFF1EB;
+            --dark-bg: #2C3E50;
+            --light-bg: #F8F9FA;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            background-color: #f5f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--net-orange) !important;
+        }
+
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 73px);
+        }
+
+        .sidebar {
+            background-color: var(--dark-bg);
+            color: white;
+            width: var(--sidebar-width);
+            min-height: 100%;
+            transition: all 0.3s;
+        }
+
+        .sidebar-heading {
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 15px;
+        }
+
+        .filter-section {
+            margin-bottom: 20px;
+        }
+
+        .filter-section h6 {
+            color: var(--net-orange);
+            margin-bottom: 10px;
+        }
+
+        .custom-shadow {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 6px;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+            border: none;
+        }
+
+        .card-header {
+            border-radius: 10px 10px 0 0 !important;
+            padding: 15px 20px;
+        }
+
+        .badge-confirmed {
+            background-color: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .badge-pending {
+            background-color: #ffc107;
+            color: black;
+            padding: 5px 10px;
+            border-radius: 20px;
+        }
+
+        .badge-net-orange {
+            background-color: var(--net-orange);
+            color: white;
+        }
+
+        .btn-net-orange {
+            background-color: var(--net-orange);
+            color: white;
+            border: none;
+        }
+
+        .btn-net-orange:hover {
+            background-color: #e55a2b;
+            color: white;
+        }
+
+        .btn-outline-net-orange {
+            color: var(--net-orange);
+            border-color: var(--net-orange);
+        }
+
+        .btn-outline-net-orange:hover {
+            background-color: var(--net-orange);
+            color: white;
+        }
+
+        .nav-tabs .nav-link {
+            border: none;
+            border-bottom: 3px solid transparent;
+            padding: 10px 15px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .nav-tabs .nav-link.active {
+            background: transparent;
+            border-bottom: 3px solid var(--net-orange);
+            color: var(--net-orange);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(255, 107, 53, 0.05);
+        }
+
+        .table thead th {
+            border-bottom: 2px solid var(--net-orange);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="main-container">
+        <!-- Sidebar Filters -->
+        <div class="col-md-3 col-lg-2 sidebar p-4">
+            <h4 class="mt-3 mb-4 sidebar-heading"><i class="fas fa-filter me-2"></i>Filters</h4>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-building me-1"></i> Company</h6>
+                <input type="text" name="company" class="form-control mb-3 custom-shadow"
+                    placeholder="Search company...">
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-building me-1"></i> Branch</h6>
+                <input type="text" name="company" class="form-control mb-3 custom-shadow"
+                    placeholder="Search Branch...">
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-book me-1"></i> Trainer </h6>
+                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                    placeholder="Search Trainer...">
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-book me-1"></i> Sales Person</h6>
+                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                    placeholder="Search course...">
+            </div>
+
+
+            <div class="filter-section">
+                <h6><i class="fas fa-users me-1"></i> Client Type</h6>
+                <select class="form-select mb-3 custom-shadow">
+                    <option value="">All Types</option>
+                    <option value="corporate">Corporate Proj Virtual</option>
+                    <option value="CorporateV">Corporate Proj</option>
+                    <option value="ProjectYouthV">Project Youth Virtual</option>
+                    <option value="ProjectYouth">Project Youth</option>
+                    <option value="OffSide">OffSide</option>
+                    <option value="Virtual">Virtual</option>
+                    <option value="Onsite">Onsite</option>
+                </select>
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-chalkboard me-1"></i> Class Type</h6>
+                <select class="form-select mb-3 custom-shadow">
+                    <option value="">All Classes</option>
+                    <option value="online">Online</option>
+                    <option value="in-person">In-Person</option>
+                    <option value="hybrid">Hybrid</option>
+                </select>
+            </div>
+            <div class="filter-section">
+                <h6><i class="fas fa-book me-1"></i>Confirmend Course</h6>
+                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                    placeholder="Search confirmed course...">
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-book me-1"></i> Course</h6>
+                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                    placeholder="Search course...">
+            </div>
+
+            <div class="filter-section">
+                <h6><i class="fas fa-calendar me-1"></i> Date Range</h6>
+                <label class="small">From</label>
+                <input type="date" class="form-control mb-2 custom-shadow">
+                <label class="small">To</label>
+                <input type="date" class="form-control mb-3 custom-shadow">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button class="btn btn-net-orange py-2" type="button">
+                    <i class="fas fa-check-circle me-1"></i> Apply Filters
+                </button>
+                <button class="btn btn-outline-light py-2" type="button">
+                    <i class="fas fa-redo me-1"></i> Reset Filters
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="content-area">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <a href="{% url 'create_sales' %}" class="btn btn-net-orange">
+                    <i class="fas fa-plus me-1"></i> New Training
+                </a>
+            </div>
+
+
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="schedule-tab" data-bs-toggle="tab" data-bs-target="#schedule"
+                        type="button" role="tab" aria-controls="schedule" aria-selected="true">
+                        <i class="fas fa-table me-2"></i>Training Schedule
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tabs Content -->
+            <div class="tab-content" id="dashboardTabsContent">
+                <div class="tab-pane fade show active" id="schedule" role="tabpanel" aria-labelledby="schedule-tab">
+                    <!-- Schedule Table -->
+                    <div class="card border-0 shadow">
+                        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-table me-2"></i>Training Schedule</h5>
+                            <div class="d-flex">
+                                <button class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fas fa-download"></i> Export
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-sync-alt"></i> Refresh
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table id="scheduleTable" class="table table-hover table-striped">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Sales Person</th>
+                                        <th>Branch</th>
+                                        <th>Company</th>
+                                        <th>Course</th>
+                                        <th>Students</th>
+                                        <th>Training Start</th>
+                                        <th>Training End</th>
+                                        <th>Trainer</th>
+                                        <th>Dietary Options</th>
+                                        <th>Client Type</th>
+                                        <th>Course Code</th>
+                                        <th>Notes</th>
+                                        <th>GP</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for sale in sales %}
+                                    <tr>
+                                        <td>
+                                            
+                                            {{ sale.sales_person }}
+                                        </td>
+                                        <td>{{ sale.training_location }}</td>
+                                        <td>{{ sale.company }}</td>
+                                        
+                                        <td>{{ sale.course_name }}</td>
+                                        <td>{{ sale.number_of_students }}</td>
+                                        <td>{{ sale.date_of_application }}</td>
+                                        <td>{{ sale.training_end_date }}</td>
+                                        <td>{{ sale.training_name }}</td>
+                                        <td>{{ sale.dietary_option }}</td>
+                                        <td>
+                                            
+                                            {{ sale.client_type_name }}
+                                            
+                                        </td>
+                                        <td>{{ sale.course_code }}</td>
+                                        <td>{{ sale.specify }}</td>
+                                        <td>
+                                            {{ sale.gp }}
+                                        </td>
+                                        <td>
+                                            {{ sale.status|capfirst }}
+                                        </td>
+                                        <td>
+                                            <a href="#"
+                                                class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="#"
+                                                class="btn btn-sm btn-danger">Delete</a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="16" class="text-center">No sales found.</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+    <!-- DataTables JS -->
+    <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#scheduleTable').DataTable({
+                responsive: true,
+                pageLength: 10,
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+            });
+
+            // Filter functionality (basic implementation)
+            // $('.btn-net-orange').on('click', function() {
+            //     alert('Filters applied!'); // Replace with actual filter logic
+            // });
+
+            $('.btn-outline-light').on('click', function () {
+                $('input, select').val('');
+                alert('Filters reset!'); // Replace with actual reset logic
+            });
+        });
+    </script>
+</body>
+
+</html>
