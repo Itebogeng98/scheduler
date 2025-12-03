@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- DataTables CSS -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.1/css/dataTables.bootstrap5.min.css">
+    <!-- DataTables Buttons CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.2/css/buttons.bootstrap5.min.css">
 
     <style>
         :root {
@@ -170,35 +172,34 @@
 
             <div class="filter-section">
                 <h6><i class="fas fa-building me-1"></i> Company</h6>
-                <input type="text" name="company" class="form-control mb-3 custom-shadow"
+                <input type="text" id="companyFilter" class="form-control mb-3 custom-shadow"
                     placeholder="Search company...">
             </div>
 
             <div class="filter-section">
                 <h6><i class="fas fa-building me-1"></i> Branch</h6>
-                <input type="text" name="company" class="form-control mb-3 custom-shadow"
+                <input type="text" id="branchFilter" class="form-control mb-3 custom-shadow"
                     placeholder="Search Branch...">
             </div>
 
             <div class="filter-section">
                 <h6><i class="fas fa-book me-1"></i> Trainer </h6>
-                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                <input type="text" id="trainerFilter" class="form-control mb-3 custom-shadow"
                     placeholder="Search Trainer...">
             </div>
 
             <div class="filter-section">
                 <h6><i class="fas fa-book me-1"></i> Sales Person</h6>
-                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
-                    placeholder="Search course...">
+                <input type="text" id="salesPersonFilter" class="form-control mb-3 custom-shadow"
+                    placeholder="Search sales person...">
             </div>
-
 
             <div class="filter-section">
                 <h6><i class="fas fa-users me-1"></i> Client Type</h6>
-                <select class="form-select mb-3 custom-shadow">
+                <select class="form-select mb-3 custom-shadow" id="clientTypeFilter">
                     <option value="">All Types</option>
-                    <option value="corporate">Corporate Proj Virtual</option>
-                    <option value="CorporateV">Corporate Proj</option>
+                    <option value="corporate">Corporate Project Virtual</option>
+                    <option value="CorporateV">Corporate Project</option>
                     <option value="ProjectYouthV">Project Youth Virtual</option>
                     <option value="ProjectYouth">Project Youth</option>
                     <option value="OffSide">OffSide</option>
@@ -209,38 +210,39 @@
 
             <div class="filter-section">
                 <h6><i class="fas fa-chalkboard me-1"></i> Class Type</h6>
-                <select class="form-select mb-3 custom-shadow">
+                <select class="form-select mb-3 custom-shadow" id="classTypeFilter">
                     <option value="">All Classes</option>
                     <option value="online">Online</option>
                     <option value="in-person">In-Person</option>
                     <option value="hybrid">Hybrid</option>
                 </select>
             </div>
+            
             <div class="filter-section">
-                <h6><i class="fas fa-book me-1"></i>Confirmend Course</h6>
-                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                <h6><i class="fas fa-book me-1"></i>Confirmed Course</h6>
+                <input type="text" id="confirmedCourseFilter" class="form-control mb-3 custom-shadow"
                     placeholder="Search confirmed course...">
             </div>
 
             <div class="filter-section">
                 <h6><i class="fas fa-book me-1"></i> Course</h6>
-                <input type="text" name="course_name" class="form-control mb-3 custom-shadow"
+                <input type="text" id="courseFilter" class="form-control mb-3 custom-shadow"
                     placeholder="Search course...">
             </div>
 
             <div class="filter-section">
                 <h6><i class="fas fa-calendar me-1"></i> Date Range</h6>
                 <label class="small">From</label>
-                <input type="date" class="form-control mb-2 custom-shadow">
+                <input type="date" id="dateFromFilter" class="form-control mb-2 custom-shadow">
                 <label class="small">To</label>
-                <input type="date" class="form-control mb-3 custom-shadow">
+                <input type="date" id="dateToFilter" class="form-control mb-3 custom-shadow">
             </div>
 
             <div class="d-grid gap-2">
-                <button class="btn btn-net-orange py-2" type="button">
+                <button class="btn btn-net-orange py-2" type="button" id="applyFilters">
                     <i class="fas fa-check-circle me-1"></i> Apply Filters
                 </button>
-                <button class="btn btn-outline-light py-2" type="button">
+                <button class="btn btn-outline-light py-2" type="button" id="resetFilters">
                     <i class="fas fa-redo me-1"></i> Reset Filters
                 </button>
             </div>
@@ -253,7 +255,6 @@
                     <i class="fas fa-plus me-1"></i> New Training
                 </a>
             </div>
-
 
             <!-- Tabs Navigation -->
             <ul class="nav nav-tabs mb-4" id="dashboardTabs" role="tablist">
@@ -273,10 +274,10 @@
                         <div class="card-header bg-white d-flex justify-content-between align-items-center">
                             <h5 class="mb-0"><i class="fas fa-table me-2"></i>Training Schedule</h5>
                             <div class="d-flex">
-                                <button class="btn btn-sm btn-outline-secondary me-2">
-                                    <i class="fas fa-download"></i> Export
+                                <button class="btn btn-sm btn-outline-secondary me-2" id="exportCSV">
+                                    <i class="fas fa-download"></i> Export CSV
                                 </button>
-                                <button class="btn btn-sm btn-outline-secondary">
+                                <button class="btn btn-sm btn-outline-secondary" id="refreshTable">
                                     <i class="fas fa-sync-alt"></i> Refresh
                                 </button>
                             </div>
@@ -305,37 +306,23 @@
                                 <tbody>
                                     {% for sale in sales %}
                                     <tr>
-                                        <td>
-                                            
-                                            {{ sale.sales_person }}
-                                        </td>
+                                        <td>{{ sale.sales_person }}</td>
                                         <td>{{ sale.training_location }}</td>
                                         <td>{{ sale.company }}</td>
-                                        
                                         <td>{{ sale.course_name }}</td>
                                         <td>{{ sale.number_of_students }}</td>
                                         <td>{{ sale.date_of_application }}</td>
                                         <td>{{ sale.training_end_date }}</td>
                                         <td>{{ sale.training_name }}</td>
                                         <td>{{ sale.dietary_option }}</td>
-                                        <td>
-                                            
-                                            {{ sale.client_type_name }}
-                                            
-                                        </td>
+                                        <td>{{ sale.client_type_name }}</td>
                                         <td>{{ sale.course_code }}</td>
                                         <td>{{ sale.specify }}</td>
+                                        <td>{{ sale.gp }}</td>
+                                        <td>{{ sale.status|capfirst }}</td>
                                         <td>
-                                            {{ sale.gp }}
-                                        </td>
-                                        <td>
-                                            {{ sale.status|capfirst }}
-                                        </td>
-                                        <td>
-                                            <a href="#"
-                                                class="btn btn-sm btn-primary">Edit</a>
-                                            <a href="#"
-                                                class="btn btn-sm btn-danger">Delete</a>
+                                            <a href="#" class="btn btn-sm btn-primary">Edit</a>
+                                            <a href="#" class="btn btn-sm btn-danger">Delete</a>
                                         </td>
                                     </tr>
                                     {% empty %}
@@ -344,9 +331,7 @@
                                     </tr>
                                     {% endfor %}
                                 </tbody>
-
                             </table>
-
                         </div>
                     </div>
                 </div>
@@ -361,24 +346,160 @@
     <!-- DataTables JS -->
     <script src="https://cdn.datatables.net/1.13.1/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.1/js/dataTables.bootstrap5.min.js"></script>
+    <!-- DataTables Buttons -->
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.3.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
 
     <script>
         $(document).ready(function () {
-            // Initialize DataTable
-            $('#scheduleTable').DataTable({
+            // Initialize DataTable with export functionality
+            var table = $('#scheduleTable').DataTable({
                 responsive: true,
                 pageLength: 10,
-                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+                lengthMenu: [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]],
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv me-1"></i> Export CSV',
+                        className: 'btn btn-sm btn-outline-secondary',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ]
             });
 
-            // Filter functionality (basic implementation)
-            // $('.btn-net-orange').on('click', function() {
-            //     alert('Filters applied!'); // Replace with actual filter logic
-            // });
+            // Apply Filters Function
+            $('#applyFilters').on('click', function() {
+                applyFilters();
+            });
 
-            $('.btn-outline-light').on('click', function () {
-                $('input, select').val('');
-                alert('Filters reset!'); // Replace with actual reset logic
+            // Reset Filters Function
+            $('#resetFilters').on('click', function() {
+                resetFilters();
+            });
+
+            // Export CSV Function
+            $('#exportCSV').on('click', function() {
+                table.button('.buttons-csv').trigger();
+            });
+
+            // Refresh Table Function
+            $('#refreshTable').on('click', function() {
+                table.ajax.reload();
+                // In a real application, you might want to reload data from server
+                // For now, we'll just reset the filters
+                resetFilters();
+            });
+
+            // Function to apply all filters
+            function applyFilters() {
+                // Get filter values
+                var companyFilter = $('#companyFilter').val().toLowerCase();
+                var branchFilter = $('#branchFilter').val().toLowerCase();
+                var trainerFilter = $('#trainerFilter').val().toLowerCase();
+                var salesPersonFilter = $('#salesPersonFilter').val().toLowerCase();
+                var clientTypeFilter = $('#clientTypeFilter').val();
+                var classTypeFilter = $('#classTypeFilter').val();
+                var confirmedCourseFilter = $('#confirmedCourseFilter').val().toLowerCase();
+                var courseFilter = $('#courseFilter').val().toLowerCase();
+                var dateFromFilter = $('#dateFromFilter').val();
+                var dateToFilter = $('#dateToFilter').val();
+
+                // Apply filters to DataTable
+                table.columns(0).search(salesPersonFilter); // Sales Person column
+                table.columns(1).search(branchFilter); // Branch column
+                table.columns(2).search(companyFilter); // Company column
+                table.columns(3).search(courseFilter); // Course column
+                table.columns(7).search(trainerFilter); // Trainer column
+                
+                // For dropdown filters (Client Type and Class Type)
+                // We need to handle these differently since they're exact matches
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        var clientType = data[9] || ''; // Client Type column
+                        var status = data[13] || ''; // Status column (for confirmed course)
+                        
+                        // Client Type filter
+                        if (clientTypeFilter && clientTypeFilter !== '' && clientType !== clientTypeFilter) {
+                            return false;
+                        }
+                        
+                        // Confirmed Course filter
+                        if (confirmedCourseFilter && confirmedCourseFilter !== '') {
+                            // This is a simplified check - you might need to adjust based on your data structure
+                            if (status.toLowerCase().indexOf('confirmed') === -1 && 
+                                status.toLowerCase().indexOf(confirmedCourseFilter) === -1) {
+                                return false;
+                            }
+                        }
+                        
+                        // Date range filter
+                        if (dateFromFilter || dateToFilter) {
+                            var trainingStart = data[5] || ''; // Training Start column
+                            
+                            if (trainingStart) {
+                                var startDate = new Date(trainingStart);
+                                var fromDate = dateFromFilter ? new Date(dateFromFilter) : null;
+                                var toDate = dateToFilter ? new Date(dateToFilter) : null;
+                                
+                                if (fromDate && startDate < fromDate) {
+                                    return false;
+                                }
+                                
+                                if (toDate && startDate > toDate) {
+                                    return false;
+                                }
+                            }
+                        }
+                        
+                        return true;
+                    }
+                );
+                
+                // Redraw the table
+                table.draw();
+                
+                // Remove the custom filter function to avoid stacking
+                $.fn.dataTable.ext.search.pop();
+            }
+
+            // Function to reset all filters
+            function resetFilters() {
+                // Clear all filter inputs
+                $('#companyFilter').val('');
+                $('#branchFilter').val('');
+                $('#trainerFilter').val('');
+                $('#salesPersonFilter').val('');
+                $('#clientTypeFilter').val('');
+                $('#classTypeFilter').val('');
+                $('#confirmedCourseFilter').val('');
+                $('#courseFilter').val('');
+                $('#dateFromFilter').val('');
+                $('#dateToFilter').val('');
+                
+                // Clear DataTable searches
+                table.columns().search('');
+                table.draw();
+            }
+
+            // Auto-apply filters when typing in search fields (with delay)
+            var filterTimeout;
+            $('.form-control').on('input', function() {
+                clearTimeout(filterTimeout);
+                filterTimeout = setTimeout(function() {
+                    applyFilters();
+                }, 500);
+            });
+
+            // Auto-apply filters when dropdowns change
+            $('.form-select').on('change', function() {
+                applyFilters();
             });
         });
     </script>

@@ -24,7 +24,10 @@ urlpatterns = [
     path('approve_sale_view/<int:sale_id>/', views.approve_sale_view, name='approve_sale_view'),
     path("sales/<int:sale_id>/approval/", views.approve_or_reject_sale, name="approve_or_reject_sale"),
     path("cost_sheet_view/", views.cost_sheet_view, name="cost_sheet_view"),
-    path('ceo_approval_cost_sheet/<int:client_id>/', views.ceo_approval_cost_sheet, name='ceo_approval_cost_sheet'),
+    path('ceo_approval_cost_sheet/<int:sheet_id>/', views.ceo_approval_cost_sheet, name='ceo_approval_cost_sheet'),
+    path("pending_admins_view/", views.pending_admins_view, name="pending_admins_view"),
+    path("approve_admin_view/<int:user_id>/", views.approve_admin_view, name="approve_admin_view"),
+    path("decline_admin_view/<int:user_id>/", views.decline_admin_view, name="decline_admin_view"),
 
 
 

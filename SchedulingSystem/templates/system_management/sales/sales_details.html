@@ -281,7 +281,7 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Trainer</label>
-                            <select name="trainer" class="form-select" {% if user.role.role != "Training Manager" and user.role.role != "CEO" %}disabled{% endif %}>
+                            <select name="trainer" class="form-select" {% if user.role.role != "Training Manager" %}disabled{% endif %}>
             <option value="">Select Trainer</option>
             {% for trainer in trainers %}
                 <option value="{{ trainer.id }}" {% if sale.trainer and sale.trainer.id == trainer.id %}selected{% endif %}>
@@ -289,8 +289,8 @@
                 </option>
             {% endfor %}
         </select>
-                            {% if user.role.role != "Training Manager" and user.role.role != "CEO" %}
-                            <div class="help-text">Only Training Manager or CEO can assign trainers</div>
+                            {% if user.role.role != "Training Manager" %}
+                            <div class="help-text">Only Training Manager can assign trainers</div>
                             {% endif %}
                         </div>
 
@@ -359,7 +359,7 @@
                 </div>
 
                 <!-- Approval Section -->
-                {% if user.role.role == "Training Manager" or user.role.role == "CEO" %}
+                {% if user.role.role == "Training Manager" %}
                 <div class="approval-section">
                     <div class="form-row">
                         <div class="form-group" style="flex: 1 0 100%">
@@ -374,13 +374,9 @@
                         <button type="submit" name="action" value="approve" class="btn btn-success">
                             Approve Sale
                         </button>
-                        {% elif user.role.role == "CEO" %}
-                        <button type="submit" name="action" value="approve" class="btn btn-primary">
-                            CEO Approve Sale
-                        </button>
                         {% endif %}
 
-                        {% if user.role.role == "Training Manager" or user.role.role == "CEO" %}
+                        {% if user.role.role == "Training Manager" %}
                         <button type="submit" name="action" value="reject" class="btn btn-danger">
                             Reject Sale
                         </button>

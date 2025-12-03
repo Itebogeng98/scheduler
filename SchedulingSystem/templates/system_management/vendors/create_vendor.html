@@ -1,74 +1,210 @@
-{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Vendor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-dark: #E55A2B;
+            --primary-orange-light: #FF8C5A;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .bg-orange {
+            background-color: var(--primary-orange) !important;
+        }
+        
+        .btn-orange {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-orange:hover {
+            background-color: var(--primary-orange-dark);
+            border-color: var(--primary-orange-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 107, 53, 0.3);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-orange-light);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--dark-gray);
+            margin-bottom: 8px;
+        }
+        
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .btn-loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .alert {
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .card-header {
+            border-radius: 8px 8px 0 0 !important;
+            padding: 1rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg border-0 rounded-3">
+                    <div class="card-header bg-orange text-white d-flex align-items-center">
+                        <i class="fas fa-user-tie me-2"></i>
+                        <h4 class="mb-0">Create Vendor</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="vendorForm">
+                            <div class="mb-4">
+                                <label for="name" class="form-label">Vendor Name</label>
+                                <input type="text" class="form-control py-2" id="name" name="name" placeholder="Enter vendor name" required>
+                                <div class="form-text">Enter the full name of the vendor</div>
+                            </div>
 
-<div class="container mt-5">
-    <div class="card shadow-lg border-0 rounded-3">
-        <div class="card-header bg-orange text-white">
-            <h4 class="mb-0">Create Vendor</h4>
-        </div>
-        <div class="card-body">
-            <form id="vendorForm">
-                <div class="mb-3">
-                    <label for="name" class="form-label">Vendor Name</label>
-                    <input type="text" class="form-control" id="name" name="name" required>
+                            <button type="submit" class="btn btn-orange w-100 py-2">
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <div class="loader"></div>
+                                    <span>Save Vendor</span>
+                                </div>
+                            </button>
+                        </form>
+                    </div>
                 </div>
 
-                <button type="submit" class="btn btn-orange w-100">Save Vendor</button>
-            </form>
+                <div id="alertBox" class="alert mt-4 d-none"></div>
+            </div>
         </div>
     </div>
 
-    <div id="alertBox" class="alert mt-3 d-none"></div>
-</div>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+    $(document).ready(function() {
+        $("#vendorForm").submit(function(e) {
+            e.preventDefault();
+            
+            // Prevent multiple submissions
+            const $submitBtn = $(this).find('button[type="submit"]');
+            const $loader = $submitBtn.find('.loader');
+            
+            // Show loader and disable button
+            $loader.show();
+            $submitBtn.addClass('btn-loading');
+            
+            var formData = {
+                name: $("#name").val(),
+                is_active: true,
+            };
 
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+            var $alertBox = $("#alertBox");
+            const csrfToken = $('[name=csrfmiddlewaretoken]').val();
+            $alertBox.addClass("d-none").removeClass("alert-success alert-danger");
 
-<script>
-$(document).ready(function() {
-    $("#vendorForm").submit(function(e) {
-        e.preventDefault();
-
-        var formData = {
-            name: $("#name").val(),
-            is_active: true,
-        };
-
-        var $alertBox = $("#alertBox");
-        const csrfToken = $('[name=csrfmiddlewaretoken]').val();
-        $alertBox.addClass("d-none").removeClass("alert-success alert-danger");
-
-        $.ajax({
-            url: "/scheduler/vendors_create/",  // Adjusted URL to match the updated API endpoint
-            type: "POST",
-            contentType: "application/json",
-            headers: {
+            $.ajax({
+                url: "/scheduler/vendors_create/",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
                     'X-CSRFToken': csrfToken
                 },
-            data: JSON.stringify(formData),
-            success: function(data, textStatus, xhr) {
-                if (xhr.status === 201) {
-                    $alertBox
-                        .removeClass("d-none")
-                        .addClass("alert alert-success")
-                        .text("✅ Vendor created successfully!");
-                    $("#vendorForm")[0].reset();
-                } else {
+                data: JSON.stringify(formData),
+                success: function(data, textStatus, xhr) {
+                    if (xhr.status === 201) {
+                        $alertBox
+                            .removeClass("d-none")
+                            .addClass("alert alert-success")
+                            .html('<i class="fas fa-check-circle me-2"></i> Vendor created successfully!');
+                        $("#vendorForm")[0].reset();
+                    } else {
+                        $alertBox
+                            .removeClass("d-none")
+                            .addClass("alert alert-danger")
+                            .html('<i class="fas fa-exclamation-triangle me-2"></i>' + (data.error || "Failed to create vendor."));
+                    }
+                },
+                error: function(xhr) {
+                    var errMsg = "<i class='fas fa-exclamation-triangle me-2'></i> API connection error";
+                    if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errMsg = "<i class='fas fa-exclamation-triangle me-2'></i>" + xhr.responseJSON.error;
+                    }
                     $alertBox
                         .removeClass("d-none")
                         .addClass("alert alert-danger")
-                        .text(data.error || "❌ Failed to create vendor.");
+                        .html(errMsg);
+                },
+                complete: function() {
+                    // Hide loader and re-enable button
+                    $loader.hide();
+                    $submitBtn.removeClass('btn-loading');
                 }
-            },
-            error: function(xhr) {
-                var errMsg = "⚠️ API connection error";
-                if (xhr.responseJSON && xhr.responseJSON.error) {
-                    errMsg = xhr.responseJSON.error;
-                }
-                $alertBox
-                    .removeClass("d-none")
-                    .addClass("alert alert-danger")
-                    .text(errMsg);
-            }
+            });
         });
     });
-});
-</script>
+    </script>
+</body>
+</html>
+
+

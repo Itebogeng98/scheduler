@@ -164,7 +164,6 @@ class Sale(models.Model):
 
     # New approval workflow
     training_manager_approved = models.BooleanField(default=False)
-    ceo_approved = models.BooleanField(default=False)
     trainer = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True, related_name='sales_trained')
     notes = models.TextField(null=True, blank=True)
 
@@ -178,10 +177,9 @@ class Sale(models.Model):
 
     def update_status(self):
         """Auto update status based on approvals."""
-        if self.training_manager_approved and self.ceo_approved:
+        if self.training_manager_approved :
             self.status = "approved"
-        elif self.training_manager_approved or self.ceo_approved:
-            self.status = "partially_approved"
+            
         else:
             self.status = "pending"
         self.save()

@@ -137,10 +137,6 @@
             background-color: rgb(0, 0, 0);
         }
 
-        .status-badge.status-partial {
-            background-color: #f0ad4e;
-            /* yellow/orange */
-        }
 
         .status-badge.status-rejected {
             background-color: red;
@@ -293,7 +289,6 @@
     <span class="status-badge 
         {% if sale.status == 'approved' %}status-approved
         {% elif sale.status == 'pending' %}status-pending
-        {% elif sale.status == 'partially_approved' %}status-partial
         {% elif sale.status == 'rejected' %}status-rejected
         {% endif %}">
 

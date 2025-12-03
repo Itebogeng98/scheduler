@@ -176,6 +176,11 @@ def dashboard(request):
     # 🔹 Pending Confirmations
     pending_confirmations = Sale.objects.filter(confirmed_training=False).count()
 
+    # 🔹 Pending count unapproved users
+
+    pending_count = CustomUser.objects.filter(is_approved=False, is_superuser=False).count()
+
+
     # 🔹 Total Companies
     total_companies = (
         Sale.objects
@@ -232,6 +237,7 @@ def dashboard(request):
         'client_type_data': client_type_data,
         'month_labels': month_labels,
         'month_data': month_data,
+        'pending_count': pending_count,
     }
 
     return render(request, 'system_management/dashboard.html', context)
@@ -537,6 +543,7 @@ def create_sales(request):
                 client_types = data["populaters"]["client_types"]
                 vendors = data["populaters"]["vendors"]
                 courses = data["populaters"]["courses"]
+                sales_people = data["populaters"]["sales_people"]
             else:
                 error = data.get("message", "Failed to fetch populaters")
         else:
@@ -549,6 +556,7 @@ def create_sales(request):
         "client_types": client_types,
         "vendors": vendors,
         "courses": courses,
+        "sales_people":sales_people,
         "error": error,
         "user_email": request.user.work_email,
         "sales_person": f"{request.user.first_name} {request.user.last_name}",
@@ -719,8 +727,6 @@ def approve_sale_view(request, sale_id):
         user_role = getattr(request.user.role, "role", "")
         if user_role == "Training Manager":
             sale.training_manager_approved = True
-        elif user_role == "CEO":
-            sale.ceo_approved = True
 
         # Update status based on approvals
         sale.update_status()
@@ -770,8 +776,6 @@ def list_sales_for_approval(request):
     return render(request, 'system_management/sales/list_sales.html', context)
 
 
-
-
 @login_required
 def approve_or_reject_sale(request, sale_id):
     sale = get_object_or_404(Sale, id=sale_id)
@@ -784,17 +788,13 @@ def approve_or_reject_sale(request, sale_id):
             if user_role == "Training Manager":
                 sale.training_manager_approved = True
                 messages.success(request, "Sale approved by Training Manager.")
-            elif user_role == "CEO":
-                sale.ceo_approved = True
-                messages.success(request, "Sale approved by CEO.")
             else:
                 messages.error(request, "You are not authorized to approve this sale.")
 
         elif action == "reject":
-            if user_role in ["Training Manager", "CEO"]:
+            if user_role in ["Training Manager"]:
                 sale.status = "rejected"
                 sale.training_manager_approved = False
-                sale.ceo_approved = False
                 messages.warning(request, "Sale rejected.")
             else:
                 messages.error(request, "You are not authorized to reject this sale.")
@@ -831,20 +831,26 @@ def cost_sheet_view(request):
 
 @login_required
 @csrf_exempt
-def ceo_approval_cost_sheet(request, client_id):
-    # Ensure only the CEO can approve
-    if not request.user.is_superuser and request.user.role != "CEO":
-        return HttpResponseForbidden("You are not authorized to approve cost sheets.")
+def ceo_approval_cost_sheet(request, sheet_id):
+    api_url = f"{request.scheme}://{request.get_host()}{reverse('ceo_approval_cost_sheet_api', args=[sheet_id])}"
 
-    # Field mapping based on client_id
+    # Determine if current user is CEO
+    is_ceo = False
+    try:
+        is_ceo = getattr(request.user.role, "role", "").strip().lower() == "ceo"
+    except Exception:
+        is_ceo = False
+
+    # Field map
     client_field_map = {
         1: ["instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee",
             "corporate_cost_content_dev", "admin_cost", "set_up_fee", "license_fee", "per_user_fee",
-            "consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware"],
+            "consulting", "analysis", "design", "development", "implementation", "evaluation",
+            "e_learning_courseware"],
         2: ["instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee",
             "corporate_cost_content_dev", "admin_cost", "set_up_fee", "license_fee", "per_user_fee",
-            "consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware",
-            "daily_venue_cost", "refreshment", "consumables"],
+            "consulting", "analysis", "design", "development", "implementation", "evaluation",
+            "e_learning_courseware", "daily_venue_cost", "refreshment", "consumables"],
         3: ["instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee",
             "daily_venue_cost", "refreshment", "consumables", "qcto_seta_consumables", "assessor_fees",
             "sme_hour", "labs", "welcome_packs", "set_up_fee", "license_fee", "per_user_fee", "consulting",
@@ -852,45 +858,134 @@ def ceo_approval_cost_sheet(request, client_id):
         4: ["instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee",
             "daily_venue_cost", "refreshment", "consumables", "qcto_seta_consumables", "assessor_fees",
             "sme_hour", "labs", "welcome_packs", "set_up_fee", "license_fee", "per_user_fee", "consulting",
-            "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware", "recruitment"],
-        5: ["instructor_cost", "exam", "lab_fees", "consumables", "sme_hour", "travel_flights", "accomodation",
-            "per_diem", "international", "driving_travel", "set_up_fee", "license_fee", "per_user_fee",
-            "consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware"],
-        6: ["instructor_cost", "exam", "lab_fees", "total_cost", "set_up_fee", "license_fee", "per_user_fee",
-            "consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware",
-            "marketing_fee"],
+            "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware",
+            "recruitment"],
+        5: ["instructor_cost", "exam", "lab_fees", "consumables", "sme_hour", "travel_flights",
+            "accomodation", "per_diem", "international", "driving_travel", "set_up_fee", "license_fee",
+            "per_user_fee", "consulting", "analysis", "design", "development", "implementation", "evaluation",
+            "e_learning_courseware"],
+        6: ["instructor_cost", "exam", "lab_fees", "total_cost", "set_up_fee", "license_fee",
+            "per_user_fee", "consulting", "analysis", "design", "development", "implementation", "evaluation",
+            "e_learning_courseware", "marketing_fee"],
         7: ["instructor_cost", "exam", "lab_fees", "daily_venue_cost", "refreshment", "consumables",
             "set_up_fee", "license_fee", "per_user_fee", "consulting", "analysis", "design", "development",
             "implementation", "evaluation", "e_learning_courseware", "marketing_fee"],
     }
 
-    # Handle GET request — display cost sheets
+    # ========== GET ==========
     if request.method == "GET":
-        sheets = CostSheet.objects.filter(client_type_id=client_id).order_by('-created_at')
-        print("======================sheets data==============",sheets)
-        return render(request, "system_management/cost_sheet/ceo_approval_cost_sheet_form.html", {
-            "client_id": client_id,
-            "allowed_fields": client_field_map.get(client_id, []),
-            "sheets": sheets,
-        })
+        try:
+            response = requests.get(api_url, timeout=15)
+            sheets = response.json().get("data", []) if response.status_code == 200 else []
 
-    # Handle POST request — CEO approves a cost sheet
+            return render(request, "system_management/cost_sheet/ceo_approval_cost_sheet_form.html", {
+                "client_id": sheet_id,
+                "allowed_fields": client_field_map.get(sheet_id, []),
+                "sheets": sheets,
+                "is_ceo": is_ceo,   # <-- Important for template
+            })
+        except requests.exceptions.RequestException as e:
+            return render(request, "system_management/cost_sheet/ceo_approval_cost_sheet_form.html", {
+                "sheet_id": sheet_id,
+                "allowed_fields": client_field_map.get(sheet_id, []),
+                "sheets": [],
+                "error": f"API connection failed: {str(e)}",
+                "is_ceo": is_ceo,
+            })
+
+    # ========== POST ==========
     if request.method == "POST":
+
+        # CEO-only enforcement
+        if not is_ceo:
+            return JsonResponse({"status": "error", "message": "Only CEO can perform this action."}, status=403)
+
         try:
             data = json.loads(request.body)
-            sheet_id = data.get("sheet_id")
+            action = data.get("action")
+            cost_sheet_id = data.get("sheet_id")
 
-            sheet = get_object_or_404(CostSheet, id=sheet_id)
-            sheet.is_approved = True
-            sheet.save()
+            if not cost_sheet_id or action not in ["approve", "decline"]:
+                return JsonResponse({"status": "error", "message": "Invalid parameters"}, status=400)
 
-            return JsonResponse({
-                "status": "success",
-                "message": f"Cost sheet #{sheet.id} approved successfully!"
-            }, status=200)
+            response = requests.post(
+                api_url,
+                headers={"Content-Type": "application/json"},
+                data=json.dumps(data),
+                timeout=15
+            )
+
+            return JsonResponse(response.json(), status=response.status_code)
 
         except Exception as e:
-            return JsonResponse({
-                "status": "error",
-                "message": str(e)
-            }, status=400)
+            return JsonResponse({"status": "error", "message": str(e)}, status=500)
+
+    # ========== FALLBACK ==========
+    return render(request, "system_management/cost_sheet/ceo_approval_cost_sheet_form.html", {
+        "sheet_id": sheet_id,
+        "allowed_fields": client_field_map.get(sheet_id, []),
+        "is_ceo": is_ceo,
+    })
+
+
+@login_required
+def pending_admins_view(request):
+    api_url = f"{host_url(request)}{reverse('pending_admins_api')}"
+
+    admins = []
+    error = None
+
+    try:
+        response = requests.get(api_url, timeout=10)
+        if response.status_code == 200:
+            data = response.json()
+            admins = data.get("data", [])
+        else:
+            error = f"Failed to fetch admins: {response.status_code}"
+    except requests.exceptions.RequestException as e:
+        error = f"Connection error: {str(e)}"
+
+    return render(request, "system_management/admins/pending_admins.html", {
+        "admins": admins,
+        "error": error,
+    })
+
+
+
+
+@login_required
+def approve_admin_view(request, user_id):
+    api_url = f"{host_url(request)}{reverse('approve_admin_api', args=[user_id])}"
+
+    try:
+        response = requests.post(api_url, timeout=10)
+        if response.status_code == 200:
+            # success → redirect back
+            return redirect("pending_admins_view")
+
+        else:
+            # return back with error (optionally use messages framework)
+            return redirect("pending_admins_view")
+
+    except requests.exceptions.RequestException:
+        return redirect("pending_admins_view")
+
+
+@login_required
+def decline_admin_view(request, user_id):
+    """
+    Sends a POST request to the API to decline (delete) a pending admin.
+    """
+    api_url = f"{host_url(request)}{reverse('delete_admin_api', args=[user_id])}"
+
+    try:
+        response = requests.post(api_url, timeout=10)
+        if response.status_code == 200:
+            # Optionally, use Django messages to show success
+            return redirect("pending_admins_view")
+        else:
+            # Optionally, log the response content for debugging
+            return redirect("pending_admins_view")
+    except requests.exceptions.RequestException as e:
+        # Optionally, log the exception e
+        return redirect("pending_admins_view")

@@ -1,19 +1,44 @@
+# Django imports
 from django.contrib.auth import authenticate, login
-from rest_framework.decorators import api_view, permission_classes
-from scheduler.models import CustomUser,Vendor, Course,Client_Type,Sale,CostSheet,Role
 from django.http import JsonResponse
-from rest_framework.authtoken.models import Token
 from django.views.decorators.csrf import csrf_exempt
 
+# Django models
+from scheduler.models import (
+    CustomUser,
+    Vendor,
+    Course,
+    Client_Type,
+    Sale,
+    CostSheet,
+    Role,
+)
+
+# Django DB
+from django.db import IntegrityError
+
+# REST Framework imports
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny,IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import VendorSerializer, CourseSerializer,SaleSerializer,CostSheetSerializer,SignupSerializer,RoleSerializer,CostSheetViewSerializer
 from rest_framework.authtoken.models import Token
 
-from django.db import IntegrityError
+# Serializers
+from .serializers import (
+    VendorSerializer,
+    CourseSerializer,
+    SaleSerializer,
+    CostSheetSerializer,
+    SignupSerializer,
+    RoleSerializer,
+    CostSheetViewSerializer,
+    SalesPersonSerializer,
+    PendingAdminSerializer,
+)
+# Email utilities
 from .email import send_welcome_email
+
 
 
 
@@ -169,6 +194,9 @@ def create_sale_api(request):
         vendor_id = request.query_params.get("vendor_id")
         client_types = list(Client_Type.objects.all().values("id", "client_name"))
         vendors = list(Vendor.objects.all().values("id", "name"))
+        sales_people = list(CustomUser.objects.filter(role_id__role='Sales Person'))
+        sales_people_serialized = SalesPersonSerializer(sales_people, many=True).data
+
 
         courses_with_codes = []
         if vendor_id:
@@ -181,7 +209,8 @@ def create_sale_api(request):
             "populaters": {
                 "client_types": client_types,
                 "vendors": vendors,
-                "courses": courses_with_codes  # each item now has id, course_description, and course_code
+                "courses": courses_with_codes,  # each item now has id, course_description, and course_code
+                "sales_people": sales_people_serialized,
             }
         }, status=status.HTTP_200_OK)
 
@@ -335,12 +364,6 @@ def approve_sale(request, sale_id):
         sale.save()
         return Response({"message": "Training Manager approved the sale."}, status=200)
 
-    elif user.role == "CEO":
-        if not sale.training_manager_approved:
-            return Response({"error": "Training Manager must approve before CEO."}, status=400)
-        sale.ceo_approved = True
-        sale.save()
-        return Response({"message": "Training Manager approved the sale."}, status=200)
 
     return Response({"error": "You are not authorized to approve this sale."}, status=403)
 
@@ -362,7 +385,7 @@ def cost_sheet_list_view_api(request):
 @api_view(['GET', 'POST'])
 @permission_classes([AllowAny])  # later you can restrict to IsAuthenticated
 def ceo_approval_cost_sheet_api(request, client_id):
-    # ✅ GET: Fetch all cost sheets by client_type
+    # GET: Fetch all cost sheets by client_type
     if request.method == "GET":
         try:
             sheets = CostSheet.objects.filter(client_type_id=client_id).order_by("-created_at")
@@ -379,10 +402,10 @@ def ceo_approval_cost_sheet_api(request, client_id):
                 "message": f"Something went wrong: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    # ✅ POST: CEO Approves or Declines
+    # POST: CEO Approves or Declines
     elif request.method == "POST":
         try:
-            sheet_id = request.data.get("sheet_id")
+            sheet_id = request.data.get("sheet_id")  # Use sheet_id from the request
             action = request.data.get("action")  # "approve" or "decline"
 
             # Validate inputs
@@ -392,14 +415,11 @@ def ceo_approval_cost_sheet_api(request, client_id):
                     "message": "Missing or invalid parameters (sheet_id, action)"
                 }, status=status.HTTP_400_BAD_REQUEST)
 
-            sheet = CostSheet.objects.get(id=sheet_id)
+            # Make sure the sheet belongs to the client
+            sheet = CostSheet.objects.get(id=sheet_id, client_type_id=client_id)
 
             # Update approval state
-            if action == "approve":
-                sheet.is_approved = True
-            else:
-                sheet.is_approved = False
-
+            sheet.is_approved = True if action == "approve" else False
             sheet.save()
 
             return Response({
@@ -410,10 +430,63 @@ def ceo_approval_cost_sheet_api(request, client_id):
         except CostSheet.DoesNotExist:
             return Response({
                 "status": "error",
-                "message": "Cost sheet not found"
+                "message": "Cost sheet not found for this client"
             }, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({
                 "status": "error",
                 "message": f"Something went wrong: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def pending_admins_api(request):
+    users = CustomUser.objects.filter(is_approved=False, is_superuser=False)
+    serializer = PendingAdminSerializer(users, many=True)
+    return Response({
+        "status": "success",
+        "count": users.count(),
+        "data": serializer.data
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def approve_admin_api(request, user_id):
+    try:
+        user = CustomUser.objects.get(id=user_id, is_superuser=False)
+    except CustomUser.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found or cannot be approved"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+    user.is_approved = True
+    user.save()
+
+    return Response({
+        "status": "success",
+        "message": "User approved successfully"
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def delete_admin_api(request, user_id):
+    """
+    Decline a pending admin by deleting their account.
+    """
+    try:
+        user = CustomUser.objects.get(id=user_id, is_superuser=False)
+    except CustomUser.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found or cannot be declined"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+    user.delete()  # Delete the user
+    return Response({
+        "status": "success",
+        "message": "User declined and deleted successfully"
+    }, status=status.HTTP_200_OK)

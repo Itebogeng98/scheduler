@@ -8,52 +8,208 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-orange: #ff6b00;
+      --primary-orange-dark: #e55a00;
+      --primary-orange-light: #ff8c33;
+      --primary-orange-bg: #fff5eb;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    }
+    
+    .card-header {
+      background-color: var(--primary-orange) !important;
+      border-bottom: none;
+      padding: 1.25rem 1.5rem;
+    }
+    
+    .card-header h4 {
+      margin: 0;
+      font-weight: 600;
+    }
+    
+    .card-body {
+      padding: 2rem;
+    }
+    
+    h2 {
+      color: var(--primary-orange);
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--primary-orange-light);
+    }
+    
+    .btn-primary, .btn-outline-primary {
+      background-color: var(--primary-orange);
+      border-color: var(--primary-orange);
+      color: white;
+    }
+    
+    .btn-primary:hover, .btn-outline-primary:hover {
+      background-color: var(--primary-orange-dark);
+      border-color: var(--primary-orange-dark);
+    }
+    
+    .btn-success {
+      background-color: #28a745;
+      border-color: #28a745;
+      padding: 0.75rem 2rem;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+    
+    .btn-success:hover {
+      background-color: #218838;
+      border-color: #1e7e34;
+    }
+    
+    .form-label {
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: #495057;
+    }
+    
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ced4da;
+      transition: all 0.2s;
+    }
+    
+    .form-control:focus, .form-select:focus {
+      border-color: var(--primary-orange);
+      box-shadow: 0 0 0 0.2rem rgba(255, 107, 0, 0.25);
+    }
+    
+    .input-group .btn-outline-danger {
+      border-radius: 0 8px 8px 0;
+    }
+    
+    .alert {
+      border-radius: 8px;
+      border: none;
+    }
+    
+    .alert-success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    
+    .alert-danger {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    
+    .alert-warning {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    
+    .modal-header.bg-warning {
+      background-color: var(--primary-orange) !important;
+      color: white;
+    }
+    
+    .spinner-border.text-primary {
+      color: var(--primary-orange) !important;
+    }
+    
+    #loader-overlay {
+      background: rgba(255, 107, 0, 0.85);
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary-orange);
+      border-color: var(--primary-orange);
+    }
+    
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--primary-orange-light), transparent);
+      margin: 2rem 0;
+    }
+    
+    .required-field::after {
+      content: " *";
+      color: #dc3545;
+    }
+    
+    .submission-status {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 10000;
+      min-width: 300px;
+    }
+  </style>
 </head>
 
 <body class="bg-light">
-  <div class="container mt-4">
+  <div class="container mt-4 mb-5">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
-        <h4>Create Sale</h4>
+        <h4><i class="fas fa-plus-circle me-2"></i>Create Sale</h4>
       </div>
       <div class="card-body">
         {% if error %}
         <div class="alert alert-danger">{{ error }}</div>
         {% endif %}
 
-        <h2>Sales Person Info</h2>
+        <h2><i class="fas fa-user me-2"></i>Sales Person Info</h2>
         <div class="row g-3">
           <!-- Email address -->
           <div class="col-md-6">
-            <label class="form-label">Email address of the person creating sales</label>
+            <label class="form-label required-field">Email address of the person creating sales</label>
             <input type="text" name="email" class="form-control" value="{{ user_email }}" readonly>
           </div>
 
           <!-- Sales Person -->
           <div class="col-md-6">
-            <label class="form-label">Sales Person(s)</label>
+            <label class="form-label required-field">Sales Person(s)</label>
+
             <div id="sales-person-container">
-              <input type="text" name="sales_person[]" class="form-control mb-2" placeholder="Enter sales person"
-                required>
+              <div class="input-group mb-2">
+                <select name="sales_person[]" class="form-select sales-person-select" required>
+                  <option value="">Select a Sales Person</option>
+                </select>
+                <button type="button" class="btn btn-outline-danger remove-sales-person" title="Remove" style="display: none;">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
             </div>
-            <button type="button" id="add-sales-person" class="btn btn-sm btn-outline-primary mt-1">Add another</button>
+
+            <button type="button" id="add-sales-person" class="btn btn-sm btn-outline-primary mt-1">
+              <i class="fas fa-plus me-1"></i>Add another
+            </button>
           </div>
-
-
         </div>
 
-        <h2 class="mt-4">Sales Details</h2>
+        <div class="section-divider"></div>
+
+        <h2><i class="fas fa-info-circle me-2"></i>Sales Details</h2>
         <form id="sale-form">
           <div class="row g-3">
             <!-- Company -->
             <div class="col-md-6">
-              <label class="form-label">Company</label>
+              <label class="form-label required-field">Company</label>
               <input type="text" name="company" class="form-control" required>
             </div>
 
             <!-- Client Type -->
             <div class="col-md-6">
-              <label class="form-label">Client Type</label>
+              <label class="form-label required-field">Client Type</label>
               <select name="client_type" class="form-select" required>
                 <option value="">Select Client Type</option>
                 {% for ct in client_types %}
@@ -64,7 +220,7 @@
 
             <!-- Class Type -->
             <div class="col-md-6">
-              <label class="form-label">Class Type</label>
+              <label class="form-label required-field">Class Type</label>
               <select id="class_type_select" name="class_type" class="form-select" required>
                 <option value="">Select Class Type</option>
                 <option value="Virtual">Virtual</option>
@@ -76,7 +232,7 @@
 
             <!-- Training Location Container -->
             <div class="col-md-6" id="training_location_container">
-              <label class="form-label">Training Location</label>
+              <label class="form-label required-field">Training Location</label>
               <!-- Dropdown for On Premise and Blended -->
               <select id="training_location_select" name="training_location" class="form-select" style="display: none;">
                 <option value="">Select Training Location</option>
@@ -96,7 +252,7 @@
 
             <!-- Vendor -->
             <div class="col-md-6">
-              <label class="form-label">Vendor</label>
+              <label class="form-label required-field">Vendor</label>
               <select name="vendor" class="form-select" required>
                 <option value="">Select Vendor</option>
                 {% for v in vendors %}
@@ -107,7 +263,7 @@
 
             <!-- Course Name -->
             <div class="col-md-6">
-              <label class="form-label">Course Name</label>
+              <label class="form-label required-field">Course Name</label>
               <select id="course_select" name="course_name" class="form-select" required>
                 <option value="">Select Course</option>
                 {% for c in courses %}
@@ -126,24 +282,26 @@
 
             <!-- Number of Students -->
             <div class="col-md-6">
-              <label class="form-label">Number of Students</label>
+              <label class="form-label required-field">Number of Students</label>
               <input type="number" name="number_of_students" class="form-control" min="1" required>
             </div>
 
             <!-- Proposed Date (Training Start Date) -->
             <div class="col-md-6">
-              <label class="form-label">Training Start Date</label>
+              <label class="form-label required-field">Training Start Date</label>
               <input type="date" name="proposed_date" class="form-control" required>
             </div>
 
             <!-- Training End Date -->
             <div class="col-md-6">
-              <label class="form-label">Training End Date</label>
+              <label class="form-label required-field">Training End Date</label>
               <input type="date" name="training_end_date" class="form-control" required>
             </div>
           </div>
 
-          <h2 class="mt-4">Financial Information</h2>
+          <div class="section-divider"></div>
+
+          <h2><i class="fas fa-chart-line me-2"></i>Financial Information</h2>
           <div class="row g-3">
             <!-- Accepted Pricing -->
             <div class="col-md-6">
@@ -181,7 +339,9 @@
             </div>
           </div>
 
-          <h2 class="mt-4">Additional Information</h2>
+          <div class="section-divider"></div>
+
+          <h2><i class="fas fa-ellipsis-h me-2"></i>Additional Information</h2>
           <div class="row g-3">
             <!-- Is Training Scheduled -->
             <div class="col-md-6">
@@ -203,24 +363,24 @@
           </div>
 
           <!-- Checkboxes -->
-          <h2 class="mt-4">Status Options</h2>
+          <h2 class="mt-4"><i class="fas fa-tasks me-2"></i>Status Options</h2>
           <div class="row g-3">
             <div class="col-md-12">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="sales_pack_uploaded">
-                <label class="form-check-label">Sales Pack Uploaded</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="sales_pack_uploaded" id="sales_pack_uploaded">
+                <label class="form-check-label" for="sales_pack_uploaded">Sales Pack Uploaded</label>
               </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="existing_account">
-                <label class="form-check-label">Existing Account</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="existing_account" id="existing_account">
+                <label class="form-check-label" for="existing_account">Existing Account</label>
               </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="confirmed_training">
-                <label class="form-check-label">Confirmed Training</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="confirmed_training" id="confirmed_training">
+                <label class="form-check-label" for="confirmed_training">Confirmed Training</label>
               </div>
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="proof_of_payment">
-                <label class="form-check-label">Proof of Payment</label>
+              <div class="form-check mb-2">
+                <input class="form-check-input" type="checkbox" name="proof_of_payment" id="proof_of_payment">
+                <label class="form-check-label" for="proof_of_payment">Proof of Payment</label>
               </div>
             </div>
           </div>
@@ -228,19 +388,24 @@
           <!-- User ID (hidden field) -->
           <input type="hidden" name="user" value="{{ user.id }}">
 
-          <div class="mt-4">
-            <button type="submit" class="btn btn-success">Submit Sale</button>
+          <div class="mt-4 text-center">
+            <button type="submit" class="btn btn-success btn-lg" id="submit-button">
+              <i class="fas fa-paper-plane me-2"></i>Submit Sale
+            </button>
           </div>
         </form>
-        <div id="message" class="mt-3"></div>
+        <div id="message" class="mt-4"></div>
       </div>
     </div>
   </div>
+
   <script>
     $(document).ready(function () {
       const apiUrl = "{{ api_url }}";
       let courseId = null;
       let isSubmitting = false;
+      let submissionTimer = null;
+      let successMessageTimer = null;
 
       // -------------------------
       // Create confirmation modal
@@ -248,43 +413,43 @@
       function createConfirmationModal() {
         if ($("#confirmationModal").length === 0) {
           $("body").append(`
-                <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content">
-                            <div class="modal-header bg-warning">
-                                <h5 class="modal-title" id="confirmationModalLabel">
-                                    <i class="fas fa-exclamation-triangle"></i> Confirm Sale Submission
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <p>Are you sure you want to submit this sale?</p>
-                                <div class="alert alert-info">
-                                    <strong>Please review your information:</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li>Company: <span id="review-company"></span></li>
-                                        <li>Course: <span id="review-course"></span></li>
-                                        <li>Students: <span id="review-students"></span></li>
-                                        <li>Start Date: <span id="review-start-date"></span></li>
-                                        <li>Revenue: R<span id="review-revenue"></span></li>
-                                        <li>GP: <span id="review-gp"></span>%</li>
-                                    </ul>
-                                </div>
-                                <div id="negative-values-warning" class="alert alert-warning d-none">
-                                    <i class="fas fa-exclamation-triangle"></i> Warning: Negative revenue or GP values detected!
-                                </div>
-                                <p class="text-muted mt-3">This action cannot be undone.</p>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="button" class="btn btn-success" id="confirmSubmit">
-                                    <i class="fas fa-check"></i> Yes, Submit Sale
-                                </button>
-                            </div>
-                        </div>
+            <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header bg-warning">
+                    <h5 class="modal-title" id="confirmationModalLabel">
+                      <i class="fas fa-exclamation-triangle"></i> Confirm Sale Submission
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p>Are you sure you want to submit this sale?</p>
+                    <div class="alert alert-info">
+                      <strong>Please review your information:</strong>
+                      <ul class="mb-0 mt-2">
+                        <li>Company: <span id="review-company"></span></li>
+                        <li>Course: <span id="review-course"></span></li>
+                        <li>Students: <span id="review-students"></span></li>
+                        <li>Start Date: <span id="review-start-date"></span></li>
+                        <li>Revenue: R<span id="review-revenue"></span></li>
+                        <li>GP: <span id="review-gp"></span>%</li>
+                      </ul>
                     </div>
+                    <div id="negative-values-warning" class="alert alert-warning d-none">
+                      <i class="fas fa-exclamation-triangle"></i> Warning: Negative revenue or GP values detected!
+                    </div>
+                    <p class="text-muted mt-3">This action cannot be undone.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success" id="confirmSubmit">
+                      <i class="fas fa-check"></i> Yes, Submit Sale
+                    </button>
+                  </div>
                 </div>
-            `);
+              </div>
+            </div>
+          `);
         }
       }
 
@@ -295,38 +460,81 @@
         if ($("#loader-overlay").length === 0) {
           $("body").append(`
             <div id="loader-overlay" style="
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0,0,0,0.8);
-                display: none;
-                justify-content: center;
-                align-items: center;
-                z-index: 9999;
-                flex-direction: column;
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: rgba(255, 107, 0, 0.85);
+              display: none;
+              justify-content: center;
+              align-items: center;
+              z-index: 9999;
+              flex-direction: column;
             ">
-                <div class="spinner-border text-primary" style="width: 4rem; height: 4rem; border-width: 0.3em;" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <div class="text-white mt-4 fs-5 fw-bold">Processing Your Sale...</div>
+              <div class="spinner-border text-white" style="width: 4rem; height: 4rem; border-width: 0.3em;" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+              <div class="text-white mt-4 fs-5 fw-bold">Processing Your Sale...</div>
+              <div class="text-white mt-2">Please wait while we submit your information</div>
+              <div class="progress mt-4" style="width: 300px; height: 10px;">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+              </div>
             </div>
-        `);
+          `);
         }
       }
 
       function showLoader() {
-        $("#loader-overlay").css("display", "flex").hide().fadeIn(200); // ensure flex centering
+        $("#loader-overlay").css("display", "flex").hide().fadeIn(200);
         $("button[type=submit]").prop("disabled", true).html(`
-        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-        Processing...
-    `);
+          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Processing...
+        `);
+        
+        // Start progress bar animation
+        let progress = 0;
+        const progressBar = $("#loader-overlay .progress-bar");
+        progressBar.css("width", "0%");
+        
+        submissionTimer = setInterval(() => {
+          progress += 1;
+          progressBar.css("width", progress + "%");
+          
+          if (progress >= 100) {
+            clearInterval(submissionTimer);
+          }
+        }, 50); // 5 seconds total for 100% (50ms * 100 = 5000ms)
       }
 
       function hideLoader() {
+        clearInterval(submissionTimer);
         $("#loader-overlay").fadeOut(200);
-        $("button[type=submit]").prop("disabled", false).html("Submit Sale");
+        $("button[type=submit]").prop("disabled", false).html(`
+          <i class="fas fa-paper-plane me-2"></i>Submit Sale
+        `);
+      }
+
+      // -------------------------
+      // Show success message that auto-dismisses
+      // -------------------------
+      function showSuccessMessage(message) {
+        // Clear any existing success message timer
+        if (successMessageTimer) {
+          clearTimeout(successMessageTimer);
+        }
+        
+        $("#message").html(`
+          <div class="alert alert-success alert-dismissible fade show" id="success-message">
+            <strong>Success!</strong> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>
+        `);
+        
+        // Auto-dismiss after 3 seconds
+        successMessageTimer = setTimeout(() => {
+          $("#success-message").alert('close');
+        }, 3000);
       }
 
       // -------------------------
@@ -351,27 +559,53 @@
       // -------------------------
       // Sales Person Management
       // -------------------------
-      function addSalesPerson() {
-        $("#sales-person-container").append(
-          '<div class="input-group mb-2">' +
-          '<input type="text" name="sales_person[]" class="form-control" placeholder="Enter sales person name">' +
-          '<button type="button" class="btn btn-outline-danger remove-sales-person" title="Remove">' +
-          '<i class="fas fa-times"></i>' +
-          '</button>' +
-          '</div>'
-        );
+      function populateSalesDropdown(selectElement, list) {
+        list.forEach(function (person) {
+          let fullName = person.first_name + " " + person.last_name;
+          selectElement.append(
+            `<option value="${person.id}">${fullName}</option>`
+          );
+        });
+      }
+
+      function addSalesPersonDropdown(salesPeople) {
+        let newSelect = $(`
+          <div class="input-group mb-2">
+            <select name="sales_person[]" class="form-select sales-person-select" required>
+              <option value="">Select a Sales Person</option>
+            </select>
+            <button type="button" class="btn btn-outline-danger remove-sales-person" title="Remove">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        `);
+
+        populateSalesDropdown(newSelect.find('select'), salesPeople);
+        $("#sales-person-container").append(newSelect);
+        
+        // Show remove button for all except the first one
+        $(".remove-sales-person").show();
+        if ($(".sales-person-select").length === 1) {
+          $(".remove-sales-person").hide();
+        }
       }
 
       function removeSalesPerson(button) {
         $(button).closest('.input-group').remove();
+        
+        // Hide remove button if only one remains
+        if ($(".sales-person-select").length === 1) {
+          $(".remove-sales-person").hide();
+        }
       }
 
       function getSalesPersons() {
         let salesPersons = [];
-        $("input[name='sales_person[]']").each(function () {
-          const value = $(this).val().trim();
+        $("select[name='sales_person[]']").each(function () {
+          const value = $(this).val();
           if (value !== "") {
-            salesPersons.push(value);
+            const selectedText = $(this).find("option:selected").text();
+            salesPersons.push(selectedText);
           }
         });
         return salesPersons;
@@ -423,16 +657,6 @@
       function validateFormData(formData) {
         const errors = [];
 
-        // Check for negative values
-        const revenue = parseFloat(formData.revenue || 0);
-        const gp = parseFloat(formData.gp || 0);
-        if (revenue < 0) {
-          errors.push("Revenue cannot be negative");
-        }
-        if (gp < 0) {
-          errors.push("Gross Profit percentage cannot be negative");
-        }
-
         // Validate numeric fields
         const numStudents = parseInt(formData.number_of_students || 0);
         if (numStudents <= 0) {
@@ -456,13 +680,9 @@
         const cleaned = { ...formData };
 
         // Convert boolean-like strings to actual booleans
-        // if (typeof cleaned.is_training_scheduled === 'string') {
-        //   cleaned.is_training_scheduled = cleaned.is_training_scheduled === 'true' || cleaned.is_training_scheduled === '1';
-        // }
         if (typeof cleaned.is_training_scheduled !== 'string') {
           cleaned.is_training_scheduled = String(cleaned.is_training_scheduled);
         }
-
 
         // Ensure numeric fields are properly formatted
         cleaned.number_of_students = parseInt(cleaned.number_of_students) || 0;
@@ -498,12 +718,12 @@
         const validationErrors = validateFormData(cleanedData);
         if (validationErrors.length > 0) {
           $("#message").html(`
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Validation Error!</strong><br>
-                    ${validationErrors.join('<br>')}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `);
+            <div class="alert alert-danger alert-dismissible fade show">
+              <strong>Validation Error!</strong><br>
+              ${validationErrors.join('<br>')}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          `);
           hideLoader();
           isSubmitting = false;
           $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
@@ -513,17 +733,20 @@
         // Ensure all required fields are present
         if (!cleanedData.course_name) {
           $("#message").html(`
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Error!</strong> Please select a course.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `);
+            <div class="alert alert-danger alert-dismissible fade show">
+              <strong>Error!</strong> Please select a course.
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          `);
           hideLoader();
           isSubmitting = false;
           return;
         }
 
         console.log("Submitting cleaned data:", cleanedData);
+
+        // Add timestamp to prevent duplicate submissions
+        cleanedData.submission_timestamp = new Date().getTime();
 
         $.ajax({
           url: apiUrl,
@@ -534,48 +757,70 @@
             "X-CSRFToken": "{{ csrf_token }}",
             "Content-Type": "application/json"
           },
+          timeout: 10000, // 10 second timeout
           complete: function () {
             hideLoader();
             isSubmitting = false;
           },
           success: function (res) {
-            $("#message").html(`
-                    <div class="alert alert-success alert-dismissible fade show">
-                        <strong>Success!</strong> ${res.message || 'Sale created successfully! waiting for admin approval.'}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `);
-            $("#sale-form")[0].reset();
-            $("#course_code").val("");
-            courseId = null;
-            updateLocationField();
-            updateCostAndRevenue();
-            $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
+            // Show success message that auto-dismisses after 3 seconds
+            showSuccessMessage(res.message || 'Sale created successfully! Waiting for admin approval.');
+            
+            // Reset form after successful submission
+            resetForm();
+            
+            // Scroll to top to show success message
+            $('html, body').animate({ scrollTop: 0 }, 500);
           },
-          error: function (xhr) {
+          error: function (xhr, status, error) {
             let err = "Error submitting sale";
-            try {
-              const response = JSON.parse(xhr.responseText);
-              err = response.message || response.error || err;
-              // Show field-specific errors if available
-              if (response.errors) {
-                err += "<br>" + Object.entries(response.errors).map(([field, messages]) =>
-                  `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
-                ).join('<br>');
+            
+            if (status === "timeout") {
+              err = "Request timed out. Please try again.";
+            } else {
+              try {
+                const response = JSON.parse(xhr.responseText);
+                err = response.message || response.error || err;
+                // Show field-specific errors if available
+                if (response.errors) {
+                  err += "<br>" + Object.entries(response.errors).map(([field, messages]) =>
+                    `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`
+                  ).join('<br>');
+                }
+              } catch (e) {
+                err = xhr.statusText || "Unknown error occurred";
               }
-            } catch (e) {
-              err = xhr.statusText || "Unknown error occurred";
             }
 
             $("#message").html(`
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        <strong>Error!</strong> ${err}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `);
+              <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Error!</strong> ${err}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+              </div>
+            `);
             $('html, body').animate({ scrollTop: $("#message").offset().top - 100 }, 500);
           }
         });
+      }
+
+      // -------------------------
+      // Reset form function
+      // -------------------------
+      function resetForm() {
+        $("#sale-form")[0].reset();
+        $("#course_code").val("");
+        courseId = null;
+        updateLocationField();
+        updateCostAndRevenue();
+        
+        // Clear sales person dropdowns except the first one
+        $("#sales-person-container .input-group:not(:first)").remove();
+        $(".remove-sales-person").hide();
+        
+        // Re-populate the first sales person dropdown
+        if ($(".sales-person-select").length > 0) {
+          $(".sales-person-select").first().val("");
+        }
       }
 
       // -------------------------
@@ -583,9 +828,11 @@
       // -------------------------
       $("#sale-form").on("submit", function (e) {
         e.preventDefault();
+        
+        // Prevent multiple submissions
         if (isSubmitting) {
           console.log("Already submitting, please wait...");
-          return;
+          return false;
         }
 
         // Basic form validation
@@ -641,16 +888,16 @@
 
         if (!isValid) {
           $("#message").html(`
-                <div class="alert alert-danger alert-dismissible fade show">
-                    <strong>Error!</strong> Please fill in all required fields.
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `);
+            <div class="alert alert-danger alert-dismissible fade show">
+              <strong>Error!</strong> Please fill in all required fields.
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          `);
           if (firstInvalidField) {
             $('html, body').animate({ scrollTop: firstInvalidField.offset().top - 100 }, 500);
             firstInvalidField.focus();
           }
-          return;
+          return false;
         }
 
         // Prepare form data
@@ -715,10 +962,12 @@
           confirmationModal.hide();
           submitFormData(formData);
         });
+        
+        return false;
       });
 
       // -------------------------
-      // Load vendors, clients, courses
+      // Load vendors, clients, courses and sales people
       // -------------------------
       function loadPopulaters(vendorId = null, initialLoad = false) {
         let url = "/scheduler_api/create_sale_api/";
@@ -728,11 +977,14 @@
           const populaters = data.populaters;
 
           if (initialLoad) {
-            const clientTypeSelect = $("select[name=client_type]").empty().append(`<option value="">Select Client Type</option>`);
-            $.each(populaters.client_types, (i, ct) => clientTypeSelect.append(`<option value="${ct.id}">${ct.client_name}</option>`));
+            // Populate sales people dropdowns
+            let salesPeople = populaters.sales_people;
+            populateSalesDropdown($('.sales-person-select'), salesPeople);
 
-            const vendorSelect = $("select[name=vendor]").empty().append(`<option value="">Select Vendor</option>`);
-            $.each(populaters.vendors, (i, v) => vendorSelect.append(`<option value="${v.id}">${v.name}</option>`));
+            // Set up add sales person button
+            $("#add-sales-person").click(function () {
+              addSalesPersonDropdown(salesPeople);
+            });
           }
 
           const courseSelect = $("#course_select").empty().append(`<option value="">Select Course</option>`);
@@ -781,7 +1033,6 @@
       $(document).on("change", "#course_select", handleCourseSelection);
 
       // Sales person event listeners
-      $("#add-sales-person").on("click", addSalesPerson);
       $(document).on("click", ".remove-sales-person", function () {
         removeSalesPerson(this);
       });

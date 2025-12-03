@@ -1,141 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Sheet Approval</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
-{% load static %}
-{% load custom_filters %} {# For get_attr filter #}
+        body {
+            background: #f8fafc;
+            padding: 20px;
+            color: #334155;
+        }
 
-<div class="container mt-5">
-    <h2 class="text-center mb-4">CEO Cost Sheet Approval</h2>
+        .approval-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-    {% if sheets %}
-        {% for sheet in sheets %}
-        <div class="cost-sheet-card mb-4 p-3 shadow-sm border rounded">
-            <h4>Cost Sheet ID: {{ sheet.id }} | Client: {{ sheet.client_type.client_name }} | Created: {{ sheet.created_at|date:"Y-m-d H:i" }}</h4>
+        .approval-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border-left: 6px solid #FF7A00;
+            margin-bottom: 30px;
+        }
 
-            <form class="cost-sheet-view-form" data-sheet-id="{{ sheet.id }}">
-                {% csrf_token %}
+        .approval-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
 
-                <!-- Classroom Section -->
-                <div class="form-section mb-3">
-                    <h5>Classroom</h5>
-                    {% for field in ["daily_venue_cost", "refreshment", "consumables", "instructor_cost", "courseware", "exam", "lab_fees", "lms_license", "data", "project_man_fee", "qcto_seta_consumables", "assessor_fees", "welcome_packs", "sme_hour", "recruitment", "labs", "travel_flights", "accomodation", "per_diem", "international", "driving_travel"] %}
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
-                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
+        .approval-title i {
+            color: #FF7A00;
+            font-size: 26px;
+        }
+
+        .cost-sheet-card {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .cost-sheet-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .sheet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .sheet-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .created-date {
+            font-size: 14px;
+            color: #64748b;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 8px;
+        }
+
+        .sheet-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+
+        .detail-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+
+        .detail-item .label {
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .detail-item .value {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .sheet-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .badge-status {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-approved {
+            background: #f0fdf4;
+            color: #16a34a;
+            border: 1px solid #bbf7d0;
+        }
+
+        .badge-pending {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+
+        .sheet-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-approve, .btn-decline {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-approve {
+            background: #16a34a;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(22, 163, 74, 0.2);
+        }
+
+        .btn-decline {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-decline:hover {
+            background: #b91c1c;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 38, 38, 0.2);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            font-size: 16px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .no-data i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            margin: 24px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .sheet-details-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sheet-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+            
+            .sheet-footer {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .sheet-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .btn-approve, .btn-decline {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="approval-container">
+        <div class="approval-card">
+            <h2 class="approval-title">
+                <i class="fas fa-clipboard-check"></i>
+                Cost Sheet Approval
+            </h2>
+
+            {% if sheets %}
+                {% for sheet in sheets %}
+                <div class="cost-sheet-card">
+                    <div class="sheet-header">
+                        <h3>Cost Sheet #{{ sheet.id }}</h3>
+                        <span class="created-date">{{ sheet.created_at }}</span>
                     </div>
-                    {% endfor %}
+
+                    <div class="sheet-details-grid">
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Basic Costs</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Instructor Cost</span>
+                            <span class="value">{{ sheet.instructor_cost }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Courseware</span>
+                            <span class="value">{{ sheet.courseware }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Exam</span>
+                            <span class="value">{{ sheet.exam }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Lab Fees</span>
+                            <span class="value">{{ sheet.lab_fees }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">LMS License</span>
+                            <span class="value">{{ sheet.lms_license }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Data</span>
+                            <span class="value">{{ sheet.data }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Management & Admin</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Project Management Fee</span>
+                            <span class="value">{{ sheet.project_man_fee }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Corporate Cost Content Dev</span>
+                            <span class="value">{{ sheet.corporate_cost_content_dev }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Admin Cost</span>
+                            <span class="value">{{ sheet.admin_cost }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Fees & Licensing</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Set Up Fee</span>
+                            <span class="value">{{ sheet.set_up_fee }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">License Fee</span>
+                            <span class="value">{{ sheet.license_fee }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Per User Fee</span>
+                            <span class="value">{{ sheet.per_user_fee }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Consulting Services</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Consulting</span>
+                            <span class="value">{{ sheet.consulting }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Analysis</span>
+                            <span class="value">{{ sheet.analysis }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Design</span>
+                            <span class="value">{{ sheet.design }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Development</span>
+                            <span class="value">{{ sheet.development }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Implementation</span>
+                            <span class="value">{{ sheet.implementation }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Evaluation</span>
+                            <span class="value">{{ sheet.evaluation }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Learning & Venue</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">E-learning Courseware</span>
+                            <span class="value">{{ sheet.e_learning_courseware }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Daily Venue Cost</span>
+                            <span class="value">{{ sheet.daily_venue_cost }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Refreshment</span>
+                            <span class="value">{{ sheet.refreshment }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Consumables</span>
+                            <span class="value">{{ sheet.consumables }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Corporate & Assessment</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Corporate Costs Content Dev</span>
+                            <span class="value">{{ sheet.corporate_costs_content_dev }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">QCTO Seta Consumables</span>
+                            <span class="value">{{ sheet.qcto_seta_consumables }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Assessor Fees</span>
+                            <span class="value">{{ sheet.assessor_fees }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Resources</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">SME Hour</span>
+                            <span class="value">{{ sheet.sme_hour }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Recruitment</span>
+                            <span class="value">{{ sheet.recruitment }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Labs</span>
+                            <span class="value">{{ sheet.labs }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Welcome Packs</span>
+                            <span class="value">{{ sheet.welcome_packs }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Travel & Expenses</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Travel Flights</span>
+                            <span class="value">{{ sheet.travel_flights }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Accommodation</span>
+                            <span class="value">{{ sheet.accomodation }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Per Diem</span>
+                            <span class="value">{{ sheet.per_diem }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">International</span>
+                            <span class="value">{{ sheet.international }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Driving Travel</span>
+                            <span class="value">{{ sheet.driving_travel }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Marketing</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Marketing Fee</span>
+                            <span class="value">{{ sheet.marketing_fee }}</span>
+                        </div>
+
+                        <h4 class="section-title" style="grid-column: 1 / -1;">Summary</h4>
+                        
+                        <div class="detail-item">
+                            <span class="label">Total Cost</span>
+                            <span class="value">{{ sheet.total_cost }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Per Learner</span>
+                            <span class="value">{{ sheet.per_learner }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="label">Days</span>
+                            <span class="value">{{ sheet.days }}</span>
+                        </div>
+                    </div>
+
+                    <div class="sheet-footer">
+
+
+                        {% if not sheet.is_approved %}
+                            {% if is_ceo %}
+                                <div class="sheet-actions">
+                                    <button class="btn-approve" onclick="updateApproval({{ sheet.id }}, 'approve')">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn-decline" onclick="updateApproval({{ sheet.id }}, 'decline')">
+                                        <i class="fas fa-times"></i> Decline
+                                    </button>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+
+                    </div>
                 </div>
-
-                <!-- LMS Section -->
-                <div class="form-section mb-3">
-                    <h5>LMS</h5>
-                    {% for field in ["set_up_fee", "license_fee", "per_user_fee", "marketing_fee"] %}
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
-                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
-                    </div>
-                    {% endfor %}
+                {% endfor %}
+            {% else %}
+                <div class="no-data">
+                    <i class="fas fa-file-invoice"></i>
+                    <p>No cost sheets available for approval.</p>
                 </div>
-
-                <!-- Content Development Section -->
-                <div class="form-section mb-3">
-                    <h5>Content Development</h5>
-                    {% for field in ["consulting", "analysis", "design", "development", "implementation", "evaluation", "e_learning_courseware", "corporate_cost_content_dev", "corporate_costs_content_dev"] %}
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">{{ field|capfirst|replace:"_"," " }}:</label>
-                        <input type="number" class="form-control" value="{{ sheet|get_attr:field }}" readonly>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Totals & Learner Info -->
-                <div class="form-section mb-3">
-                    <h5>Totals</h5>
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">Total Cost:</label>
-                        <input type="number" class="form-control" value="{{ sheet.total_cost }}" readonly>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">Per Learner:</label>
-                        <input type="number" class="form-control" value="{{ sheet.per_learner }}" readonly>
-                    </div>
-                    <div class="form-group mb-2">
-                        <label class="fw-bold">Days:</label>
-                        <input type="number" class="form-control" value="{{ sheet.days }}" readonly>
-                    </div>
-                </div>
-
-                <!-- Status -->
-                <p>Status: 
-                    {% if sheet.is_approved %}
-                        <span class="badge bg-success">Approved</span>
-                    {% else %}
-                        <span class="badge bg-warning text-dark">Pending</span>
-                    {% endif %}
-                </p>
-
-                <!-- Approve Button -->
-                {% if not sheet.is_approved %}
-                <button type="button" class="btn btn-success approve-btn" data-id="{{ sheet.id }}">
-                    Approve Cost Sheet
-                </button>
-                {% else %}
-                <button type="button" class="btn btn-secondary" disabled>
-                    Already Approved
-                </button>
-                {% endif %}
-            </form>
+            {% endif %}
         </div>
-        {% endfor %}
-    {% else %}
-        <div class="alert alert-warning text-center">
-            No cost sheets found for this client.
-        </div>
-    {% endif %}
-</div>
+    </div>
 
-<!-- Approve AJAX Script -->
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    const buttons = document.querySelectorAll(".approve-btn");
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    buttons.forEach(btn => {
-        btn.addEventListener("click", function () {
-            const sheetId = this.dataset.id;
-            if (!confirm("Are you sure you want to approve this cost sheet?")) return;
-
+    <script>
+        function updateApproval(sheetId, action) {
             fetch("", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}"
+                headers: { 
+                    "Content-Type": "application/json", 
+                    "X-CSRFToken": "{{ csrf_token }}" 
                 },
-                body: JSON.stringify({ sheet_id: sheetId })
+                body: JSON.stringify({ sheet_id: sheetId, action: action })
             })
             .then(res => res.json())
             .then(data => {
-                if (data.status === "success") {
-                    const form = document.querySelector(`.cost-sheet-view-form[data-sheet-id="${sheetId}"]`);
-                    form.querySelector(".badge").className = "badge bg-success";
-                    form.querySelector(".badge").textContent = "Approved";
-                    btn.className = "btn btn-secondary";
-                    btn.textContent = "Already Approved";
-                    btn.disabled = true;
-                    alert(data.message);
-                } else {
-                    alert("❌ " + data.message);
-                }
+                Swal.fire({
+                    icon: data.status === "success" ? "success" : "error",
+                    title: data.status === "success" ? "Success" : "Error",
+                    text: data.message || "",
+                    confirmButtonColor: "#FF7A00"
+                }).then(() => {
+                    location.reload();
+                });
             })
             .catch(err => {
-                console.error(err);
-                alert("Error approving cost sheet.");
+                Swal.fire({
+                    icon: "error",
+                    title: "Connection Error",
+                    text: "Something went wrong. Please try again.",
+                    confirmButtonColor: "#FF7A00"
+                });
             });
-        });
-    });
-});
-</script>
-
-<style>
-.cost-sheet-card {
-    background-color: #f9f9f9;
-}
-</style>
-
+        }
+    </script>
+</body>
+</html>

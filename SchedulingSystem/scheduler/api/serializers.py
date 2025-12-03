@@ -86,7 +86,7 @@ class CostSheetSerializer(serializers.ModelSerializer):
                     self.fields.pop(field_name)
 
         # Debugging log to confirm field list (optional)
-        print("✅ Final serializer fields:", list(self.fields.keys()))
+        # print("✅ Final serializer fields:", list(self.fields.keys()))
 
 class SaleSerializer(serializers.ModelSerializer):
     client_type_name = serializers.CharField(source='client_type.client_name', read_only=True)
@@ -132,3 +132,15 @@ class CostSheetViewSerializer(serializers.ModelSerializer):
     class Meta:
         model = CostSheet
         fields = '__all__'
+
+class SalesPersonSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'work_email']
+
+
+class PendingAdminSerializer(serializers.ModelSerializer):
+    role = serializers.CharField(source='role.role', read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['id', 'first_name', 'last_name', 'work_email', 'role', 'is_approved']
