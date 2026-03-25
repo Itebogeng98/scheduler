@@ -1,0 +1,658 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netcampus Group — Education & Technology Solutions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #1a1d23;
+            --net-light:        #f8f9fa;
+            --bg:               #ffffff;
+            --surface:          #ffffff;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text-primary);
+            background: var(--bg);
+            overflow-x: hidden;
+        }
+
+        /* ══════════════════ NAVBAR ══════════════════ */
+        .navbar {
+            position: sticky; top: 0; z-index: 999;
+            background: var(--net-orange);
+            padding: 0 2rem;
+            height: 68px;
+            display: flex; align-items: center;
+            box-shadow: 0 4px 20px rgba(255,140,0,.35);
+        }
+
+        .nav-inner {
+            max-width: 1200px; width: 100%; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .nav-brand {
+            display: flex; align-items: center; gap: .75rem;
+            text-decoration: none;
+        }
+        .nav-logo {
+            height: 42px; width: auto;
+            filter: drop-shadow(0 1px 3px rgba(0,0,0,.2));
+        }
+        .nav-logo-fallback {
+            height: 42px; width: 42px; background: rgba(255,255,255,.25);
+            border: 2px solid rgba(255,255,255,.5); border-radius: 10px;
+            display: none; align-items: center; justify-content: center;
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+            color: #fff; letter-spacing: .05em;
+        }
+        .nav-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem; letter-spacing: .1em; color: #fff; line-height: 1;
+        }
+
+        .nav-links {
+            display: flex; align-items: center; gap: .25rem; list-style: none;
+        }
+        .nav-links a {
+            color: rgba(255,255,255,.88); text-decoration: none;
+            font-size: .875rem; font-weight: 500;
+            padding: .5rem .9rem; border-radius: 7px;
+            transition: all .2s;
+        }
+        .nav-links a:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+        .btn-login {
+            display: inline-flex; align-items: center; gap: .35rem;
+            background: #fff; color: var(--net-orange) !important;
+            border-radius: 7px; font-weight: 700 !important;
+            padding: .45rem 1.1rem !important;
+            box-shadow: 0 2px 8px rgba(0,0,0,.12);
+            transition: all .2s !important;
+        }
+        .btn-login:hover {
+            background: var(--net-dark) !important;
+            color: #fff !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,0,0,.2) !important;
+        }
+
+        /* Hamburger */
+        .hamburger {
+            display: none; background: none; border: none;
+            color: #fff; font-size: 1.4rem; cursor: pointer; padding: .3rem;
+        }
+        .mobile-menu {
+            display: none; flex-direction: column;
+            background: var(--net-orange-dark);
+            padding: 1rem;
+            border-top: 1px solid rgba(255,255,255,.15);
+        }
+        .mobile-menu.open { display: flex; }
+        .mobile-menu a {
+            color: rgba(255,255,255,.9); text-decoration: none;
+            font-size: .9rem; font-weight: 500; padding: .65rem .75rem;
+            border-radius: 7px; transition: background .2s;
+        }
+        .mobile-menu a:hover { background: rgba(255,255,255,.12); }
+        .mobile-menu .btn-login-m {
+            background: #fff; color: var(--net-orange) !important;
+            font-weight: 700; margin-top: .4rem; text-align: center;
+            border-radius: 7px; padding: .65rem !important;
+        }
+
+        /* ══════════════════ HERO ══════════════════ */
+        .hero {
+            min-height: 100vh;
+            background:
+                linear-gradient(rgba(0,0,0,.62), rgba(0,0,0,.55)),
+                url("{% static 'images/ai_pic.png' %}") no-repeat center center / cover;
+            display: flex; align-items: center; justify-content: center;
+            text-align: center; color: #fff;
+            padding: 5rem 1.5rem;
+            position: relative; overflow: hidden;
+        }
+        /* subtle orange bottom accent */
+        .hero::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
+            background: var(--net-orange);
+        }
+
+        .hero-content { max-width: 780px; }
+        .hero-tag {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: rgba(255,140,0,.25); border: 1px solid rgba(255,140,0,.5);
+            color: var(--net-orange-light); font-size: .75rem; font-weight: 700;
+            letter-spacing: .1em; text-transform: uppercase;
+            padding: .3rem .85rem; border-radius: 20px; margin-bottom: 1.5rem;
+        }
+        .hero h1 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            letter-spacing: .06em; line-height: .95;
+            margin-bottom: 1.25rem;
+            text-shadow: 0 2px 12px rgba(0,0,0,.4);
+        }
+        .hero h1 span { color: var(--net-orange); }
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            color: rgba(255,255,255,.8); margin-bottom: 2.5rem;
+            max-width: 580px; margin-left: auto; margin-right: auto;
+            line-height: 1.65;
+        }
+        .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+        .btn-hero-primary {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--net-orange); color: #fff;
+            border: none; border-radius: 50px; font-family: 'DM Sans', sans-serif;
+            font-size: .95rem; font-weight: 700;
+            padding: .85rem 2rem; text-decoration: none;
+            box-shadow: 0 6px 24px rgba(255,140,0,.45);
+            transition: all .25s;
+        }
+        .btn-hero-primary:hover {
+            background: var(--net-orange-light); color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 32px rgba(255,140,0,.55);
+        }
+        .btn-hero-outline {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: transparent; color: #fff;
+            border: 2px solid rgba(255,255,255,.6); border-radius: 50px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: .95rem; font-weight: 600;
+            padding: .82rem 2rem; text-decoration: none;
+            transition: all .25s;
+        }
+        .btn-hero-outline:hover {
+            background: #fff; color: var(--net-orange);
+            border-color: #fff; transform: translateY(-3px);
+        }
+
+        /* scroll indicator */
+        .scroll-hint {
+            position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+            display: flex; flex-direction: column; align-items: center; gap: .35rem;
+            color: rgba(255,255,255,.4); font-size: .72rem; letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+        .scroll-hint span { width: 1px; height: 40px; background: rgba(255,255,255,.25); animation: scrollPulse 2s ease-in-out infinite; }
+        @keyframes scrollPulse { 0%,100%{ opacity:.3; } 50%{ opacity:1; } }
+
+        /* ══════════════════ SECTION SHARED ══════════════════ */
+        .section { padding: 90px 1.5rem; }
+        .section-inner { max-width: 1200px; margin: 0 auto; }
+
+        .section-label {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .7rem; font-weight: 800;
+            letter-spacing: .12em; text-transform: uppercase;
+            padding: .25rem .75rem; border-radius: 20px; margin-bottom: .75rem;
+        }
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: .06em; color: var(--text-primary); line-height: 1;
+            margin-bottom: .6rem;
+        }
+        .section-sub {
+            font-size: .95rem; color: var(--text-muted); max-width: 500px;
+            line-height: 1.6;
+        }
+        .section-head { margin-bottom: 3rem; }
+        .section-head.center { text-align: center; }
+        .section-head.center .section-sub { margin: 0 auto; }
+
+        /* ══════════════════ SERVICES ══════════════════ */
+        .services-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;
+        }
+        .service-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 16px; padding: 2rem 1.75rem;
+            box-shadow: 0 2px 12px rgba(0,0,0,.05);
+            transition: transform .25s, box-shadow .25s;
+            position: relative; overflow: hidden;
+        }
+        .service-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+            background: var(--net-orange); transform: scaleX(0); transform-origin: left;
+            transition: transform .3s ease;
+        }
+        .service-card:hover { transform: translateY(-8px); box-shadow: 0 16px 40px rgba(0,0,0,.1); }
+        .service-card:hover::before { transform: scaleX(1); }
+
+        .service-icon {
+            width: 58px; height: 58px; border-radius: 14px;
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.2);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; color: var(--net-orange);
+            margin-bottom: 1.25rem; transition: background .25s;
+        }
+        .service-card:hover .service-icon { background: var(--net-orange); color: #fff; }
+        .service-card h3 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+            letter-spacing: .06em; color: var(--text-primary);
+            margin-bottom: .6rem;
+        }
+        .service-card p { font-size: .88rem; color: var(--text-secondary); line-height: 1.65; }
+
+        /* ══════════════════ STATS BAR ══════════════════ */
+        .stats-bar {
+            background: linear-gradient(135deg, var(--net-orange) 0%, var(--net-orange-dark) 100%);
+            padding: 3.5rem 1.5rem;
+        }
+        .stats-inner {
+            max-width: 1200px; margin: 0 auto;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;
+        }
+        .stat-item { text-align: center; color: #fff; }
+        .stat-num {
+            font-family: 'Bebas Neue', sans-serif; font-size: 3rem;
+            letter-spacing: .04em; line-height: 1;
+        }
+        .stat-num span { font-size: 2rem; }
+        .stat-text { font-size: .8rem; color: rgba(255,255,255,.75); font-weight: 500; letter-spacing: .04em; margin-top: .2rem; }
+
+        /* ══════════════════ WHY US ══════════════════ */
+        .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; align-items: center; }
+        .why-visual {
+            background: linear-gradient(135deg, rgba(255,140,0,.08) 0%, rgba(255,140,0,.02) 100%);
+            border: 1px solid rgba(255,140,0,.15);
+            border-radius: 20px; padding: 3rem;
+            display: flex; flex-direction: column; gap: 1.25rem;
+        }
+        .why-pill {
+            display: flex; align-items: center; gap: .85rem;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 12px; padding: 1rem 1.25rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,.05);
+            transition: transform .2s, box-shadow .2s;
+        }
+        .why-pill:hover { transform: translateX(6px); box-shadow: 0 4px 16px rgba(255,140,0,.15); }
+        .why-pill-icon {
+            width: 40px; height: 40px; flex-shrink: 0;
+            background: rgba(255,140,0,.1); border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--net-orange); font-size: .95rem;
+        }
+        .why-pill-text strong { display: block; font-size: .9rem; color: var(--text-primary); font-weight: 600; }
+        .why-pill-text span { font-size: .78rem; color: var(--text-muted); }
+
+        .why-points { display: flex; flex-direction: column; gap: 1.1rem; }
+        .why-point { display: flex; gap: .9rem; align-items: flex-start; }
+        .why-point-icon {
+            width: 34px; height: 34px; flex-shrink: 0;
+            background: rgba(255,140,0,.1); border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--net-orange); font-size: .85rem; margin-top: .1rem;
+        }
+        .why-point h4 { font-size: .95rem; font-weight: 700; color: var(--text-primary); margin-bottom: .2rem; }
+        .why-point p { font-size: .83rem; color: var(--text-secondary); line-height: 1.55; }
+
+        /* ══════════════════ FOOTER ══════════════════ */
+        .footer {
+            background: var(--net-dark); color: rgba(255,255,255,.65);
+            padding: 4.5rem 1.5rem 2rem;
+        }
+        .footer-inner { max-width: 1200px; margin: 0 auto; }
+        .footer-grid {
+            display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr;
+            gap: 2.5rem; margin-bottom: 3rem;
+        }
+        .footer-brand { display: flex; align-items: center; gap: .65rem; margin-bottom: 1rem; }
+        .footer-logo { height: 36px; filter: brightness(0) invert(1) opacity(.85); }
+        .footer-brand-name {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem;
+            letter-spacing: .1em; color: #fff;
+        }
+        .footer-about { font-size: .85rem; line-height: 1.65; margin-bottom: 1.25rem; }
+
+        .social-icons { display: flex; gap: .6rem; }
+        .social-icons a {
+            width: 36px; height: 36px; border-radius: 50%;
+            background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.12);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(255,255,255,.6); font-size: .85rem; text-decoration: none;
+            transition: all .2s;
+        }
+        .social-icons a:hover { background: var(--net-orange); border-color: var(--net-orange); color: #fff; transform: translateY(-3px); }
+
+        .footer-heading {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+            letter-spacing: .1em; color: #fff; margin-bottom: 1.1rem;
+            position: relative; padding-bottom: .6rem;
+        }
+        .footer-heading::after {
+            content: ''; position: absolute; bottom: 0; left: 0;
+            width: 30px; height: 2px; background: var(--net-orange);
+        }
+        .footer-links { list-style: none; display: flex; flex-direction: column; gap: .55rem; }
+        .footer-links a {
+            color: rgba(255,255,255,.55); text-decoration: none; font-size: .85rem;
+            transition: all .2s; display: inline-flex; align-items: center; gap: .35rem;
+        }
+        .footer-links a:hover { color: var(--net-orange); padding-left: 4px; }
+
+        .footer-contact { display: flex; flex-direction: column; gap: .65rem; }
+        .footer-contact-item { display: flex; gap: .65rem; align-items: flex-start; font-size: .83rem; }
+        .footer-contact-item i { color: var(--net-orange); margin-top: .15rem; flex-shrink: 0; }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,.08); padding-top: 1.5rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem; font-size: .78rem;
+        }
+        .footer-bottom a { color: var(--net-orange); text-decoration: none; }
+
+        /* ══════════════════ RESPONSIVE ══════════════════ */
+        @media (max-width: 1024px) {
+            .services-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .why-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .services-grid { grid-template-columns: 1fr; }
+            .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 2rem; }
+            .footer-grid { grid-template-columns: 1fr; }
+            .footer-bottom { justify-content: center; text-align: center; }
+            .section { padding: 60px 1.25rem; }
+        }
+        @media (max-width: 480px) {
+            .stats-inner { grid-template-columns: 1fr 1fr; }
+            .hero h1 { font-size: 2.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+    <div class="nav-inner">
+        <a class="nav-brand" href="#">
+            <img src="{% static 'images/logo.png' %}" alt="Netcampus" class="nav-logo"
+                 onerror="this.style.display='none';document.querySelector('.nav-logo-fallback').style.display='flex'">
+            <div class="nav-logo-fallback">N</div>
+            <span class="nav-title">Netcampus</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a href="#">Home</a></li>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#contact">Support</a></li>
+            <li><a href="{% url 'login_view' %}" class="btn-login">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </a></li>
+        </ul>
+
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <a href="#">Home</a>
+    <a href="#services">Services</a>
+    <a href="#contact">Support</a>
+    <a href="{% url 'login_view' %}" class="btn-login-m">Login</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section class="hero">
+    <div class="hero-content">
+        <div class="hero-tag"><i class="fas fa-bolt"></i> Education & Technology</div>
+        <h1>Unlocking <span>Potential</span></h1>
+        <p>Netcampus Group provides cutting-edge educational solutions and technology services to institutions worldwide.</p>
+        <div class="hero-buttons">
+            <a href="#services" class="btn-hero-primary">
+                <i class="fas fa-rocket"></i> Get Started
+            </a>
+            <a href="#services" class="btn-hero-outline">
+                <i class="fas fa-th-large"></i> Our Services
+            </a>
+        </div>
+    </div>
+    <div class="scroll-hint">
+        Scroll <span></span>
+    </div>
+</section>
+
+<!-- ══ SERVICES ══ -->
+<section class="section" id="services" style="background:#f9fafb;">
+    <div class="section-inner">
+        <div class="section-head center">
+            <div class="section-label"><i class="fas fa-layer-group"></i> What We Offer</div>
+            <div class="section-title">Our Services</div>
+            <p class="section-sub">Comprehensive solutions for modern educational institutions and enterprises.</p>
+        </div>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-laptop-code"></i></div>
+                <h3>Learning Management Systems</h3>
+                <p>Custom LMS solutions tailored to your institution's needs with advanced tracking, analytics, and reporting built in.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-calendar-alt"></i></div>
+                <h3>Smart Scheduling</h3>
+                <p>Intelligent scheduling systems that optimize resources and minimize conflicts for educational institutions of any size.</p>
+            </div>
+            <div class="service-card">
+                <div class="service-icon"><i class="fas fa-chalkboard-teacher"></i></div>
+                <h3>IT Portal</h3>
+                <p>Interactive online learning environments with real-time collaboration tools and seamless integrations.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ STATS BAR ══ -->
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat-item">
+            <div class="stat-num">25<span>+</span></div>
+            <div class="stat-text">Years Experience</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">500<span>+</span></div>
+            <div class="stat-text">Institutions Served</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">50k<span>+</span></div>
+            <div class="stat-text">Students Trained</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-num">98<span>%</span></div>
+            <div class="stat-text">Client Satisfaction</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ WHY US ══ -->
+<section class="section" style="background:#fff;">
+    <div class="section-inner">
+        <div class="why-grid">
+            <div>
+                <div class="section-label"><i class="fas fa-star"></i> Why Netcampus</div>
+                <div class="section-title" style="margin-bottom:1rem;">Built for Education.<br>Designed for Growth.</div>
+                <p class="section-sub" style="margin-bottom:2rem;">We combine decades of education-sector expertise with modern technology to deliver solutions that actually work in the real world.</p>
+                <div class="why-points">
+                    <div class="why-point">
+                        <div class="why-point-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div>
+                            <h4>Secure & Reliable</h4>
+                            <p>Enterprise-grade security and 99.9% uptime SLA ensures your data and operations are always protected.</p>
+                        </div>
+                    </div>
+                    <div class="why-point">
+                        <div class="why-point-icon"><i class="fas fa-headset"></i></div>
+                        <div>
+                            <h4>Dedicated Support</h4>
+                            <p>Our local support team is always on hand to help you get the most from your Netcampus solutions.</p>
+                        </div>
+                    </div>
+                    <div class="why-point">
+                        <div class="why-point-icon"><i class="fas fa-chart-line"></i></div>
+                        <div>
+                            <h4>Data-Driven Insights</h4>
+                            <p>Advanced analytics and reporting give you the visibility to make smarter decisions, faster.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="why-visual">
+                <div class="why-pill">
+                    <div class="why-pill-icon"><i class="fas fa-laptop-code"></i></div>
+                    <div class="why-pill-text">
+                        <strong>LMS Integration</strong>
+                        <span>Fully customisable learning environments</span>
+                    </div>
+                </div>
+                <div class="why-pill">
+                    <div class="why-pill-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="why-pill-text">
+                        <strong>Smart Scheduling</strong>
+                        <span>Automated conflict-free timetabling</span>
+                    </div>
+                </div>
+                <div class="why-pill">
+                    <div class="why-pill-icon"><i class="fas fa-users"></i></div>
+                    <div class="why-pill-text">
+                        <strong>Vendor Management</strong>
+                        <span>Centralised supplier & course control</span>
+                    </div>
+                </div>
+                <div class="why-pill">
+                    <div class="why-pill-icon"><i class="fas fa-chart-bar"></i></div>
+                    <div class="why-pill-text">
+                        <strong>Analytics Dashboard</strong>
+                        <span>Real-time performance metrics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="footer" id="contact">
+    <div class="footer-inner">
+        <div class="footer-grid">
+            <!-- Brand -->
+            <div>
+                <div class="footer-brand">
+                    <img src="{% static 'images/logo.png' %}" alt="Netcampus" class="footer-logo"
+                         onerror="this.style.display='none'">
+                    <span class="footer-brand-name">Netcampus Group</span>
+                </div>
+                <p class="footer-about">Transforming education through innovative technology solutions and services since 1997.</p>
+                <div class="social-icons">
+                    <a href="#" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+
+            <!-- Quick Links -->
+            <div>
+                <div class="footer-heading">Quick Links</div>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Home</a></li>
+                    <li><a href="#services"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Services</a></li>
+                    <li><a href="#contact"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Support</a></li>
+                    <li><a href="{% url 'login_view' %}"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Login</a></li>
+                </ul>
+            </div>
+
+            <!-- Services -->
+            <div>
+                <div class="footer-heading">Services</div>
+                <ul class="footer-links">
+                    <li><a href="#"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Scheduling Systems</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>Analytics</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>IT Consulting</a></li>
+                    <li><a href="#"><i class="fas fa-chevron-right" style="font-size:.65rem;"></i>LMS Solutions</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <div class="footer-heading">Contact Us</div>
+                <div class="footer-contact">
+                    <div class="footer-contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>Block 4, Lords Office Estate, 276 West Ave, Centurion, 0163</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-phone"></i>
+                        <span>(012) 6631 593</span>
+                    </div>
+                    <div class="footer-contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>info@netcampus.com</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <span>© 1997 Netcampus Group. All Rights Reserved.</span>
+            <span>Designed with <span style="color:var(--net-orange);">♥</span> for Education</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+    /* Mobile menu toggle */
+    document.getElementById('hamburger').addEventListener('click', function () {
+        const menu = document.getElementById('mobileMenu');
+        menu.classList.toggle('open');
+        this.querySelector('i').classList.toggle('fa-bars');
+        this.querySelector('i').classList.toggle('fa-times');
+    });
+
+    /* Close mobile menu on link click */
+    document.querySelectorAll('.mobile-menu a').forEach(function (link) {
+        link.addEventListener('click', function () {
+            document.getElementById('mobileMenu').classList.remove('open');
+            const icon = document.getElementById('hamburger').querySelector('i');
+            icon.classList.add('fa-bars');
+            icon.classList.remove('fa-times');
+        });
+    });
+
+    /* Navbar logo fallback */
+    document.querySelectorAll('.nav-logo').forEach(function (img) {
+        img.addEventListener('error', function () {
+            this.style.display = 'none';
+            const fallback = this.parentElement.querySelector('.nav-logo-fallback');
+            if (fallback) fallback.style.display = 'flex';
+        });
+    });
+</script>
+
+</body>
+</html>

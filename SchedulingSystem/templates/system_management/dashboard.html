@@ -1,0 +1,654 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetCampus — Scheduler Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+            --sidebar-w:        260px;
+            --navbar-h:         64px;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ══════════════════ NAVBAR ══════════════════ */
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            height: var(--navbar-h);
+            background: var(--net-dark);
+            display: flex; align-items: center;
+            padding: 0 1.5rem;
+            box-shadow: 0 2px 16px rgba(0,0,0,.25);
+        }
+        .navbar-brand {
+            display: flex; align-items: center; gap: .75rem;
+            text-decoration: none; flex-shrink: 0;
+        }
+        .navbar-logo { height: 36px; width: auto; filter: drop-shadow(0 1px 2px rgba(0,0,0,.3)); }
+        .navbar-logo-placeholder {
+            width: 36px; height: 36px; background: var(--net-orange);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; color: #fff; font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.1rem; letter-spacing: .05em;
+        }
+        .navbar-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.3rem; letter-spacing: .1em;
+            color: #fff; line-height: 1;
+        }
+        .navbar-title span { color: var(--net-orange); }
+
+        .navbar-spacer { flex: 1; }
+
+        .navbar-user {
+            display: flex; align-items: center; gap: .5rem;
+            font-size: .82rem; color: rgba(255,255,255,.7);
+            margin-right: 1rem;
+        }
+        .navbar-user strong { color: #fff; font-weight: 600; }
+        .navbar-user .role-pill {
+            background: rgba(255,140,0,.2); border: 1px solid rgba(255,140,0,.3);
+            color: var(--net-orange-light); font-size: .68rem; font-weight: 700;
+            letter-spacing: .08em; text-transform: uppercase;
+            padding: .15rem .5rem; border-radius: 20px;
+        }
+
+        /* Notification bell */
+        .notif-wrap {
+            position: relative; margin-right: 1rem; cursor: pointer;
+            color: rgba(255,255,255,.7); font-size: 1.2rem;
+            transition: color .2s;
+        }
+        .notif-wrap:hover { color: var(--net-orange); }
+        .notif-badge {
+            position: absolute; top: -5px; right: -5px;
+            background: #ef4444; color: #fff; font-size: .65rem; font-weight: 800;
+            width: 17px; height: 17px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid var(--net-dark);
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60%  { transform: translateX(-4px); }
+            40%,80%  { transform: translateX(4px); }
+        }
+        .notif-wrap.shake { animation: shake .5s ease-in-out 3; }
+
+        /* Logout btn */
+        .btn-logout {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: transparent; border: 1.5px solid rgba(255,255,255,.2);
+            border-radius: 8px; color: rgba(255,255,255,.8);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .4rem .9rem; text-decoration: none; cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-logout:hover { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.08); }
+
+        /* Hamburger (mobile) */
+        .hamburger {
+            display: none; background: none; border: none;
+            color: rgba(255,255,255,.7); font-size: 1.3rem; cursor: pointer;
+            padding: .3rem; margin-right: .75rem; transition: color .2s;
+        }
+        .hamburger:hover { color: var(--net-orange); }
+
+        /* ══════════════════ LAYOUT ══════════════════ */
+        .layout { display: flex; min-height: calc(100vh - var(--navbar-h)); }
+
+        /* ══════════════════ SIDEBAR ══════════════════ */
+        .sidebar {
+            width: var(--sidebar-w); flex-shrink: 0;
+            background: linear-gradient(160deg, var(--net-orange) 0%, var(--net-orange-dark) 100%);
+            border-right: none;
+            position: sticky; top: var(--navbar-h);
+            height: calc(100vh - var(--navbar-h));
+            overflow-y: auto; padding: 1.5rem 1rem;
+            box-shadow: 4px 0 20px rgba(255,140,0,.25);
+            transition: transform .3s ease;
+        }
+        .sidebar::-webkit-scrollbar { width: 3px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.4); border-radius: 2px; }
+        .sidebar::-webkit-scrollbar-track { background: rgba(255,255,255,.1); }
+
+        .sidebar-section-label {
+            font-size: .67rem; font-weight: 800; letter-spacing: .14em;
+            text-transform: uppercase; color: rgba(255,255,255,.55);
+            padding: 0 .6rem; margin-bottom: .5rem; margin-top: 1.2rem;
+        }
+        .sidebar-section-label:first-child { margin-top: 0; }
+
+        .sidebar-menu { list-style: none; padding: 0; }
+        .sidebar-menu li { margin-bottom: .15rem; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: .65rem;
+            color: rgba(255,255,255,.88); text-decoration: none;
+            font-size: .875rem; font-weight: 500;
+            padding: .65rem .75rem; border-radius: 9px;
+            transition: all .18s; position: relative;
+        }
+        .sidebar-menu a i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,.18);
+            color: #fff;
+            transform: translateX(4px);
+        }
+        .sidebar-menu a.active {
+            background: rgba(255,255,255,.22);
+            color: #fff; font-weight: 700;
+            box-shadow: 0 2px 10px rgba(0,0,0,.1);
+        }
+        .sidebar-menu a.active::before {
+            content: ''; position: absolute; left: 0; top: 20%; bottom: 20%;
+            width: 3px; background: #fff; border-radius: 0 2px 2px 0;
+        }
+        .sidebar-menu a.logout-link { color: rgba(255,255,255,.7); }
+        .sidebar-menu a.logout-link:hover { background: rgba(0,0,0,.15); color: #fff; transform: translateX(4px); }
+
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,.2); margin: 1rem .6rem; }
+
+        /* ══════════════════ CONTENT ══════════════════ */
+        .content { flex: 1; padding: 2rem; overflow-x: hidden; min-width: 0; }
+
+        /* Page heading */
+        .page-heading {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;
+        }
+        .page-heading-left h1 {
+            font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 3vw, 2.6rem);
+            letter-spacing: .08em; line-height: 1; color: var(--text-primary);
+        }
+        .page-heading-left p { font-size: .82rem; color: var(--text-muted); margin-top: .2rem; }
+        .page-heading .date-pill {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; padding: .35rem .9rem;
+            font-size: .78rem; color: var(--text-muted); font-weight: 500;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
+        }
+
+        /* ══════════════════ STAT CARDS ══════════════════ */
+        .stats-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 1.1rem; margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.4rem 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.05);
+            display: flex; align-items: center; gap: 1.1rem;
+            transition: transform .22s, box-shadow .22s;
+            position: relative; overflow: hidden;
+            animation: fadeUp .5s ease both;
+        }
+        .stat-card:hover { transform: translateY(-4px); box-shadow: 0 8px 28px rgba(0,0,0,.1); }
+        .stat-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 3px; opacity: 0; transition: opacity .2s;
+        }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-card.orange::after { background: var(--net-orange); }
+        .stat-card.green::after  { background: #10b981; }
+        .stat-card.amber::after  { background: #f59e0b; }
+        .stat-card.blue::after   { background: #3b82f6; }
+        .stat-icon {
+            width: 52px; height: 52px; flex-shrink: 0; border-radius: 14px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.3rem;
+        }
+        .stat-icon.orange { background: rgba(255,140,0,.12); border: 1px solid rgba(255,140,0,.2); color: var(--net-orange); }
+        .stat-icon.green  { background: rgba(16,185,129,.1);  border: 1px solid rgba(16,185,129,.2);  color: #10b981; }
+        .stat-icon.amber  { background: rgba(245,158,11,.1);  border: 1px solid rgba(245,158,11,.2);  color: #f59e0b; }
+        .stat-icon.blue   { background: rgba(59,130,246,.1);  border: 1px solid rgba(59,130,246,.2);  color: #3b82f6; }
+        .stat-info {}
+        .stat-label { font-size: .75rem; color: var(--text-muted); font-weight: 500; margin-bottom: .15rem; }
+        .stat-number {
+            font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem;
+            color: var(--text-primary); letter-spacing: .04em; line-height: 1;
+        }
+
+        @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+        .stat-card:nth-child(1) { animation-delay: .05s; }
+        .stat-card:nth-child(2) { animation-delay: .12s; }
+        .stat-card:nth-child(3) { animation-delay: .19s; }
+        .stat-card:nth-child(4) { animation-delay: .26s; }
+
+        /* ══════════════════ CHARTS ══════════════════ */
+        .charts-grid {
+            display: grid; grid-template-columns: 1fr 1fr;
+            gap: 1.25rem; margin-bottom: 2rem;
+        }
+        .chart-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.5rem;
+            box-shadow: 0 2px 14px rgba(0,0,0,.06);
+            animation: fadeUp .5s ease both;
+        }
+        .chart-card:nth-child(1) { animation-delay: .3s; }
+        .chart-card:nth-child(2) { animation-delay: .38s; }
+        .chart-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 1.25rem;
+        }
+        .chart-card-header h5 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem;
+            letter-spacing: .06em; color: var(--text-primary);
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .chart-card-header h5 i { color: var(--net-orange); font-size: .95rem; }
+        .chart-badge {
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .7rem; font-weight: 700;
+            padding: .18rem .55rem; border-radius: 20px;
+        }
+        .chart-wrap { position: relative; }
+
+        /* ══════════════════ QUICK LINKS ══════════════════ */
+        .quick-links-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.5rem;
+            box-shadow: 0 2px 14px rgba(0,0,0,.06);
+            animation: fadeUp .5s .44s ease both;
+        }
+        .quick-links-card h5 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem;
+            letter-spacing: .06em; color: var(--text-primary);
+            margin-bottom: 1.1rem; display: flex; align-items: center; gap: .5rem;
+        }
+        .quick-links-card h5 i { color: var(--net-orange); }
+        .quick-links-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: .75rem;
+        }
+        .quick-link {
+            display: flex; flex-direction: column; align-items: center; gap: .5rem;
+            background: var(--surface-2); border: 1.5px solid var(--border);
+            border-radius: 11px; padding: 1.1rem .75rem; text-decoration: none;
+            color: var(--text-secondary); font-size: .8rem; font-weight: 600;
+            text-align: center; transition: all .2s;
+        }
+        .quick-link i { font-size: 1.35rem; color: var(--net-orange); transition: transform .2s; }
+        .quick-link:hover {
+            border-color: var(--net-orange); color: var(--net-orange);
+            background: rgba(255,140,0,.05); transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(255,140,0,.15);
+        }
+        .quick-link:hover i { transform: scale(1.15); }
+
+        /* ══════════════════ FOOTER ══════════════════ */
+        .footer {
+            background: var(--net-dark); color: rgba(255,255,255,.5);
+            padding: 1.1rem 2rem; font-size: .78rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .footer a { color: var(--net-orange); text-decoration: none; }
+
+        /* ══════════════════ LOGOUT OVERLAY ══════════════════ */
+        .logout-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.65); z-index: 9999;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
+        .logout-box {
+            background: var(--surface); border-radius: 16px; padding: 2.5rem 3rem;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,.3);
+        }
+        .logout-box .spinner {
+            width: 44px; height: 44px; border: 3px solid var(--net-gray);
+            border-top-color: var(--net-orange); border-radius: 50%;
+            animation: spin 1s linear infinite; margin: 0 auto 1rem;
+        }
+        .logout-box h4 { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; letter-spacing: .06em; color: var(--text-primary); }
+        .logout-box p { font-size: .82rem; color: var(--text-muted); margin-top: .3rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ══════════════════ MOBILE OVERLAY ══════════════════ */
+        .sidebar-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,.4); z-index: 89;
+        }
+        .sidebar-overlay.open { display: block; }
+
+        /* ══════════════════ RESPONSIVE ══════════════════ */
+        @media (max-width: 1100px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+            .quick-links-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                position: fixed; top: var(--navbar-h); left: 0;
+                height: calc(100vh - var(--navbar-h));
+                z-index: 90; transform: translateX(-100%);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .hamburger { display: flex; }
+            .content { padding: 1.25rem; }
+        }
+        @media (max-width: 600px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .quick-links-grid { grid-template-columns: repeat(2, 1fr); }
+            .navbar-user .role-pill { display: none; }
+            .page-heading .date-pill { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ LOGOUT OVERLAY ══ -->
+<div class="logout-overlay" id="logoutOverlay">
+    <div class="logout-box">
+        <div class="spinner"></div>
+        <h4>Logging Out</h4>
+        <p>Please wait while we securely log you out…</p>
+    </div>
+</div>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="navbar">
+    <button class="hamburger" id="hamburger" aria-label="Open menu">
+        <i class="bi bi-list"></i>
+    </button>
+
+    <a class="navbar-brand" href="#">
+        <img src="{% static 'images/logo.png' %}" alt="NetCampus" class="navbar-logo"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="navbar-logo-placeholder" style="display:none">N</div>
+        <div>
+            <div class="navbar-title">Net<span>Campus</span></div>
+        </div>
+    </a>
+
+    <div class="navbar-spacer"></div>
+
+    {% if request.user.is_authenticated %}
+        {% if request.user.is_superuser %}
+        <a href="{% url 'pending_admins_view' %}" class="notif-wrap" id="notifIcon" title="Pending Admins">
+            <i class="bi bi-bell"></i>
+            {% if pending_count > 0 %}
+            <span class="notif-badge">{{ pending_count }}</span>
+            {% endif %}
+        </a>
+        {% endif %}
+
+        <div class="navbar-user">
+            <i class="fas fa-user-circle" style="font-size:1.1rem;color:rgba(255,255,255,.5);"></i>
+            <div>
+                <strong>{{ request.user.first_name }} {{ request.user.last_name }}</strong>
+                <span class="role-pill">{{ request.user.role.role }}</span>
+            </div>
+        </div>
+    {% endif %}
+
+    <a href="{% url 'logout_view' %}" class="btn-logout" id="logoutLink">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </a>
+</nav>
+
+<!-- ══ SIDEBAR MOBILE OVERLAY ══ -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- ══ LAYOUT ══ -->
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-section-label">Main</div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'sales_view' %}"><i class="bi bi-graph-up"></i> Sales</a></li>
+            <li><a href="{% url 'cost_sheet_view' %}"><i class="bi bi-cash-stack"></i> Cost Sheet</a></li>
+            <li><a href="{% url 'list_sales_for_approval' %}"><i class="bi bi-headset"></i> Operations</a></li>
+            <li><a href="{% url 'vendors_view' %}"><i class="bi bi-buildings"></i> Vendor Management</a></li>
+        </ul>
+
+        <div class="sidebar-section-label">Setup</div>
+        <ul class="sidebar-menu">
+            <li><a href="{% url 'studio_view' %}"><i class="bi bi-pencil-square"></i> Studio Assignment</a></li>
+            <li><a href="{% url 'equipment_view' %}"><i class="bi bi-laptop"></i> IT Setup</a></li>
+        </ul>
+
+        <div class="sidebar-divider"></div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{% url 'logout_view' %}" class="logout-link sidebar-logout-link">
+                    <i class="bi bi-box-arrow-left"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </aside>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <!-- Page heading -->
+        <div class="page-heading">
+            <div class="page-heading-left">
+                <h1>Training Schedule Overview</h1>
+                <p>Welcome back, {{ request.user.first_name }}. Here's your dashboard at a glance.</p>
+            </div>
+            <span class="date-pill" id="dateDisplay"></span>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card orange">
+                <div class="stat-icon orange"><i class="fas fa-user-graduate"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Total Students</div>
+                    <div class="stat-number">{{ total_students }}</div>
+                </div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-icon green"><i class="fas fa-calendar-check"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Confirmed Trainings</div>
+                    <div class="stat-number">{{ confirmed_trainings }}</div>
+                </div>
+            </div>
+            <div class="stat-card amber">
+                <div class="stat-icon amber"><i class="fas fa-clock"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Pending Confirmations</div>
+                    <div class="stat-number">{{ pending_confirmations }}</div>
+                </div>
+            </div>
+            <div class="stat-card blue">
+                <div class="stat-icon blue"><i class="fas fa-building"></i></div>
+                <div class="stat-info">
+                    <div class="stat-label">Companies</div>
+                    <div class="stat-number">{{ total_companies }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Training by Client Type</h5>
+                    <span class="chart-badge">Doughnut</span>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="clientTypeChart" height="240"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <div class="chart-card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Monthly Training Volume</h5>
+                    <span class="chart-badge">Bar</span>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="monthlyVolumeChart" height="240"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="quick-links-card">
+            <h5><i class="fas fa-bolt"></i> Quick Navigation</h5>
+            <div class="quick-links-grid">
+                <a href="{% url 'sales_view' %}" class="quick-link">
+                    <i class="bi bi-graph-up"></i> Sales
+                </a>
+                <a href="{% url 'cost_sheet_view' %}" class="quick-link">
+                    <i class="bi bi-cash-stack"></i> Cost Sheet
+                </a>
+                <a href="{% url 'list_sales_for_approval' %}" class="quick-link">
+                    <i class="bi bi-headset"></i> Operations
+                </a>
+                <a href="{% url 'vendors_view' %}" class="quick-link">
+                    <i class="bi bi-buildings"></i> Vendors
+                </a>
+                <a href="{% url 'studio_view' %}" class="quick-link">
+                    <i class="bi bi-pencil-square"></i> Studios
+                </a>
+                <a href="{% url 'equipment_view' %}" class="quick-link">
+                    <i class="bi bi-laptop"></i> IT Setup
+                </a>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <span>© 2026 NetCampus Training Management System</span>
+    <span><i class="fas fa-envelope" style="margin-right:.3rem;color:var(--net-orange);"></i><a href="mailto:support@netcampus.com">support@netcampus.com</a></span>
+</footer>
+
+<script>
+$(document).ready(function () {
+
+    /* ── Date pill ── */
+    const now = new Date();
+    $('#dateDisplay').text(now.toLocaleDateString('en-GB', { weekday:'short', day:'2-digit', month:'short', year:'numeric' }));
+
+    /* ── Mobile sidebar ── */
+    $('#hamburger').click(function () {
+        $('#sidebar').toggleClass('open');
+        $('#sidebarOverlay').toggleClass('open');
+    });
+    $('#sidebarOverlay').click(function () {
+        $('#sidebar').removeClass('open');
+        $(this).removeClass('open');
+    });
+
+    /* ── Notification shake ── */
+    const $notif = $('#notifIcon');
+    if ($notif.find('.notif-badge').length) {
+        $notif.addClass('shake');
+        setTimeout(() => $notif.removeClass('shake'), 1600);
+    }
+
+    /* ── Logout overlay ── */
+    $('#logoutLink, .sidebar-logout-link').on('click', function (e) {
+        e.preventDefault();
+        const url = $(this).attr('href');
+        $('#logoutOverlay').css('display', 'flex');
+        setTimeout(() => { window.location.href = url; }, 1500);
+    });
+
+    /* ── Chart helpers ── */
+    function randPastel() {
+        const h = Math.floor(Math.random() * 360);
+        return `hsl(${h},55%,62%)`;
+    }
+
+    /* ── Doughnut: Client Type ── */
+    const clientColors = Array({{ client_type_labels|length }}).fill(0).map(randPastel);
+
+    new Chart(document.getElementById('clientTypeChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: {{ client_type_labels|safe }},
+            datasets: [{
+                data: {{ client_type_data|safe }},
+                backgroundColor: clientColors,
+                borderWidth: 2,
+                borderColor: '#fff',
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            cutout: '62%',
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'DM Sans', size: 12 }, padding: 14 } },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            return ` ${ctx.label}: ${ctx.raw} sale${ctx.raw !== 1 ? 's' : ''}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    /* ── Bar: Monthly Volume ── */
+    new Chart(document.getElementById('monthlyVolumeChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: {{ month_labels|safe }},
+            datasets: [{
+                label: 'Trainings',
+                data: {{ month_data|safe }},
+                backgroundColor: 'rgba(255,140,0,.75)',
+                borderColor: '#FF8C00',
+                borderWidth: 0,
+                borderRadius: 6,
+                hoverBackgroundColor: '#FF8C00'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(0,0,0,.05)' },
+                    ticks: { font: { family: 'DM Sans', size: 11 } }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { family: 'DM Sans', size: 11 } }
+                }
+            },
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.raw} training${ctx.raw !== 1 ? 's' : ''}` } }
+            }
+        }
+    });
+
+});
+</script>
+</body>
+</html>

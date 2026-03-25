@@ -1,0 +1,575 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Training Dashboard — NET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+
+            /* sidebar */
+            --sidebar-width: 270px;
+            --sidebar-bg: #1e2430;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+        /* ── LAYOUT ── */
+        .layout { display: flex; min-height: 100vh; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+            width: var(--sidebar-width); flex-shrink: 0;
+            background: var(--sidebar-bg);
+            min-height: 100vh; position: sticky; top: 0; height: 100vh;
+            overflow-y: auto; padding: 1.5rem 1.25rem;
+            display: flex; flex-direction: column; gap: 0;
+        }
+        .sidebar::-webkit-scrollbar { width: 4px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--net-orange); border-radius: 2px; }
+
+        /* Back button inside sidebar */
+        .sidebar-back {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; color: rgba(255,255,255,.7);
+            font-family: 'DM Sans', sans-serif; font-size: .8rem; font-weight: 600;
+            padding: .45rem .9rem; text-decoration: none; margin-bottom: 1.5rem;
+            transition: all .2s;
+        }
+        .sidebar-back svg { width: 13px; height: 13px; transition: transform .2s; }
+        .sidebar-back:hover { background: var(--net-orange); border-color: var(--net-orange); color: #fff; transform: translateX(-2px); }
+        .sidebar-back:hover svg { transform: translateX(-2px); }
+
+        .sidebar-title {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem;
+            letter-spacing: .1em; color: #fff; margin-bottom: 1.5rem;
+            padding-bottom: .75rem; border-bottom: 1px solid rgba(255,255,255,.08);
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .sidebar-title i { color: var(--net-orange); }
+
+        .filter-group { margin-bottom: 1.1rem; }
+        .filter-group label {
+            display: block; font-size: .7rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--net-orange); margin-bottom: .4rem;
+            display: flex; align-items: center; gap: .35rem;
+        }
+        .sidebar-input {
+            width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif;
+            font-size: .85rem; padding: .55rem .8rem; outline: none; transition: all .2s;
+        }
+        .sidebar-input::placeholder { color: rgba(255,255,255,.3); }
+        .sidebar-input:focus { border-color: var(--net-orange); background: rgba(255,140,0,.08); box-shadow: 0 0 0 3px rgba(255,140,0,.15); }
+        .sidebar-select {
+            width: 100%; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+            border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif;
+            font-size: .85rem; padding: .55rem .8rem; outline: none; cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FF8C00' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right .75rem center;
+            transition: all .2s;
+        }
+        .sidebar-select option { background: #2c3440; color: #fff; }
+        .sidebar-select:focus { border-color: var(--net-orange); background-color: rgba(255,140,0,.08); }
+
+        .sidebar-divider { height: 1px; background: rgba(255,255,255,.07); margin: 1rem 0; }
+
+        .sidebar-actions { display: flex; flex-direction: column; gap: .5rem; margin-top: auto; padding-top: 1.5rem; }
+        .btn-sidebar-primary {
+            display: flex; align-items: center; justify-content: center; gap: .4rem;
+            background: var(--net-orange); border: none; border-radius: 8px; color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 700;
+            padding: .65rem 1rem; cursor: pointer; transition: all .2s;
+            box-shadow: 0 2px 8px rgba(255,140,0,.3);
+        }
+        .btn-sidebar-primary:hover { background: var(--net-orange-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,140,0,.4); }
+        .btn-sidebar-outline {
+            display: flex; align-items: center; justify-content: center; gap: .4rem;
+            background: transparent; border: 1px solid rgba(255,255,255,.15); border-radius: 8px;
+            color: rgba(255,255,255,.6); font-family: 'DM Sans', sans-serif;
+            font-size: .85rem; font-weight: 600; padding: .65rem 1rem; cursor: pointer; transition: all .2s;
+        }
+        .btn-sidebar-outline:hover { border-color: rgba(255,255,255,.4); color: #fff; }
+
+        /* ── CONTENT ── */
+        .content { flex: 1; padding: 2rem; overflow-x: auto; }
+
+        /* Content header */
+        .content-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.4rem 2rem 1.4rem 2.3rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden;
+        }
+        .content-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--net-orange); }
+        .content-header-left h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 3vw, 2.6rem); letter-spacing: .06em; line-height: 1; }
+        .content-header-left p { font-size: .82rem; color: var(--text-muted); margin-top: .2rem; }
+        .btn-create {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--net-orange); border: none; border-radius: 8px; color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 700;
+            padding: .6rem 1.3rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,140,0,.25); transition: all .2s;
+        }
+        .btn-create:hover { background: var(--net-orange-light); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35); }
+
+        /* Table card */
+        .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .table-card-header {
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+            padding: 1rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface-2);
+        }
+        .table-card-header h5 { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; letter-spacing: .06em; color: var(--text-primary); }
+        .table-tools { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+
+        .search-wrap { position: relative; }
+        .search-wrap input {
+            background: var(--bg); border: 1.5px solid var(--border); border-radius: 25px;
+            color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: .82rem;
+            padding: .48rem 1rem .48rem 2.3rem; outline: none; width: 210px; transition: border-color .2s, box-shadow .2s;
+        }
+        .search-wrap input:focus { border-color: var(--net-orange); box-shadow: 0 0 0 3px rgba(255,140,0,.1); background: #fffbf5; }
+        .search-wrap input::placeholder { color: var(--text-muted); }
+        .search-wrap svg { position: absolute; left: .75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+        .btn-tool {
+            display: inline-flex; align-items: center; gap: .35rem;
+            background: var(--surface); border: 1.5px solid var(--border); border-radius: 7px;
+            color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+            font-size: .78rem; font-weight: 600; padding: .42rem .85rem;
+            cursor: pointer; transition: all .18s; white-space: nowrap;
+        }
+        .btn-tool:hover { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.05); }
+        .btn-tool.orange { border-color: var(--net-orange); color: var(--net-orange); }
+        .btn-tool.orange:hover { background: var(--net-orange); color: #fff; }
+
+        /* count row */
+        .table-meta { display: flex; align-items: center; justify-content: space-between; padding: .65rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+        .count-pill { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .72rem; font-weight: 700; padding: .15rem .6rem; border-radius: 20px; }
+        .row-info { font-size: .75rem; color: var(--text-muted); }
+        .row-info strong { color: var(--text-secondary); }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th { font-family: 'Bebas Neue', sans-serif; font-size: .88rem; letter-spacing: .08em; color: #fff; padding: .8rem 1rem; text-align: left; white-space: nowrap; }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .75rem 1rem; font-size: .85rem; color: var(--text-secondary); vertical-align: middle; }
+
+        /* Status badges */
+        .status-badge { display: inline-flex; align-items: center; gap: .3rem; font-size: .72rem; font-weight: 700; padding: .22rem .65rem; border-radius: 20px; white-space: nowrap; }
+        .status-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; display: inline-block; }
+        .status-confirmed { background: #ecfdf5; border: 1px solid #6ee7b7; color: #059669; }
+        .status-confirmed::before { background: #10b981; }
+        .status-pending   { background: #fffbeb; border: 1px solid #fde68a; color: #d97706; }
+        .status-pending::before   { background: #f59e0b; }
+        .status-cancelled { background: #fff5f5; border: 1px solid #fca5a5; color: #dc2626; }
+        .status-cancelled::before { background: #ef4444; }
+
+        /* Action buttons */
+        .action-buttons { display: flex; gap: .35rem; align-items: center; flex-wrap: nowrap; }
+        .btn-action {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 7px;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-secondary); text-decoration: none; font-size: .85rem;
+            transition: all .18s; cursor: pointer;
+        }
+        .btn-action.edit:hover   { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,.06); transform: translateY(-1px); }
+        .btn-action.delete:hover { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,.06); transform: translateY(-1px); }
+        .btn-action.view:hover   { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.06); transform: translateY(-1px); }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 3.5rem 1rem; color: var(--text-muted); font-size: .9rem; }
+        .empty-state .icon { display: block; font-size: 2.8rem; margin-bottom: .6rem; }
+        .empty-state h5 { color: var(--text-secondary); font-weight: 600; margin-bottom: .3rem; }
+        .empty-state small { font-size: .8rem; }
+
+        /* Pagination */
+        .pagination-wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .75rem; padding: .9rem 1.4rem; border-top: 1px solid var(--border); }
+        .pagination-btns { display: flex; gap: .35rem; }
+        .page-btn { display: inline-flex; align-items: center; justify-content: center; height: 30px; min-width: 30px; border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-secondary); font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600; text-decoration: none; transition: all .18s; padding: 0 .6rem; cursor: pointer; }
+        .page-btn:hover, .page-btn.active { background: var(--net-orange); border-color: var(--net-orange); color: #fff; box-shadow: 0 3px 10px rgba(255,140,0,.3); }
+        .page-btn.disabled { opacity: .4; pointer-events: none; }
+
+        /* Toast */
+        .toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .5rem; }
+        .toast-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: .75rem 1.1rem; box-shadow: 0 6px 24px rgba(0,0,0,.12); display: flex; align-items: center; gap: .6rem; font-size: .85rem; font-weight: 500; animation: slideIn .3s ease; min-width: 240px; }
+        .toast-item.success { border-left: 4px solid #10b981; }
+        .toast-item.success i { color: #10b981; }
+        .toast-item.error { border-left: 4px solid #ef4444; }
+        .toast-item.error i { color: #ef4444; }
+        @keyframes slideIn { from { opacity:0; transform:translateX(20px); } to { opacity:1; transform:none; } }
+
+        @media (max-width: 1100px) { .layout { flex-direction: column; } .sidebar { width: 100%; height: auto; position: static; max-height: 70vh; } }
+        @media (max-width: 768px) { .content { padding: 1rem; } .search-wrap input { width: 100%; } }
+    </style>
+</head>
+<body>
+<div class="layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+
+        <a href="{% url 'dashboard' %}" class="sidebar-back">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            Back to Dashboard
+        </a>
+
+        <div class="sidebar-title"><i class="fas fa-filter"></i> Filters</div>
+
+        <div class="filter-group">
+            <label><i class="fas fa-building"></i> Company</label>
+            <input type="text" id="companyFilter" class="sidebar-input" placeholder="Search company…">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-code-branch"></i> Branch</label>
+            <input type="text" id="branchFilter" class="sidebar-input" placeholder="Search branch…">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-chalkboard-teacher"></i> Trainer</label>
+            <input type="text" id="trainerFilter" class="sidebar-input" placeholder="Search trainer…">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-user-tie"></i> Sales Person</label>
+            <input type="text" id="salesPersonFilter" class="sidebar-input" placeholder="Search sales person…">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-users"></i> Client Type</label>
+            <select class="sidebar-select" id="clientTypeFilter">
+                <option value="">All Types</option>
+                {% for client in client_types %}
+                <option value="{{ client.id }}">{{ client.client_name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-book"></i> Course</label>
+            <input type="text" id="courseFilter" class="sidebar-input" placeholder="Search course…">
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-alt"></i> Date From</label>
+            <input type="date" id="dateFromFilter" class="sidebar-input">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-calendar-alt"></i> Date To</label>
+            <input type="date" id="dateToFilter" class="sidebar-input">
+        </div>
+        <div class="filter-group">
+            <label><i class="fas fa-flag"></i> Status</label>
+            <select class="sidebar-select" id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+            </select>
+        </div>
+
+        <div class="sidebar-actions">
+            <button class="btn-sidebar-primary" id="applyFilters"><i class="fas fa-check-circle"></i> Apply Filters</button>
+            <button class="btn-sidebar-outline" id="resetFilters"><i class="fas fa-redo"></i> Reset Filters</button>
+        </div>
+
+    </aside>
+
+    <!-- ── CONTENT ── -->
+    <main class="content">
+
+        <!-- Content header -->
+        <div class="content-header">
+            <div class="content-header-left">
+                <h2>Training Dashboard</h2>
+                <p>Manage and filter training schedules</p>
+            </div>
+            <a href="{% url 'create_sales' %}" class="btn-create"><i class="fas fa-plus"></i> New Training</a>
+        </div>
+
+        <!-- Table card -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <h5>Training Schedule</h5>
+                <div class="table-tools">
+                    <div class="search-wrap">
+                        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                        <input type="text" id="globalSearch" placeholder="Search all columns…">
+                    </div>
+                    <button class="btn-tool" id="exportCSV"><i class="fas fa-download"></i> Export</button>
+                    <button class="btn-tool" id="printTable"><i class="fas fa-print"></i> Print</button>
+                    <button class="btn-tool orange" id="refreshTable"><i class="fas fa-sync-alt"></i> Refresh</button>
+                </div>
+            </div>
+
+            <div class="table-meta">
+                <span class="row-info">Showing <strong id="visibleRows">0</strong> of <strong id="totalRows">{{ sales|length }}</strong> records</span>
+                <span class="count-pill" id="countPill">{{ sales|length }} records</span>
+            </div>
+
+            <div style="overflow-x:auto;">
+                <table id="scheduleTable">
+                    <thead>
+                        <tr>
+                            <th>Sales Person</th>
+                            <th>Branch</th>
+                            <th>Company</th>
+                            <th>Course</th>
+                            <th>Students</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Trainer</th>
+                            <th>Client Type</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        {% for sale in sales %}
+                        <tr data-company="{{ sale.company|lower|default:'' }}"
+                            data-branch="{{ sale.training_location|lower|default:'' }}"
+                            data-trainer="{{ sale.training_name|lower|default:'' }}"
+                            data-salesperson="{{ sale.sales_person|lower|default:'' }}"
+                            data-clienttype="{{ sale.client_type_name|lower|default:'' }}"
+                            data-course="{{ sale.course_name|lower|default:'' }}"
+                            data-status="{{ sale.status|lower|default:'' }}"
+                            data-startdate="{{ sale.date_of_application|date:'Y-m-d'|default:'' }}"
+                            data-enddate="{{ sale.training_end_date|date:'Y-m-d'|default:'' }}">
+                            <td>{{ sale.sales_person|default:"-" }}</td>
+                            <td>{{ sale.training_location|default:"-" }}</td>
+                            <td>{{ sale.company|default:"-" }}</td>
+                            <td>{{ sale.course_name|default:"-" }}</td>
+                            <td style="text-align:center;">{{ sale.number_of_students|default:"0" }}</td>
+                            <td>{{ sale.proposed_date }}</td>
+                            <td>{{ sale.training_end_date }}</td>
+                            <td>{{ sale.training_name|default:"-" }}</td>
+                            <td>{{ sale.client_type_name|default:"-" }}</td>
+                            <td>
+                                {% if sale.status == 'confirmed' %}
+                                <span class="status-badge status-confirmed">Confirmed</span>
+                                {% elif sale.status == 'pending' %}
+                                <span class="status-badge status-pending">Pending</span>
+                                {% elif sale.status == 'cancelled' %}
+                                <span class="status-badge status-cancelled">Cancelled</span>
+                                {% else %}
+                                <span class="status-badge">{{ sale.status|capfirst|default:"-" }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'edit_sale' sale.id %}" class="btn-action edit" title="Edit"><i class="fas fa-edit"></i></a>
+                                    <a href="{% url 'delete_sale' sale.id %}" class="btn-action delete" title="Delete"
+                                       onclick="return confirm('Are you sure you want to delete this sale?');"><i class="fas fa-trash"></i></a>
+                                    <a href="{% url 'view_sale' sale.id %}" class="btn-action view" title="View"><i class="fas fa-eye"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="11">
+                                <div class="empty-state">
+                                    <span class="icon">📅</span>
+                                    <h5>No training records found</h5>
+                                    <small>Create a new training or adjust your filters</small>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-wrap">
+                <div class="row-info">Page <strong id="currentPage">1</strong> of <strong id="totalPages">1</strong></div>
+                <div class="pagination-btns" id="pagination"></div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+$(document).ready(function () {
+    let currentPage = 1;
+    const rowsPerPage = 10;
+    let filteredRows = [];
+    let allRows = [];
+
+    function initRows() {
+        allRows = $('#tableBody tr').filter(function () { return $(this).find('td').length > 1; }).toArray();
+        filteredRows = [...allRows];
+        updateCount();
+        setupPagination();
+        showPage(1);
+    }
+    initRows();
+
+    function showToast(msg, type) {
+        const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+        const t = $(`<div class="toast-item ${type}"><i class="${icon}"></i>${msg}</div>`);
+        $('#toastContainer').append(t);
+        setTimeout(() => t.fadeOut(300, function () { $(this).remove(); }), 3000);
+    }
+
+    function updateCount() {
+        const n = filteredRows.length;
+        $('#visibleRows').text(n);
+        $('#totalRows').text(allRows.length);
+        $('#countPill').text(n + ' record' + (n !== 1 ? 's' : ''));
+    }
+
+    function applyFilters() {
+        const company    = $('#companyFilter').val().toLowerCase();
+        const branch     = $('#branchFilter').val().toLowerCase();
+        const trainer    = $('#trainerFilter').val().toLowerCase();
+        const sales      = $('#salesPersonFilter').val().toLowerCase();
+        const client     = $('#clientTypeFilter').val().toLowerCase();
+        const course     = $('#courseFilter').val().toLowerCase();
+        const status     = $('#statusFilter').val().toLowerCase();
+        const dateFrom   = $('#dateFromFilter').val();
+        const dateTo     = $('#dateToFilter').val();
+        const global     = $('#globalSearch').val().toLowerCase();
+
+        filteredRows = allRows.filter(function (row) {
+            const $r = $(row);
+            if (company  && !($r.data('company')     || '').includes(company))    return false;
+            if (branch   && !($r.data('branch')      || '').includes(branch))     return false;
+            if (trainer  && !($r.data('trainer')     || '').includes(trainer))    return false;
+            if (sales    && !($r.data('salesperson') || '').includes(sales))      return false;
+            if (client   && !($r.data('clienttype')  || '').includes(client))     return false;
+            if (course   && !($r.data('course')      || '').includes(course))     return false;
+            if (status   && !($r.data('status')      || '').includes(status))     return false;
+            const sd = $r.data('startdate') || '';
+            if (dateFrom && sd && sd < dateFrom) return false;
+            if (dateTo   && sd && sd > dateTo)   return false;
+            if (global   && !$r.text().toLowerCase().includes(global)) return false;
+            return true;
+        });
+
+        currentPage = 1;
+        updateCount();
+        setupPagination();
+        showPage(1);
+    }
+
+    function resetFilters() {
+        $('#companyFilter, #branchFilter, #trainerFilter, #salesPersonFilter, #courseFilter, #dateFromFilter, #dateToFilter, #globalSearch').val('');
+        $('#clientTypeFilter, #statusFilter').val('');
+        filteredRows = [...allRows];
+        currentPage = 1;
+        updateCount();
+        setupPagination();
+        showPage(1);
+        showToast('Filters reset.', 'success');
+    }
+
+    function showPage(page) {
+        currentPage = page;
+        const start = (page - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        $('#tableBody tr').hide();
+        filteredRows.slice(start, end).forEach(function (r) { $(r).show(); });
+        if (filteredRows.length === 0) $('#tableBody tr:has(td[colspan])').show();
+        $('#currentPage').text(page);
+    }
+
+    function setupPagination() {
+        const total = Math.ceil(filteredRows.length / rowsPerPage);
+        $('#totalPages').text(total || 1);
+        const $p = $('#pagination').empty();
+        if (total <= 1) return;
+        $p.append(`<span class="page-btn ${currentPage===1?'disabled':''}" data-page="${currentPage-1}">←</span>`);
+        for (let i = 1; i <= total; i++) {
+            $p.append(`<span class="page-btn ${i===currentPage?'active':''}" data-page="${i}">${i}</span>`);
+        }
+        $p.append(`<span class="page-btn ${currentPage===total?'disabled':''}" data-page="${currentPage+1}">→</span>`);
+        $p.find('.page-btn:not(.disabled)').click(function () {
+            const pg = parseInt($(this).data('page'));
+            if (!isNaN(pg) && pg >= 1 && pg <= total) { showPage(pg); setupPagination(); }
+        });
+    }
+
+    /* Export CSV */
+    $('#exportCSV').click(function () {
+        const headers = ['Sales Person','Branch','Company','Course','Students','Start Date','End Date','Trainer','Client Type','Status'];
+        let csv = headers.join(',') + '\n';
+        filteredRows.forEach(function (r) {
+            const cells = [];
+            $(r).find('td').slice(0, -1).each(function () {
+                cells.push('"' + $(this).text().trim().replace(/"/g, '""') + '"');
+            });
+            csv += cells.join(',') + '\n';
+        });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+        a.download = 'training-schedule-' + new Date().toISOString().slice(0,10) + '.csv';
+        a.click();
+        showToast('CSV exported!', 'success');
+    });
+
+    /* Print */
+    $('#printTable').click(function () {
+        const w = window.open('', '_blank');
+        const tbl = $('#scheduleTable').clone();
+        tbl.find('.action-buttons').remove();
+        w.document.write(`<html><head><title>Training Schedule</title>
+            <style>body{font-family:sans-serif;padding:20px;}table{width:100%;border-collapse:collapse;}th{background:#FF8C00;color:#fff;padding:8px;}td{padding:8px;border-bottom:1px solid #eee;}</style>
+            </head><body><h2>Training Schedule</h2><p>${new Date().toLocaleString()}</p>${tbl[0].outerHTML}
+            <script>window.onload=function(){window.print();setTimeout(()=>window.close(),500)}<\/script></body></html>`);
+        w.document.close();
+    });
+
+    /* Refresh */
+    $('#refreshTable').click(function () {
+        const $i = $(this).find('i');
+        $i.css({ animation: 'spin .5s linear' });
+        setTimeout(() => {
+            filteredRows = [...allRows]; updateCount(); setupPagination(); showPage(1);
+            $i.css({ animation: '' });
+            showToast('Table refreshed!', 'success');
+        }, 400);
+    });
+
+    /* Auto-filter listeners */
+    let timeout;
+    $('#companyFilter, #branchFilter, #trainerFilter, #salesPersonFilter, #courseFilter, #globalSearch').on('input', function () {
+        clearTimeout(timeout); timeout = setTimeout(applyFilters, 400);
+    });
+    $('#clientTypeFilter, #statusFilter, #dateFromFilter, #dateToFilter').on('change', applyFilters);
+
+    $('#applyFilters').click(function () { applyFilters(); showToast('Filters applied!', 'success'); });
+    $('#resetFilters').click(resetFilters);
+
+    /* Spin animation */
+    $('<style>@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}</style>').appendTo('head');
+});
+</script>
+</body>
+</html>

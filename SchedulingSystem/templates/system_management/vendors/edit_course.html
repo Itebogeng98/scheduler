@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-dark: #E55A2B;
+            --primary-orange-light: #FF8C5A;
+            --orange-hover: rgba(255, 107, 53, 0.1);
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        /* Header Section */
+        .page-header {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-orange);
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 28px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .course-code {
+            display: inline-block;
+            background: var(--primary-orange);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-left: 10px;
+        }
+        
+        /* Form Card */
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Form Field Styling */
+        form p {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        form label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 15px;
+            padding-left: 5px;
+        }
+        
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="tel"],
+        form input[type="url"],
+        form input[type="number"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        form input:focus,
+        form textarea:focus,
+        form select:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+            background-color: white;
+            outline: none;
+        }
+        
+        /* Checkbox Styling */
+        form input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            accent-color: var(--primary-orange);
+        }
+        
+        /* Required field indicator */
+        form label:after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 4px;
+        }
+        
+        form label.optional:after {
+            content: '';
+        }
+        
+        /* Error Messages */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin-top: 8px;
+        }
+        
+        .errorlist li {
+            color: #dc3545;
+            font-size: 14px;
+            padding: 8px 12px;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border-left: 3px solid #dc3545;
+        }
+        
+        /* Help Text */
+        .helptext {
+            display: block;
+            color: #6c757d;
+            font-size: 13px;
+            margin-top: 8px;
+            padding-left: 5px;
+            font-style: italic;
+        }
+        
+        /* Button Styling */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(108, 117, 125, 0.35);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Alert Messages */
+        .alert-container {
+            margin-bottom: 25px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+        
+        .alert-error, .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 5px solid #17a2b8;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+        
+        /* Field Groups */
+        .field-group {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-orange-light);
+            transition: all 0.3s ease;
+        }
+        
+        .field-group:hover {
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.1);
+        }
+        
+        .field-group h5 {
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .field-group h5 i {
+            font-size: 18px;
+            color: var(--primary-orange-dark);
+        }
+        
+        /* Row styling for exam and duration */
+        .row-fields {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 0;
+        }
+        
+        .row-fields .field-group {
+            flex: 1;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-card {
+                padding: 25px 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 22px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .course-code {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .row-fields {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+        
+        /* Additional form element styling */
+        form select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px 12px;
+            padding-right: 40px;
+        }
+        
+        /* Focus states for all form elements */
+        form input:focus,
+        form textarea:focus,
+        form select:focus {
+            transform: translateY(-1px);
+        }
+        
+        /* Price input special styling - UPDATED for South African Rand */
+        .price-wrapper {
+            position: relative;
+        }
+        
+        .price-wrapper::before {
+            content: 'R';
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-orange);
+            font-weight: 600;
+            font-size: 16px;
+            z-index: 1;
+        }
+        
+        .price-wrapper input {
+            padding-left: 30px !important;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                height: 0;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+        }
+        
+        /* Close button for alerts */
+        .alert-close {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: inherit;
+            opacity: 0.7;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+        }
+        
+        /* Active course checkbox special styling */
+        .checkbox-group {
+            background: linear-gradient(135deg, #fff5e6, #ffffff);
+            border: 2px dashed var(--primary-orange-light);
+        }
+        
+        .checkbox-group h5 i {
+            color: #28a745;
+        }
+        
+        /* Character counter styling */
+        .char-counter {
+            font-size: 12px;
+            color: #6c757d;
+            text-align: right;
+            margin-top: 5px;
+            transition: color 0.3s ease;
+        }
+        
+        /* Duration field special */
+        .duration-wrapper {
+            position: relative;
+        }
+        
+        .duration-wrapper::after {
+            content: 'hours';
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            font-size: 14px;
+            background: #f8f9fa;
+            padding: 0 8px;
+        }
+        
+        .duration-wrapper input {
+            padding-right: 70px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="{% url 'courses_view' course.vendor.id %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Courses
+        </a>
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-book-open"></i>
+                Edit Course
+                <span class="course-code">{{ course.course_code }}</span>
+            </h1>
+            <p class="text-muted mt-2 mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Update the course information below. All fields marked with * are required.
+            </p>
+        </div>
+
+        <!-- Alert Container for Messages -->
+        <div class="alert-container" id="alertContainer">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" data-message-id="{{ forloop.counter }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="alert-close" onclick="removeMessage('{{ forloop.counter }}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <form method="post" id="courseForm">
+                {% csrf_token %}
+                
+                <!-- Course Code Field -->
+                <div class="field-group">
+                    <h5>
+                        <i class="fas fa-code"></i>
+                        Course Code
+                    </h5>
+                    {{ form.course_code }}
+                    {% if form.course_code.help_text %}
+                        <small class="helptext">{{ form.course_code.help_text }}</small>
+                    {% endif %}
+                    {% if form.course_code.errors %}
+                        <div class="errorlist">
+                            {% for error in form.course_code.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Course Description Field -->
+                <div class="field-group">
+                    <h5>
+                        <i class="fas fa-align-left"></i>
+                        Course Description
+                    </h5>
+                    {{ form.course_description }}
+                    {% if form.course_description.help_text %}
+                        <small class="helptext">{{ form.course_description.help_text }}</small>
+                    {% endif %}
+                    {% if form.course_description.errors %}
+                        <div class="errorlist">
+                            {% for error in form.course_description.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Exam and Duration Row -->
+                <div class="row-fields">
+                    <!-- Exam Field -->
+                    <div class="field-group">
+                        <h5>
+                            <i class="fas fa-pencil-alt"></i>
+                            Exam
+                        </h5>
+                        {{ form.exam }}
+                        {% if form.exam.help_text %}
+                            <small class="helptext">{{ form.exam.help_text }}</small>
+                        {% endif %}
+                        {% if form.exam.errors %}
+                            <div class="errorlist">
+                                {% for error in form.exam.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Duration Field -->
+                    <div class="field-group">
+                        <h5>
+                            <i class="fas fa-clock"></i>
+                            Duration
+                        </h5>
+                        <div class="duration-wrapper">
+                            {{ form.duration }}
+                        </div>
+                        {% if form.duration.help_text %}
+                            <small class="helptext">{{ form.duration.help_text }}</small>
+                        {% endif %}
+                        {% if form.duration.errors %}
+                            <div class="errorlist">
+                                {% for error in form.duration.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Price Field - Updated for South African Rand -->
+                <div class="field-group">
+                    <h5>
+                        <i class="fas fa-currency-rand"></i> <!-- Updated icon to represent Rand -->
+                        Price (ZAR)
+                    </h5>
+                    <div class="price-wrapper">
+                        {{ form.price }}
+                    </div>
+                    {% if form.price.help_text %}
+                        <small class="helptext">{{ form.price.help_text }}</small>
+                    {% endif %}
+                    {% if form.price.errors %}
+                        <div class="errorlist">
+                            {% for error in form.price.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Active Course Checkbox -->
+                <div class="field-group checkbox-group">
+                    <h5>
+                        <i class="fas fa-check-circle"></i>
+                        Course Status
+                    </h5>
+                    <div class="form-check" style="padding-left: 35px;">
+                        {{ form.is_active }}
+                        <label class="form-check-label" for="{{ form.is_active.id_for_label }}" style="display: inline-block; padding-left: 5px;">
+                            <strong>Active Course</strong>
+                        </label>
+                    </div>
+                    {% if form.is_active.help_text %}
+                        <small class="helptext">{{ form.is_active.help_text }}</small>
+                    {% endif %}
+                    {% if form.is_active.errors %}
+                        <div class="errorlist">
+                            {% for error in form.is_active.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'courses_view' course.vendor.id %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add focus effect to all form fields
+            const formFields = document.querySelectorAll('input, textarea, select');
+            
+            formFields.forEach(field => {
+                field.addEventListener('focus', function() {
+                    this.closest('.field-group').style.transform = 'translateY(-2px)';
+                    this.closest('.field-group').style.boxShadow = '0 6px 15px rgba(255, 107, 53, 0.15)';
+                });
+                
+                field.addEventListener('blur', function() {
+                    this.closest('.field-group').style.transform = 'translateY(0)';
+                    this.closest('.field-group').style.boxShadow = 'none';
+                });
+            });
+            
+            // Add optional class to non-required fields
+            const labels = document.querySelectorAll('form h5');
+            labels.forEach(label => {
+                const fieldGroup = label.closest('.field-group');
+                if (fieldGroup) {
+                    const inputs = fieldGroup.querySelectorAll('input, select, textarea');
+                    inputs.forEach(input => {
+                        if (!input.required && input.type !== 'checkbox') {
+                            const optionalBadge = document.createElement('span');
+                            optionalBadge.className = 'badge bg-secondary ms-2';
+                            optionalBadge.style.cssText = 'font-size: 10px; padding: 3px 8px; border-radius: 12px;';
+                            optionalBadge.textContent = 'Optional';
+                            label.appendChild(optionalBadge);
+                        }
+                    });
+                }
+            });
+            
+            // Add character counter for description textarea
+            const description = document.querySelector('textarea[name="course_description"]');
+            if (description) {
+                const maxLength = description.getAttribute('maxlength') || 500;
+                const counter = document.createElement('div');
+                counter.className = 'char-counter';
+                counter.textContent = `0/${maxLength} characters`;
+                description.parentNode.appendChild(counter);
+                
+                description.addEventListener('input', function() {
+                    const currentLength = this.value.length;
+                    counter.textContent = `${currentLength}/${maxLength} characters`;
+                    
+                    if (currentLength > maxLength * 0.8) {
+                        counter.style.color = '#ffc107';
+                    } else {
+                        counter.style.color = '#6c757d';
+                    }
+                    
+                    if (currentLength > maxLength * 0.95) {
+                        counter.style.color = '#dc3545';
+                    }
+                });
+            }
+            
+            // Auto-hide success messages after 5 seconds
+            const successAlerts = document.querySelectorAll('.alert-success');
+            successAlerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.animation = 'fadeOut 0.5s ease forwards';
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 500);
+                }, 5000);
+            });
+            
+            // Clear messages from localStorage to prevent showing on page reload
+            if (performance.navigation.type === 1) {
+                // Page was reloaded
+                localStorage.removeItem('course_edit_messages_shown');
+            }
+            
+            // Mark messages as shown in localStorage
+            if (document.querySelector('.alert')) {
+                localStorage.setItem('course_edit_messages_shown', 'true');
+            }
+            
+            // Form submission handling
+            const form = document.getElementById('courseForm');
+            const formSubmitted = sessionStorage.getItem('course_form_submitted');
+            
+            if (formSubmitted === 'true') {
+                // Clear the form if it was just submitted
+                sessionStorage.removeItem('course_form_submitted');
+            }
+            
+            // Track form submission
+            form.addEventListener('submit', function() {
+                sessionStorage.setItem('course_form_submitted', 'true');
+            });
+            
+            // Prevent duplicate submission
+            let formIsSubmitting = false;
+            form.addEventListener('submit', function(e) {
+                if (formIsSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                formIsSubmitting = true;
+                
+                // Disable submit button
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                }
+                
+                return true;
+            });
+            
+            // Add price formatting for South African Rand (R)
+            const priceInput = document.querySelector('input[name="price"]');
+            if (priceInput) {
+                priceInput.addEventListener('blur', function() {
+                    let value = this.value.replace(/[^\d.]/g, '');
+                    if (value) {
+                        // Ensure two decimal places for cents
+                        value = parseFloat(value).toFixed(2);
+                        this.value = value;
+                    }
+                });
+                
+                // Optional: Add input validation to allow only numbers and decimal point
+                priceInput.addEventListener('input', function() {
+                    // Allow digits and one decimal point
+                    this.value = this.value.replace(/[^0-9.]/g, '');
+                    // Ensure only one decimal point
+                    const parts = this.value.split('.');
+                    if (parts.length > 2) {
+                        this.value = parts[0] + '.' + parts.slice(1).join('');
+                    }
+                });
+            }
+            
+            // Add duration validation
+            const durationInput = document.querySelector('input[name="duration"]');
+            if (durationInput) {
+                durationInput.addEventListener('input', function() {
+                    this.value = this.value.replace(/[^\d.]/g, '');
+                });
+            }
+        });
+        
+        // Function to remove message
+        function removeMessage(messageId) {
+            const alert = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (alert) {
+                alert.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            }
+        }
+        
+        // Clear all messages
+        function clearAllMessages() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }
+        
+        // Clear messages when navigating away
+        window.addEventListener('beforeunload', function() {
+            localStorage.removeItem('course_edit_messages_shown');
+        });
+    </script>
+</body>
+</html>

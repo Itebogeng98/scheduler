@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ studio.name }} — IT Setup</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; padding: 2rem; }
+        .page-wrapper { max-width: 900px; margin: 0 auto; }
+
+        /* ── BACK BUTTON ── */
+        .btn-back {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .45rem .95rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: all .2s; margin-bottom: 1.5rem;
+        }
+        .btn-back svg { width: 14px; height: 14px; transition: transform .2s; }
+        .btn-back:hover { background: var(--net-orange); border-color: var(--net-orange); color: #fff; transform: translateX(-2px); box-shadow: 0 4px 14px rgba(255,140,0,.28); }
+        .btn-back:hover svg { transform: translateX(-2px); }
+
+        /* ── BREADCRUMB ── */
+        .breadcrumb {
+            display: flex; align-items: center; gap: .5rem;
+            font-size: .78rem; color: var(--text-muted);
+            margin-bottom: 1.1rem;
+        }
+        .breadcrumb a { color: var(--net-orange); text-decoration: none; transition: color .2s; }
+        .breadcrumb a:hover { color: var(--net-orange-dark); }
+        .breadcrumb .sep { color: var(--border); }
+        .breadcrumb .current { color: var(--text-secondary); font-weight: 500; }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.5rem 2rem 1.5rem 2.5rem; margin-bottom: 1.75rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden;
+        }
+        .page-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--net-orange); }
+        .page-header-left { display: flex; flex-direction: column; gap: .3rem; padding-left: .25rem; }
+        .studio-label { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+        .page-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            letter-spacing: .06em; line-height: 1; color: var(--text-primary);
+        }
+        .page-header h2 .highlight { color: var(--net-orange); }
+        .page-header .tag { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .25rem .65rem; border-radius: 20px; width: fit-content; }
+        .header-stat strong { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--net-orange); letter-spacing: .04em; line-height: 1; display: block; text-align: right; }
+        .header-stat span { font-size: .72rem; color: var(--text-muted); }
+
+        /* ── ALERTS ── */
+        .alert { padding: .85rem 1.1rem; border-radius: 8px; font-size: .875rem; font-weight: 500; display: flex; align-items: center; gap: .6rem; margin-bottom: 1.25rem; animation: slideIn .3s ease; }
+        .alert-danger { background: #fff5f5; border: 1px solid #fecaca; color: #c0392b; }
+        .alert-danger::before { content: '⚠ '; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+        /* ── TABLE ── */
+        .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 1.75rem; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .table-card-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; padding: .9rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+        .table-card-header > span:first-child { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+        .count-pill { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .72rem; font-weight: 700; padding: .15rem .6rem; border-radius: 20px; }
+
+        /* search in toolbar */
+        .toolbar-search { position: relative; }
+        .toolbar-search input { background: var(--bg); border: 1.5px solid var(--border); border-radius: 7px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: .8rem; padding: .38rem 2rem .38rem .7rem; outline: none; width: 180px; transition: border-color .2s, box-shadow .2s; }
+        .toolbar-search input:focus { border-color: var(--net-orange); box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .toolbar-search input::placeholder { color: var(--text-muted); }
+        .toolbar-search svg { position: absolute; right: .55rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th { font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .1em; color: #fff; padding: .85rem 1.4rem; text-align: left; }
+        thead th:last-child { text-align: right; }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .85rem 1.4rem; font-size: .9rem; color: var(--text-secondary); vertical-align: middle; }
+        tbody td:first-child { color: var(--text-muted); font-size: .78rem; width: 40px; }
+        tbody td:last-child { text-align: right; }
+
+        .equip-cell { display: flex; align-items: center; gap: .65rem; }
+        .equip-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; background: rgba(255,140,0,.1); border-radius: 7px; color: var(--net-orange); font-size: .85rem; border: 1px solid rgba(255,140,0,.18); }
+        .qty-badge { display: inline-flex; align-items: center; justify-content: center; background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .78rem; font-weight: 700; padding: .2rem .7rem; border-radius: 20px; min-width: 48px; }
+
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .9rem; }
+        .empty-state .icon { display: block; font-size: 2.5rem; margin-bottom: .5rem; }
+        .empty-state p { font-size: .8rem; margin-top: .3rem; }
+
+        /* ── FORM ── */
+        .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem 2rem; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .form-section h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .08em; color: var(--text-primary); margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem; }
+        .form-section h3::before { content: ''; display: inline-block; width: 4px; height: 1.3rem; background: var(--net-orange); border-radius: 2px; }
+        .form-row { display: grid; grid-template-columns: 1fr 160px auto; gap: .75rem; align-items: end; }
+        .field-group { display: flex; flex-direction: column; gap: .3rem; }
+        .field-group label { font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); }
+        .form-select {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: .9rem;
+            padding: .65rem 2.2rem .65rem .9rem; width: 100%; outline: none; appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23FF8C00' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right .85rem center;
+            cursor: pointer; transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        .form-select:focus { border-color: var(--net-orange); background-color: #fffbf5; box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .form-select option { background: #fff; color: var(--text-primary); }
+        .form-input { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: .65rem .9rem; width: 100%; outline: none; transition: border-color .2s, box-shadow .2s, background .2s; }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-input:focus { border-color: var(--net-orange); background: #fffbf5; box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .form-input.error { border-color: #e74c3c; box-shadow: 0 0 0 3px rgba(231,76,60,.1); }
+        .btn-submit { background: var(--net-orange); border: none; border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 700; padding: .68rem 1.4rem; cursor: pointer; white-space: nowrap; height: fit-content; box-shadow: 0 2px 8px rgba(255,140,0,.25); transition: all .2s; }
+        .btn-submit:hover { background: var(--net-orange-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35); }
+        .btn-submit:active { transform: translateY(0); }
+
+        @media (max-width: 640px) { body { padding: 1rem; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'studio_view' %}" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Studios
+    </a>
+
+    <!-- BREADCRUMB -->
+    <nav class="breadcrumb">
+        <a href="#">Studios</a>
+        <span class="sep">›</span>
+        <span class="current">{{ studio.name }}</span>
+        <span class="sep">›</span>
+        <span class="current">IT Setup</span>
+    </nav>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <span class="studio-label">Studio</span>
+            <h2><span class="highlight">{{ studio.name }}</span> — IT Setup</h2>
+            <span class="tag">IT Configuration</span>
+        </div>
+        <div class="header-stat">
+            <strong>{% if equipment %}{{ equipment|length }}{% else %}0{% endif %}</strong>
+            <span>items assigned</span>
+        </div>
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <!-- EQUIPMENT TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span>Assigned Equipment</span>
+            <div style="display:flex;align-items:center;gap:.75rem;">
+                <div class="toolbar-search">
+                    <input type="text" id="tableSearch" placeholder="Search…">
+                    <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                </div>
+                <span class="count-pill" id="rowCount">{% if equipment %}{{ equipment|length }}{% else %}0{% endif %} items</span>
+            </div>
+        </div>
+        <table>
+            <thead><tr><th>#</th><th>Equipment</th><th>Quantity</th></tr></thead>
+            <tbody id="equipTableBody">
+                {% for item in equipment %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><div class="equip-cell"><span class="equip-icon">⚙</span>{{ item.equipment_name }}</div></td>
+                    <td><span class="qty-badge">{{ item.quantity }}</span></td>
+                </tr>
+                {% empty %}
+                <tr class="empty-row">
+                    <td colspan="3">
+                        <div class="empty-state">
+                            <span class="icon">🖥️</span>
+                            No equipment assigned yet.
+                            <p>Use the form below to assign equipment to this studio.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ASSIGN FORM -->
+    <div class="form-section">
+        <h3>Assign Equipment</h3>
+        <form method="POST" id="assignForm">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="field-group">
+                    <label for="equipSelect">Equipment</label>
+                    <select class="form-select" id="equipSelect" name="equipment" required>
+                        <option value="">Select Equipment…</option>
+                        {% for item in all_equipment %}
+                        <option value="{{ item.id }}">{{ item.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label for="equipQty">Quantity</label>
+                    <input class="form-input" id="equipQty" type="number" name="quantity" placeholder="e.g. 2" min="1" required>
+                </div>
+                <button type="submit" class="btn-submit">+ Assign</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+<script>
+$(document).ready(function () {
+    /* Search filter */
+    $('#tableSearch').on('input', function () {
+        const q = $(this).val().toLowerCase().trim();
+        let visible = 0;
+        $('#equipTableBody tr:not(.empty-row)').each(function () {
+            const show = !q || $(this).find('.equip-cell').text().toLowerCase().includes(q);
+            $(this).toggle(show);
+            if (show) visible++;
+        });
+        $('#rowCount').text(visible + ' item' + (visible !== 1 ? 's' : ''));
+        $('#noSearch').remove();
+        if (visible === 0 && q) {
+            $('#equipTableBody').append('<tr id="noSearch"><td colspan="3"><div class="empty-state"><span class="icon">🔍</span>No matches found.</div></td></tr>');
+        }
+    });
+
+    /* Form validation */
+    $('#assignForm').on('submit', function (e) {
+        let valid = true;
+        if (!$('#equipSelect').val()) {
+            valid = false;
+            $('#equipSelect').css({ borderColor: '#e74c3c', boxShadow: '0 0 0 3px rgba(231,76,60,.1)' });
+            $('#equipSelect').one('change', function () { $(this).css({ borderColor: '', boxShadow: '' }); });
+        }
+        if (!$('#equipQty').val() || parseInt($('#equipQty').val()) < 1) {
+            valid = false;
+            $('#equipQty').addClass('error').one('input', function () { $(this).removeClass('error'); });
+        }
+        if (!valid) e.preventDefault();
+    });
+
+    /* Row fade-in */
+    $('#equipTableBody tr:not(.empty-row)').each(function (i) {
+        $(this).css({ opacity: 0 }).delay(i * 55).animate({ opacity: 1 }, 280);
+    });
+
+    /* Qty badge highlight for large quantities */
+    $('.qty-badge').each(function () {
+        if (parseInt($(this).text()) >= 10) {
+            $(this).css({ background: 'rgba(255,140,0,.2)', borderColor: 'rgba(255,140,0,.4)', fontWeight: '800' });
+        }
+    });
+
+    /* Auto-dismiss alerts */
+    setTimeout(function () { $('.alert').fadeOut(400, function () { $(this).remove(); }); }, 5000);
+});
+</script>
+</body>
+</html>

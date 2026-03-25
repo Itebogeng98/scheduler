@@ -1,0 +1,501 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Management — NET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .page-wrapper { max-width: 1200px; margin: 0 auto; }
+
+        /* ── BACK BUTTON ── */
+        .btn-back {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .45rem .95rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: all .2s; margin-bottom: 1.5rem;
+        }
+        .btn-back svg { width: 14px; height: 14px; transition: transform .2s; }
+        .btn-back:hover {
+            background: var(--net-orange); border-color: var(--net-orange);
+            color: #fff; transform: translateX(-2px);
+            box-shadow: 0 4px 14px rgba(255,140,0,.28);
+        }
+        .btn-back:hover svg { transform: translateX(-2px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.5rem 2rem 1.5rem 2.5rem; margin-bottom: 1.75rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+            width: 5px; background: var(--net-orange);
+        }
+        .page-header-left { display: flex; align-items: center; gap: .85rem; }
+        .page-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: .06em; line-height: 1; color: var(--text-primary);
+        }
+        .page-header .tag {
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .68rem; font-weight: 700;
+            letter-spacing: .12em; text-transform: uppercase;
+            padding: .25rem .65rem; border-radius: 20px;
+        }
+        .header-right { display: flex; align-items: center; gap: 1rem; }
+
+        /* ── STATS ── */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 1rem; margin-bottom: 1.75rem;
+        }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.4rem 1.6rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex; align-items: center; gap: 1rem;
+            transition: transform .2s, box-shadow .2s;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::after {
+            content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+            height: 3px; background: var(--net-orange); opacity: 0;
+            transition: opacity .2s;
+        }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,.1); }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-icon {
+            width: 48px; height: 48px; flex-shrink: 0;
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.2);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            color: var(--net-orange); font-size: 1.2rem;
+        }
+        .stat-info { display: flex; flex-direction: column; }
+        .stat-number {
+            font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+            color: var(--text-primary); letter-spacing: .04em; line-height: 1;
+        }
+        .stat-label { font-size: .75rem; color: var(--text-muted); font-weight: 500; margin-top: .1rem; }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1rem 1.4rem;
+            margin-bottom: 1.75rem; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .75rem;
+        }
+        .search-wrap { position: relative; }
+        .search-wrap input {
+            background: var(--bg); border: 1.5px solid var(--border);
+            border-radius: 25px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: .875rem;
+            padding: .55rem 1rem .55rem 2.5rem; outline: none; width: 260px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .search-wrap input:focus {
+            border-color: var(--net-orange); box-shadow: 0 0 0 3px rgba(255,140,0,.1);
+            background: #fffbf5;
+        }
+        .search-wrap input::placeholder { color: var(--text-muted); }
+        .search-wrap svg {
+            position: absolute; left: .85rem; top: 50%;
+            transform: translateY(-50%); color: var(--text-muted); pointer-events: none;
+        }
+        .toolbar-actions { display: flex; gap: .5rem; }
+        .btn-tool {
+            display: inline-flex; align-items: center; gap: .4rem;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 25px; color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .5rem 1rem; cursor: pointer; transition: all .2s;
+        }
+        .btn-tool:hover { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.05); }
+
+        /* ── CREATE VENDOR BUTTON ── */
+        .btn-create {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--net-orange); border: none; border-radius: 8px;
+            color: #fff; font-family: 'DM Sans', sans-serif;
+            font-size: .875rem; font-weight: 700; padding: .6rem 1.3rem;
+            text-decoration: none; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,140,0,.25);
+            transition: all .2s;
+        }
+        .btn-create:hover {
+            background: var(--net-orange-light); color: #fff;
+            transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35);
+        }
+
+        /* ── TABLE ── */
+        .table-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; overflow: hidden;
+            box-shadow: 0 2px 14px rgba(0,0,0,.07);
+            margin-bottom: 1.75rem;
+        }
+        .table-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: .9rem 1.4rem; border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+        .table-card-header > span:first-child {
+            font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+        .count-pill {
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .72rem; font-weight: 700;
+            padding: .15rem .6rem; border-radius: 20px;
+        }
+
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th {
+            font-family: 'Bebas Neue', sans-serif; font-size: .95rem;
+            letter-spacing: .1em; color: #fff;
+            padding: .85rem 1.4rem; text-align: left; white-space: nowrap;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .85rem 1.4rem; font-size: .9rem; color: var(--text-secondary); vertical-align: middle; }
+
+        .vendor-cell { display: flex; align-items: center; gap: .75rem; }
+        .vendor-icon {
+            width: 38px; height: 38px; flex-shrink: 0;
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.18);
+            border-radius: 10px; display: flex; align-items: center;
+            justify-content: center; color: var(--net-orange); font-size: .95rem;
+        }
+        .vendor-name { font-weight: 600; color: var(--text-primary); }
+
+        /* Status badges */
+        .badge-active {
+            background: #ecfdf5; border: 1px solid #6ee7b7;
+            color: #059669; font-size: .75rem; font-weight: 700;
+            padding: .22rem .65rem; border-radius: 20px; white-space: nowrap;
+        }
+        .badge-inactive {
+            background: #f9fafb; border: 1px solid var(--border);
+            color: var(--text-muted); font-size: .75rem; font-weight: 700;
+            padding: .22rem .65rem; border-radius: 20px; white-space: nowrap;
+        }
+
+        /* Course count */
+        .course-count { display: flex; align-items: center; gap: .35rem; }
+        .course-count strong { color: var(--text-primary); font-size: .95rem; }
+        .course-count span { color: var(--text-muted); font-size: .8rem; }
+
+        /* Action buttons */
+        .action-buttons { display: flex; flex-wrap: wrap; gap: .4rem; align-items: center; }
+        .btn-action {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 7px;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-secondary); font-size: .85rem;
+            text-decoration: none; transition: all .18s; cursor: pointer;
+        }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.1); }
+        .btn-action.add:hover { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.06); }
+        .btn-action.view:hover { border-color: #3b82f6; color: #3b82f6; background: rgba(59,130,246,.06); }
+        .btn-action.edit:hover { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,.06); }
+        .btn-toggle {
+            display: inline-flex; align-items: center; gap: .3rem;
+            border-radius: 6px; border: 1.5px solid var(--border);
+            background: var(--surface); color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .75rem; font-weight: 600;
+            padding: .28rem .7rem; text-decoration: none; transition: all .18s; white-space: nowrap;
+        }
+        .btn-toggle.deactivate:hover { border-color: #f59e0b; color: #d97706; background: rgba(245,158,11,.06); }
+        .btn-toggle.activate:hover { border-color: #10b981; color: #059669; background: rgba(16,185,129,.06); }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center; padding: 4rem 1rem;
+            color: var(--text-muted); font-size: .9rem;
+        }
+        .empty-state .icon { display: block; font-size: 3rem; margin-bottom: .75rem; }
+        .empty-state h5 { color: var(--text-secondary); font-weight: 600; margin-bottom: .4rem; }
+        .empty-state p { font-size: .85rem; margin-bottom: 1.25rem; }
+
+        /* ── PAGINATION ── */
+        .pagination-wrap {
+            display: flex; justify-content: center; gap: .35rem; padding: .5rem 0;
+        }
+        .page-btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 34px; height: 34px; border-radius: 7px;
+            border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+            font-size: .85rem; font-weight: 600; text-decoration: none;
+            transition: all .18s;
+        }
+        .page-btn:hover, .page-btn.active {
+            background: var(--net-orange); border-color: var(--net-orange); color: #fff;
+            box-shadow: 0 3px 10px rgba(255,140,0,.3);
+        }
+        .page-btn.disabled { opacity: .4; pointer-events: none; }
+        .page-btn.wide { width: auto; padding: 0 .85rem; }
+
+        @media (max-width: 768px) {
+            body { padding: 1rem; }
+            .stats-row { grid-template-columns: 1fr; }
+            .search-wrap input { width: 100%; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+        }
+        @media (max-width: 480px) {
+            .action-buttons { flex-direction: column; align-items: flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'dashboard' %}" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to Dashboard
+    </a>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2>Vendor Management</h2>
+            <span class="tag">Management</span>
+        </div>
+        <div class="header-right">
+            <a href="{% url 'vendors_create' %}" class="btn-create">
+                <i class="fas fa-plus-circle"></i> Create Vendor
+            </a>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-store"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ total_vendors|default:"0" }}</span>
+                <span class="stat-label">Total Vendors</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ active_vendors_count|default:"0" }}</span>
+                <span class="stat-label">Active Vendors</span>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-book"></i></div>
+            <div class="stat-info">
+                <span class="stat-number">{{ courses_count|default:"0" }}</span>
+                <span class="stat-label">Total Courses</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="search-wrap">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+            </svg>
+            <input type="text" id="vendorSearch" placeholder="Search vendors…">
+        </div>
+        <div class="toolbar-actions">
+            <button class="btn-tool">
+                <i class="fas fa-sort"></i> Sort
+            </button>
+            <button class="btn-tool">
+                <i class="fas fa-download"></i> Export
+            </button>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span>All Vendors</span>
+            <span class="count-pill" id="vendorCount">{{ vendors|length|default:"0" }} vendors</span>
+        </div>
+
+        {% if vendors %}
+        <div style="overflow-x:auto;">
+            <table id="vendorTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                        <th>Courses</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="vendorTableBody">
+                    {% for vendor in vendors %}
+                    <tr>
+                        <td style="color:var(--text-muted);font-size:.78rem;width:40px;">{{ forloop.counter }}</td>
+                        <td>
+                            <div class="vendor-cell">
+                                <div class="vendor-icon"><i class="fas fa-store"></i></div>
+                                <span class="vendor-name">{{ vendor.name|default:"(No Name)" }}</span>
+                            </div>
+                        </td>
+                        <td>
+                            {% if vendor.is_active %}
+                            <span class="badge-active">● Active</span>
+                            {% else %}
+                            <span class="badge-inactive">○ Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="course-count">
+                                <strong>{{ vendor.active_course_count|default:"0" }}</strong>
+                                <span>courses</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'create_course_view' vendor.id %}" class="btn-action add" title="Create Course">
+                                    <i class="fas fa-plus"></i>
+                                </a>
+                                <a href="{% url 'courses_view' vendor.id %}" class="btn-action view" title="View Courses">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'edit_vendor' vendor.id %}" class="btn-action edit" title="Edit Vendor">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'toggle_vendor' vendor.id %}"
+                                   class="btn-toggle {% if vendor.is_active %}deactivate{% else %}activate{% endif %}"
+                                   title="{% if vendor.is_active %}Deactivate{% else %}Activate{% endif %}">
+                                    {% if vendor.is_active %}
+                                    <i class="fas fa-toggle-off"></i> Deactivate
+                                    {% else %}
+                                    <i class="fas fa-toggle-on"></i> Activate
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <span class="icon">🏪</span>
+                                <h5>No vendors found</h5>
+                                <p>There are no vendors to display at the moment.</p>
+                                <a href="{% url 'vendors_create' %}" class="btn-create">
+                                    <i class="fas fa-plus-circle"></i> Create Your First Vendor
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <span class="icon">🏪</span>
+            <h5>No vendors found</h5>
+            <p>There are no vendors to display at the moment.</p>
+            <a href="{% url 'vendors_create' %}" class="btn-create">
+                <i class="fas fa-plus-circle"></i> Create Your First Vendor
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- PAGINATION -->
+    {% if vendors and vendors.has_other_pages %}
+    <div class="pagination-wrap">
+        {% if vendors.has_previous %}
+        <a class="page-btn wide" href="?page={{ vendors.previous_page_number }}">← Prev</a>
+        {% else %}
+        <span class="page-btn wide disabled">← Prev</span>
+        {% endif %}
+
+        {% for i in vendors.paginator.page_range %}
+            {% if vendors.number == i %}
+            <span class="page-btn active">{{ i }}</span>
+            {% else %}
+            <a class="page-btn" href="?page={{ i }}">{{ i }}</a>
+            {% endif %}
+        {% endfor %}
+
+        {% if vendors.has_next %}
+        <a class="page-btn wide" href="?page={{ vendors.next_page_number }}">Next →</a>
+        {% else %}
+        <span class="page-btn wide disabled">Next →</span>
+        {% endif %}
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+$(document).ready(function () {
+
+    /* ── Live search ── */
+    $('#vendorSearch').on('input', function () {
+        const q = $(this).val().toLowerCase().trim();
+        let visible = 0;
+        $('#vendorTableBody tr').each(function () {
+            const name = $(this).find('.vendor-name').text().toLowerCase();
+            const show = !q || name.includes(q);
+            $(this).toggle(show);
+            if (show) visible++;
+        });
+        $('#vendorCount').text(visible + ' vendor' + (visible !== 1 ? 's' : ''));
+    });
+
+    /* ── Row fade-in ── */
+    $('#vendorTableBody tr').each(function (i) {
+        $(this).css({ opacity: 0 }).delay(i * 55).animate({ opacity: 1 }, 280);
+    });
+
+});
+</script>
+</body>
+</html>

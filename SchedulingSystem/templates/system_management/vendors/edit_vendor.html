@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vendor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-dark: #E55A2B;
+            --primary-orange-light: #FF8C5A;
+            --orange-hover: rgba(255, 107, 53, 0.1);
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        /* Header Section */
+        .page-header {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-orange);
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 28px;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .vendor-name {
+            display: inline-block;
+            background: var(--primary-orange);
+            color: white;
+            padding: 6px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-left: 10px;
+        }
+        
+        /* Form Card */
+        .form-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 35px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Form Field Styling */
+        form p {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        form label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            font-size: 15px;
+            padding-left: 5px;
+        }
+        
+        form input[type="text"],
+        form input[type="email"],
+        form input[type="tel"],
+        form input[type="url"],
+        form input[type="number"],
+        form textarea,
+        form select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        form input:focus,
+        form textarea:focus,
+        form select:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+            background-color: white;
+            outline: none;
+        }
+        
+        /* Checkbox Styling */
+        form input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            accent-color: var(--primary-orange);
+        }
+        
+        /* Required field indicator */
+        form label:after {
+            content: '*';
+            color: #dc3545;
+            margin-left: 4px;
+        }
+        
+        form label.optional:after {
+            content: '';
+        }
+        
+        /* Error Messages */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin-top: 8px;
+        }
+        
+        .errorlist li {
+            color: #dc3545;
+            font-size: 14px;
+            padding: 8px 12px;
+            background-color: rgba(220, 53, 69, 0.1);
+            border-radius: 6px;
+            margin-bottom: 5px;
+            border-left: 3px solid #dc3545;
+        }
+        
+        /* Help Text */
+        .helptext {
+            display: block;
+            color: #6c757d;
+            font-size: 13px;
+            margin-top: 8px;
+            padding-left: 5px;
+            font-style: italic;
+        }
+        
+        /* Button Styling */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            border: none;
+            border-radius: 8px;
+            padding: 14px 30px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(108, 117, 125, 0.35);
+            color: white;
+            text-decoration: none;
+        }
+        
+        /* Alert Messages */
+        .alert-container {
+            margin-bottom: 25px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            margin-bottom: 15px;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+        
+        .alert-error, .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 5px solid #17a2b8;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border-left: 5px solid #ffc107;
+        }
+        
+        /* Field Groups */
+        .field-group {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--primary-orange-light);
+        }
+        
+        .field-group h5 {
+            color: var(--primary-orange);
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-card {
+                padding: 25px 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn-primary, .btn-secondary {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .page-title {
+                font-size: 22px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .vendor-name {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+        
+        /* Additional form element styling */
+        form select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px 12px;
+            padding-right: 40px;
+        }
+        
+        /* Focus states for all form elements */
+        form input:focus,
+        form textarea:focus,
+        form select:focus {
+            transform: translateY(-1px);
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                height: 0;
+                padding: 0;
+                margin: 0;
+                overflow: hidden;
+            }
+        }
+        
+        /* Close button for alerts */
+        .alert-close {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: inherit;
+            opacity: 0.7;
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            transition: opacity 0.3s ease;
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="{% url 'vendors_view' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Vendors
+        </a>
+
+        <!-- Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-user-tie"></i>
+                Edit Vendor
+                <span class="vendor-name">{{ vendor.name }}</span>
+            </h1>
+        </div>
+
+        <!-- Alert Container for Messages -->
+        <div class="alert-container" id="alertContainer">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}" data-message-id="{{ forloop.counter }}">
+                        <i class="fas fa-{% if message.tags == 'success' %}check-circle{% elif message.tags == 'error' or message.tags == 'danger' %}exclamation-circle{% elif message.tags == 'warning' %}exclamation-triangle{% else %}info-circle{% endif %} me-2"></i>
+                        {{ message }}
+                        <button type="button" class="alert-close" onclick="removeMessage('{{ forloop.counter }}')">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <form method="post" id="vendorForm">
+                {% csrf_token %}
+                
+                <!-- Loop through form fields for better styling -->
+                {% for field in form %}
+                    <div class="field-group">
+                        <h5>
+                            <i class="fas fa-tag"></i>
+                            {{ field.label_tag }}
+                        </h5>
+                        
+                        {% if field.field.widget.input_type == 'checkbox' %}
+                            <div class="form-check">
+                                {{ field }}
+                                <label class="form-check-label" for="{{ field.id_for_label }}">
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <small class="helptext">{{ field.help_text }}</small>
+                        {% endif %}
+                        
+                        {% if field.errors %}
+                            <div class="errorlist">
+                                {% for error in field.errors %}
+                                    <div>{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="{% url 'vendors_view' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add focus effect to all form fields
+            const formFields = document.querySelectorAll('input, textarea, select');
+            
+            formFields.forEach(field => {
+                field.addEventListener('focus', function() {
+                    this.parentElement.style.transform = 'translateY(-2px)';
+                });
+                
+                field.addEventListener('blur', function() {
+                    this.parentElement.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // Add optional class to non-required fields
+            const labels = document.querySelectorAll('form label');
+            labels.forEach(label => {
+                const fieldName = label.getAttribute('for');
+                if (fieldName) {
+                    const field = document.getElementById(fieldName);
+                    if (field && !field.required) {
+                        label.classList.add('optional');
+                    }
+                }
+            });
+            
+            // Add character counter for textareas
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                const maxLength = textarea.getAttribute('maxlength');
+                if (maxLength) {
+                    const counter = document.createElement('div');
+                    counter.className = 'char-counter';
+                    counter.style.cssText = 'font-size: 12px; color: #6c757d; text-align: right; margin-top: 5px;';
+                    counter.textContent = `0/${maxLength}`;
+                    textarea.parentNode.appendChild(counter);
+                    
+                    textarea.addEventListener('input', function() {
+                        const currentLength = this.value.length;
+                        counter.textContent = `${currentLength}/${maxLength}`;
+                        
+                        if (currentLength > maxLength * 0.8) {
+                            counter.style.color = '#ffc107';
+                        } else {
+                            counter.style.color = '#6c757d';
+                        }
+                    });
+                }
+            });
+            
+            // Auto-hide success messages after 5 seconds
+            const successAlerts = document.querySelectorAll('.alert-success');
+            successAlerts.forEach(alert => {
+                setTimeout(() => {
+                    alert.style.animation = 'fadeOut 0.5s ease forwards';
+                    setTimeout(() => {
+                        if (alert.parentNode) {
+                            alert.parentNode.removeChild(alert);
+                        }
+                    }, 500);
+                }, 5000); // 5 seconds
+            });
+            
+            // Clear messages from localStorage to prevent showing on page reload
+            if (performance.navigation.type === 1) {
+                // Page was reloaded
+                localStorage.removeItem('vendor_edit_messages_shown');
+            }
+            
+            // Mark messages as shown in localStorage
+            if (document.querySelector('.alert')) {
+                localStorage.setItem('vendor_edit_messages_shown', 'true');
+            }
+            
+            // Clear form data on successful submission if redirected back
+            const form = document.getElementById('vendorForm');
+            const formSubmitted = sessionStorage.getItem('vendor_form_submitted');
+            
+            if (formSubmitted === 'true') {
+                // Clear the form if it was just submitted
+                form.reset();
+                sessionStorage.removeItem('vendor_form_submitted');
+            }
+            
+            // Track form submission
+            form.addEventListener('submit', function() {
+                sessionStorage.setItem('vendor_form_submitted', 'true');
+            });
+            
+            // Prevent duplicate submission
+            let formIsSubmitting = false;
+            form.addEventListener('submit', function(e) {
+                if (formIsSubmitting) {
+                    e.preventDefault();
+                    return false;
+                }
+                formIsSubmitting = true;
+                
+                // Disable submit button
+                const submitBtn = this.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                }
+                
+                return true;
+            });
+        });
+        
+        // Function to remove message
+        function removeMessage(messageId) {
+            const alert = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (alert) {
+                alert.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            }
+        }
+        
+        // Clear all messages
+        function clearAllMessages() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.animation = 'fadeOut 0.5s ease forwards';
+                setTimeout(() => {
+                    if (alert.parentNode) {
+                        alert.parentNode.removeChild(alert);
+                    }
+                }, 500);
+            });
+        }
+        
+        // Clear messages when navigating away
+        window.addEventListener('beforeunload', function() {
+            localStorage.removeItem('vendor_edit_messages_shown');
+        });
+    </script>
+</body>
+</html>

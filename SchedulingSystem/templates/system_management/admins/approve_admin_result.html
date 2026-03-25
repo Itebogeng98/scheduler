@@ -1,0 +1,20 @@
+
+{% load static %}
+
+<div class="container mt-5 text-center">
+
+    {% if success %}
+        <div class="alert alert-success">
+            Admin approved successfully.
+        </div>
+    {% else %}
+        <div class="alert alert-danger">
+            Failed to approve admin.
+        </div>
+    {% endif %}
+
+    <a href="{% url 'pending_admins_view' %}" class="btn btn-primary mt-3">
+        Back to Pending Admins
+    </a>
+
+</div>

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studios — NET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .page-wrapper { max-width: 1100px; margin: 0 auto; }
+
+        /* ── BACK BUTTON ── */
+        .btn-back {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--surface);
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif;
+            font-size: .82rem; font-weight: 600;
+            padding: .45rem .95rem;
+            text-decoration: none; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+            transition: all .2s;
+            margin-bottom: 1.5rem;
+        }
+        .btn-back svg { width: 14px; height: 14px; transition: transform .2s; }
+        .btn-back:hover {
+            background: var(--net-orange); border-color: var(--net-orange);
+            color: #fff; transform: translateX(-2px);
+            box-shadow: 0 4px 14px rgba(255,140,0,.28);
+        }
+        .btn-back:hover svg { transform: translateX(-2px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem 2rem 1.5rem 2.5rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            position: relative; overflow: hidden;
+        }
+        .page-header::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+            background: var(--net-orange);
+        }
+        .page-header-left { display: flex; align-items: center; gap: .85rem; }
+        .page-header h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: clamp(2rem, 4vw, 3rem);
+            letter-spacing: .06em; line-height: 1;
+            color: var(--text-primary);
+        }
+        .page-header .tag {
+            background: rgba(255,140,0,.1);
+            border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark);
+            font-size: .68rem; font-weight: 700; letter-spacing: .12em;
+            text-transform: uppercase; padding: .25rem .65rem; border-radius: 20px;
+        }
+        .header-stat strong {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem; color: var(--net-orange); letter-spacing: .04em; line-height: 1;
+            display: block; text-align: right;
+        }
+        .header-stat span { font-size: .72rem; color: var(--text-muted); }
+
+        /* ── ALERTS ── */
+        .alert {
+            padding: .85rem 1.1rem; border-radius: 8px;
+            font-size: .875rem; font-weight: 500;
+            display: flex; align-items: center; gap: .6rem;
+            margin-bottom: 1.25rem; animation: slideIn .3s ease;
+        }
+        .alert-danger  { background: #fff5f5; border: 1px solid #fecaca; color: #c0392b; }
+        .alert-danger::before  { content: '⚠ '; }
+        .alert-success { background: #fffbeb; border: 1px solid rgba(255,140,0,.3); color: var(--net-orange-dark); }
+        .alert-success::before { content: '✓ '; }
+        @keyframes slideIn { from { opacity:0; transform:translateY(-6px); } to { opacity:1; transform:none; } }
+
+        /* ── TABLE CARD ── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px; overflow: hidden;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 2px 14px rgba(0,0,0,.07);
+        }
+        .table-card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: .9rem 1.4rem;
+            border-bottom: 1px solid var(--border);
+            background: var(--surface-2);
+        }
+        .table-card-header > span:first-child {
+            font-size: .72rem; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+        .count-pill {
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .72rem; font-weight: 700;
+            padding: .15rem .6rem; border-radius: 20px;
+        }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th {
+            font-family: 'Bebas Neue', sans-serif; font-size: .95rem;
+            letter-spacing: .1em; color: #fff;
+            padding: .85rem 1.4rem; text-align: left;
+        }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .85rem 1.4rem; font-size: .9rem; color: var(--text-secondary); vertical-align: middle; }
+        tbody td:first-child { color: var(--text-muted); font-size: .78rem; width: 40px; }
+        tbody td strong { color: var(--text-primary); font-weight: 600; }
+
+        .badge-capacity {
+            background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22);
+            color: var(--net-orange-dark); font-size: .75rem; font-weight: 600;
+            padding: .2rem .6rem; border-radius: 20px; display: inline-block;
+        }
+        .btn-view {
+            display: inline-flex; align-items: center; gap: .4rem;
+            border: 1.5px solid var(--net-orange); color: var(--net-orange);
+            background: transparent; font-family: 'DM Sans', sans-serif;
+            font-size: .8rem; font-weight: 600; padding: .35rem .85rem;
+            border-radius: 6px; text-decoration: none;
+            transition: all .2s; white-space: nowrap;
+        }
+        .btn-view:hover {
+            background: var(--net-orange); color: #fff;
+            transform: translateY(-1px); box-shadow: 0 4px 14px rgba(255,140,0,.3);
+        }
+        .btn-view svg { width: 12px; height: 12px; }
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .9rem; }
+        .empty-state .icon { display: block; font-size: 2.5rem; margin-bottom: .5rem; }
+
+        /* ── FORM ── */
+        .form-section {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 1.75rem 2rem;
+            box-shadow: 0 2px 14px rgba(0,0,0,.07);
+        }
+        .form-section h3 {
+            font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem;
+            letter-spacing: .08em; color: var(--text-primary);
+            margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem;
+        }
+        .form-section h3::before {
+            content: ''; display: inline-block; width: 4px; height: 1.3rem;
+            background: var(--net-orange); border-radius: 2px;
+        }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr 160px auto; gap: .75rem; align-items: end; }
+        .field-group { display: flex; flex-direction: column; gap: .3rem; }
+        .field-group label {
+            font-size: .7rem; font-weight: 700; letter-spacing: .09em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+        .form-input {
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: .9rem;
+            padding: .65rem .9rem; width: 100%; outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s;
+        }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-input:focus { border-color: var(--net-orange); background: #fffbf5; box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .btn-submit {
+            background: var(--net-orange); border: none; border-radius: 8px;
+            color: #fff; font-family: 'DM Sans', sans-serif;
+            font-size: .9rem; font-weight: 700; padding: .68rem 1.4rem;
+            cursor: pointer; white-space: nowrap; height: fit-content;
+            box-shadow: 0 2px 8px rgba(255,140,0,.25);
+            transition: all .2s;
+        }
+        .btn-submit:hover { background: var(--net-orange-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35); }
+        .btn-submit:active { transform: translateY(0); }
+
+        @media (max-width: 768px) { body { padding: 1rem; } .form-grid { grid-template-columns: 1fr 1fr; } .form-grid .btn-submit { grid-column: span 2; } }
+        @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .form-grid .btn-submit { grid-column: 1; } }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'dashboard' %}" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+        </svg>
+        Back to Dashboard
+    </a>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2>Studios</h2>
+            <span class="tag">Management</span>
+        </div>
+        <div class="header-stat">
+            <strong>{% if studios %}{{ studios|length }}{% else %}0{% endif %}</strong>
+            <span>total studios</span>
+        </div>
+    </div>
+
+    {% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span>All Studios</span>
+            <span class="count-pill">{% if studios %}{{ studios|length }}{% else %}0{% endif %} studios</span>
+        </div>
+        <table id="studiosTable">
+            <thead>
+                <tr>
+                    <th>#</th><th>Name</th><th>Location</th><th>Capacity</th><th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for studio in studios %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><strong>{{ studio.name }}</strong></td>
+                    <td>{{ studio.location }}</td>
+                    <td><span class="badge-capacity">{{ studio.capacity }} seats</span></td>
+                    <td>
+                        <a href="{% url 'studio_detail_view' studio.id %}" class="btn-view">
+                            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8" cy="8" r="3"/><path d="M1 8s2.5-5 7-5 7 5 7 5-2.5 5-7 5-7-5-7-5z"/></svg>
+                            View IT Setup
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5"><div class="empty-state"><span class="icon">🎬</span>No studios yet — create your first one below.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- CREATE FORM -->
+    <div class="form-section">
+        <h3>Create Studio</h3>
+        <form method="POST" id="createStudioForm">
+            {% csrf_token %}
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="studioName">Studio Name</label>
+                    <input class="form-input" id="studioName" type="text" name="name" placeholder="e.g. Studio Alpha" required>
+                </div>
+                <div class="field-group">
+                    <label for="studioLocation">Location</label>
+                    <input class="form-input" id="studioLocation" type="text" name="location" placeholder="e.g. Building 3, Floor 2">
+                </div>
+                <div class="field-group">
+                    <label for="studioCapacity">Capacity</label>
+                    <input class="form-input" id="studioCapacity" type="number" name="capacity" placeholder="50" min="1" required>
+                </div>
+
+                <div class="field-group">
+                    <label for="itPerson">IT Person</label>
+                    <select class="form-input" id="itPerson" name="it_person" required>
+                        <option value="">Select IT Person</option>
+                        {% for user in it_users %}
+                            <option value="{{ user.id }}">
+                                {{ user.first_name }} {{ user.last_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button type="submit" class="btn-submit">+ Create</button>
+            </div>
+        </form>
+    </div>
+
+    {% if success %}<div class="alert alert-success" style="margin-top:1.25rem;">{{ success }}</div>{% endif %}
+    {% if error %}<div class="alert alert-danger" style="margin-top:1.25rem;">{{ error }}</div>{% endif %}
+
+</div>
+<script>
+$(document).ready(function () {
+    $('#studiosTable tbody tr').each(function (i) {
+        $(this).css({ opacity: 0 }).delay(i * 55).animate({ opacity: 1 }, 280);
+    });
+    $('#createStudioForm').on('submit', function (e) {
+        let valid = true;
+        $(this).find('input[required]').each(function () {
+            if (!$(this).val().trim()) {
+                valid = false;
+                $(this).css({ borderColor: '#e74c3c', boxShadow: '0 0 0 3px rgba(231,76,60,.1)' });
+                $(this).one('input', function () { $(this).css({ borderColor: '', boxShadow: '' }); });
+            }
+        });
+        if (!valid) { e.preventDefault(); $('html,body').animate({ scrollTop: $(this).offset().top - 60 }, 300); }
+    });
+    setTimeout(function () { $('.alert').fadeOut(400, function () { $(this).remove(); }); }, 5000);
+});
+</script>
+</body>
+</html>

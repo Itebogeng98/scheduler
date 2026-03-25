@@ -1,0 +1,1087 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Vendor Courses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-dark: #E55A2B;
+            --primary-orange-light: #FF8C5A;
+            --orange-hover: rgba(255, 107, 53, 0.08);
+            --card-bg: #ffffff;
+            --border-color: #e0e0e0;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            padding: 20px;
+        }
+        
+        /* Back Button */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-bottom: 25px;
+            border: none;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        /* Main Header */
+        .page-header {
+            background-color: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 5px solid var(--primary-orange);
+        }
+        
+        .page-title {
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 28px;
+            margin: 0;
+        }
+        
+        .vendor-id-display {
+            display: inline-block;
+            background: var(--primary-orange);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            margin-left: 15px;
+            vertical-align: middle;
+        }
+        
+        /* Import Section - Improved Visibility */
+        .import-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+        
+        .import-title {
+            color: var(--primary-orange);
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .import-title i {
+            background-color: rgba(255, 107, 53, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+            color: var(--primary-orange);
+        }
+        
+        .form-control {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 14px 16px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+            background-color: white;
+            outline: none;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+            width: 100%;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 14px 28px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.25);
+            width: 100%;
+        }
+        
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(40, 167, 69, 0.35);
+        }
+        
+        .btn-outline-info {
+            border: 2px solid #17a2b8;
+            color: #17a2b8;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+        
+        .btn-outline-info:hover {
+            background-color: #17a2b8;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+        }
+        
+        /* File Input Styling */
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-input-wrapper input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            cursor: pointer;
+        }
+        
+        .custom-file-upload {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background-color: #f8f9fa;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-file-upload:hover {
+            background-color: var(--orange-hover);
+            border-color: var(--primary-orange);
+        }
+        
+        .file-icon {
+            font-size: 32px;
+            color: var(--primary-orange);
+        }
+        
+        .file-text h5 {
+            margin: 0;
+            color: #495057;
+            font-weight: 600;
+        }
+        
+        .file-text p {
+            margin: 5px 0 0;
+            color: #6c757d;
+            font-size: 14px;
+        }
+        
+        /* Alert Container */
+        #alert-container {
+            margin-bottom: 25px;
+        }
+        
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 18px 20px;
+            font-size: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+        
+        .alert-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-left: 5px solid #17a2b8;
+        }
+        
+        /* Template Info Card */
+        .template-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--primary-orange);
+        }
+        
+        .template-info h6 {
+            color: var(--primary-orange);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .required-fields {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .required-fields li {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .required-fields li i {
+            color: var(--primary-orange);
+            margin-right: 6px;
+        }
+        
+        .required-fields li span {
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        /* Format Toggle Buttons */
+        .format-toggle {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .format-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 8px;
+            color: #6c757d;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .format-btn.active {
+            background: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+        
+        .format-btn i {
+            margin-right: 8px;
+        }
+        
+        /* Courses Table */
+        .courses-card {
+            background-color: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            color: white;
+            padding: 20px 25px;
+            border-bottom: none;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        .table-container {
+            padding: 0;
+        }
+        
+        .table {
+            margin-bottom: 0;
+        }
+        
+        .table thead th {
+            background-color: #f8f9fa;
+            color: #495057;
+            font-weight: 700;
+            padding: 18px 15px;
+            border-bottom: 2px solid var(--primary-orange);
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .table tbody td {
+            padding: 16px 15px;
+            vertical-align: middle;
+            border-color: #f1f3f4;
+            font-size: 15px;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: var(--orange-hover);
+        }
+        
+        /* Status Badges */
+        .status-badge {
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background-color: rgba(40, 167, 69, 0.15);
+            color: #155724;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+        
+        .status-inactive {
+            background-color: rgba(220, 53, 69, 0.15);
+            color: #721c24;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+        
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+        }
+        
+        .btn-outline-warning {
+            border: 2px solid #ffc107;
+            color: #ffc107;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+        }
+        
+        .btn-outline-warning:hover {
+            background-color: #ffc107;
+            color: #212529;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+        }
+        
+        .btn-outline-danger {
+            border: 2px solid #dc3545;
+            color: #dc3545;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Price Styling */
+        .price-cell {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        /* Exam Badge */
+        .exam-badge {
+            background-color: #e7f5ff;
+            color: #0d6efd;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            color: #adb5bd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        /* Button Group */
+        .button-group {
+            display: flex;
+            gap: 15px;
+            align-items: flex-end;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-outline-secondary,
+            .btn-outline-warning,
+            .btn-primary,
+            .btn-success {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .import-card {
+                padding: 20px;
+            }
+            
+            .table-responsive {
+                margin: 0 -15px;
+            }
+            
+            .required-fields {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .format-toggle {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Back Button -->
+        <a href="{% url 'vendors_view' %}" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Vendors
+        </a>
+
+        <!-- Main Header -->
+        <div class="page-header">
+            <h1 class="page-title">
+                <i class="fas fa-book me-3"></i>
+                Vendor Courses Management
+                <span class="vendor-id-display">Vendor #{{ vendor_id }}</span>
+            </h1>
+        </div>
+                <!-- Courses Table -->
+        {% if courses %}
+        <div class="courses-card">
+            <div class="card-header">
+                <h5><i class="fas fa-list me-2"></i>Course List</h5>
+            </div>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Course Code</th>
+                                <th>Description</th>
+                                <th>Exam</th>
+                                <th>Duration</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courses-table-body">
+                            {% for course in courses %}
+                            <tr data-id="{{ course.id }}" data-course-code="{{ course.course_code }}">
+                                <td>
+                                    <strong class="text-primary">{{ course.course_code|default:"-" }}</strong>
+                                </td>
+                                <td>
+                                    {% if course.course_description %}
+                                        <span class="text-dark">{{ course.course_description|truncatechars:60 }}</span>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="exam-badge">{{ course.exam|default:"NA" }}</span>
+                                </td>
+                                <td class="text-dark">
+                                    {{ course.duration|default:"-" }}
+                                </td>
+                                <td class="price-cell">
+                                    {% if course.price %}
+                                        R{{ course.price }}
+                                    {% else %}
+                                        R0.00
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if course.is_active %}
+                                        <span class="status-badge status-active">
+                                            <i class="fas fa-check-circle me-1"></i> Active
+                                        </span>
+                                    {% else %}
+                                        <span class="status-badge status-inactive">
+                                            <i class="fas fa-times-circle me-1"></i> Inactive
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="{% url 'edit_course' course.id %}" class="btn btn-outline-secondary">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <!-- Removed the conflicting URL tag, now using only the button with data attributes -->
+                                        <button class="btn btn-outline-danger delete-course-btn" 
+                                                data-course-id="{{ course.id }}"
+                                                data-course-code="{{ course.course_code }}">
+                                            <i class="fas fa-trash-alt me-1"></i> Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-book-open"></i>
+            <h4>No Courses Found</h4>
+            <p class="text-muted">Start by downloading the CSV template and importing your courses</p>
+            <button id="empty-state-download-btn" class="btn btn-primary mt-3">
+                <i class="fas fa-download me-2"></i> Download CSV Template
+            </button>
+        </div>
+        {% endif %}
+
+        <!-- Alert Container -->
+        <div id="alert-container"></div>
+
+        <!-- Import Section -->
+        <div class="import-card">
+            <div class="import-title">
+                <i class="fas fa-file-excel"></i>
+                Import Courses from File
+            </div>
+            
+            <!-- Template Info Card -->
+            <div class="template-info mb-4">
+                <h6><i class="fas fa-info-circle me-2"></i>Template Instructions</h6>
+                <ul class="required-fields">
+                    <li><i class="fas fa-asterisk text-danger"></i> <span>Course Code</span> <span class="text-muted">(Required - Unique)</span></li>
+                    <li><i class="fas fa-asterisk text-danger"></i> <span>Description</span> <span class="text-muted">(Required)</span></li>
+                    <li><i class="fas fa-tag"></i> <span>Exam</span> <span class="text-muted">(Optional)</span></li>
+                    <li><i class="fas fa-clock"></i> <span>Duration</span> <span class="text-muted">(e.g., 3 days, 2 weeks)</span></li>
+                    <li> <span>Price</span> <span class="text-muted">(Numeric - e.g., 499.99)</span></li>
+                    <li><i class="fas fa-toggle-on"></i> <span>Status</span> <span class="text-muted">(Active/Inactive - Default: Active)</span></li>
+                </ul>
+                <div class="alert alert-primary mt-3 mb-0 py-2">
+                    <i class="fas fa-file-csv me-2"></i>
+                    <strong>CSV format is recommended for instant compatibility!</strong>
+                    <span class="ms-2">The template has headers only - you can add UNLIMITED rows!</span>
+                </div>
+            </div>
+            
+            <form id="import-courses-form" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="mb-3">
+                            <label for="excel_file" class="form-label">Select File (CSV or Excel)</label>
+                            <div class="file-input-wrapper">
+                                <div class="custom-file-upload" id="file-drop-area">
+                                    <div class="file-icon">
+                                        <i class="fas fa-file-csv" id="file-icon-default"></i>
+                                    </div>
+                                    <div class="file-text">
+                                        <h5>Click to upload or drag and drop</h5>
+                                        <p>CSV files recommended (.csv) - Also accepts .xlsx, .xls</p>
+                                    </div>
+                                    <input type="file" name="excel_file" id="excel_file" 
+                                           accept=".csv,.xlsx,.xls" class="form-control" required>
+                                </div>
+                            </div>
+                            <div id="file-name-display" class="mt-2 text-muted small"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="button-group">
+                            <button type="button" id="download-template-btn" class="btn btn-primary">
+                                <i class="fas fa-download me-2"></i> Download CSV Template
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-upload me-2"></i> Import Courses
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <!-- Sample Data Preview (For Reference Only) -->
+            <div class="mt-4 p-3 bg-light rounded">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-table text-primary me-2"></i>
+                    <span class="fw-bold">Example Format (For Reference):</span>
+                    <span class="text-muted ms-2">course_code, course_description, exam, duration, price, is_active</span>
+                </div>
+                
+                <div class="small text-muted mt-1">
+                    <code>BUS202, Business Management, PMI, 3 days, 299.99, Active</code>
+                </div>
+                <div class="small text-muted mt-1">
+                    <code>ENG105, Technical Writing, IEEE, 2 days, 199.99, Inactive</code>
+                </div>
+                <p class="text-info small mt-2 mb-0">
+                    <i class="fas fa-info-circle"></i> These are just examples. Your downloaded template will have ONLY headers - no sample data.
+                </p>
+            </div>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger mt-3">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            {{ error }}
+        </div>
+        {% endif %}
+
+
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const vendorId = {{ vendor_id }};
+            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            // Function to download CSV template
+            function downloadTemplate() {
+                // Template headers matching your Course model fields
+                const headers = [
+                    'course_code',
+                    'course_description',
+                    'exam', 
+                    'duration',
+                    'price',
+                    'is_active'
+                ];
+                
+                // Create CSV content with headers only
+                const csvContent = headers.map(header => `"${header}"`).join(',') + '\n';
+                
+                // Add UTF-8 BOM for Excel compatibility
+                const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                
+                // Generate filename with vendor ID and current date
+                const date = new Date();
+                const dateStr = date.toISOString().split('T')[0];
+                a.download = `vendor_${vendorId}_courses_template_${dateStr}.csv`;
+                
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                // Show success message
+                $("#alert-container").html(`
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle me-2"></i>
+                        ✅ CSV Template downloaded successfully! 
+                        <br><br><strong>📝 Instructions:</strong>
+                        <br>• Headers are ready in row 1
+                        <br>• Add your courses starting from row 2
+                        <br>• Use these exact header names: course_code, course_description, exam, duration, price, is_active
+                        <br>• For is_active, use: True or False
+                        <br>• You can add <strong>UNLIMITED rows</strong>
+                        <br>• Save as CSV and upload the file
+                    </div>
+                `);
+            }
+
+            // Download template button click handler
+            $('#download-template-btn').click(function(e) {
+                e.preventDefault();
+                downloadTemplate();
+            });
+            
+            // Empty state download button handler
+            $('#empty-state-download-btn').click(function(e) {
+                e.preventDefault();
+                downloadTemplate();
+            });
+
+            // File input display with format detection
+            $('#excel_file').change(function() {
+                const file = this.files[0];
+                if (!file) {
+                    $('#file-name-display').html('');
+                    return;
+                }
+                
+                const fileName = file.name;
+                const fileExt = fileName.split('.').pop().toLowerCase();
+                let fileIcon = 'fa-file-excel';
+                let fileColor = 'text-success';
+                let formatMsg = '';
+                
+                if (fileExt === 'csv') {
+                    fileIcon = 'fa-file-csv';
+                    fileColor = 'text-info';
+                    formatMsg = '<span class="badge bg-success ms-2">Recommended Format</span>';
+                } else if (fileExt === 'xlsx' || fileExt === 'xls') {
+                    fileIcon = 'fa-file-excel';
+                    fileColor = 'text-success';
+                    formatMsg = '<span class="badge bg-warning text-dark ms-2">Note: Requires openpyxl on server</span>';
+                }
+                
+                // Update icon
+                $('#file-icon-default').attr('class', `fas ${fileIcon} ${fileColor}`);
+                
+                $('#file-name-display').html(`
+                    <div class="alert alert-info py-2">
+                        <i class="fas ${fileIcon} ${fileColor} me-2"></i>
+                        Selected file: <strong>${fileName}</strong> ${formatMsg}
+                    </div>
+                `);
+                
+                // Update drop area style
+                $('#file-drop-area').css({
+                    'border-color': '#28a745',
+                    'background-color': 'rgba(40, 167, 69, 0.05)'
+                });
+            });
+
+            // Drag and drop functionality
+            $('#file-drop-area').on('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).css({
+                    'border-color': 'var(--primary-orange)',
+                    'background-color': 'var(--orange-hover)'
+                });
+            });
+
+            $('#file-drop-area').on('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $(this).css({
+                    'border-color': '#dee2e6',
+                    'background-color': '#f8f9fa'
+                });
+            });
+
+            $('#file-drop-area').on('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const files = e.originalEvent.dataTransfer.files;
+                if (files.length > 0) {
+                    $('#excel_file')[0].files = files;
+                    $('#excel_file').trigger('change');
+                }
+            });
+
+            // Delete course with confirmation and name typing
+            $(document).on('click', '.delete-course-btn', function(e) {
+                e.preventDefault();
+                const button = $(this);
+                const courseId = button.data('course-id');
+                const courseCode = button.data('course-code');
+                
+                Swal.fire({
+                    title: 'Delete Course',
+                    html: `
+                        <div class="text-center mb-3">
+                            <i class="fas fa-exclamation-triangle text-danger" style="font-size: 48px;"></i>
+                        </div>
+                        <p class="fw-bold">You are about to delete course: <span class="text-danger">${courseCode}</span></p>
+                        <p>This action cannot be undone.</p>
+                        <div class="mt-3">
+                            <label class="form-label">Please type <span class="fw-bold text-danger">${courseCode}</span> to confirm:</label>
+                            <input type="text" id="confirm-course-name" class="form-control" placeholder="Enter course code">
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Delete Course',
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    preConfirm: () => {
+                        const inputValue = document.getElementById('confirm-course-name').value;
+                        if (inputValue !== courseCode) {
+                            Swal.showValidationMessage(`❌ Course code does not match. Please type "${courseCode}" exactly.`);
+                            return false;
+                        }
+                        return true;
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Perform the deletion via AJAX
+                        $.ajax({
+                            url: `/scheduler/delete_course/${courseId}/`,
+                            type: "POST",  // Changed from DELETE to POST
+                            headers: { 
+                                "X-CSRFToken": csrftoken,
+                                "X-Requested-With": "XMLHttpRequest"
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: `Course ${courseCode} has been deleted.`,
+                                    icon: 'success',
+                                    confirmButtonColor: '#28a745'
+                                }).then(() => {
+                                    refreshCourses();
+                                });
+                            },
+                            error: function(xhr) {
+                                let msg = "Error deleting course.";
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    msg = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: msg,
+                                    icon: 'error',
+                                    confirmButtonColor: '#dc3545'
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+
+            // Refresh courses table
+            function refreshCourses() {
+                $.ajax({
+                    url: `/scheduler_api/create_course_api/${vendorId}/`,
+                    type: "GET",
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function (response) {
+                        if (response.status === "success") {
+                            let rows = "";
+                            response.data.forEach(course => {
+                                const statusClass = course.is_active ? 'status-active' : 'status-inactive';
+                                const statusText = course.is_active ? 
+                                    '<i class="fas fa-check-circle me-1"></i> Active' : 
+                                    '<i class="fas fa-times-circle me-1"></i> Inactive';
+                                
+                                rows += `<tr data-id="${course.id}" data-course-code="${course.course_code}">
+                                    <td><strong class="text-primary">${course.course_code || "-"}</strong></td>
+                                    <td>${course.course_description ? course.course_description.substring(0, 60) + (course.course_description.length > 60 ? '...' : '') : "<span class='text-muted'>-</span>"}</td>
+                                    <td><span class="exam-badge">${course.exam || "NA"}</span></td>
+                                    <td class="text-dark">${course.duration || "-"}</td>
+                                    <td class="price-cell">${course.price ? "R" + course.price : "R0.00"}</td>
+                                    <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <a href="/scheduler/edit_course/${course.id}/" class="btn btn-outline-secondary">
+                                                <i class="fas fa-edit me-1"></i> Edit
+                                            </a>
+                                            <button class="btn btn-outline-danger delete-course-btn" 
+                                                    data-course-id="${course.id}"
+                                                    data-course-code="${course.course_code}">
+                                                <i class="fas fa-trash-alt me-1"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>`;
+                            });
+                            $("#courses-table-body").html(rows);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error("Error refreshing courses:", xhr);
+                    }
+                });
+            }
+
+            // Handle file import (supports both CSV and Excel)
+            $("#import-courses-form").submit(function (e) {
+                e.preventDefault();
+                const fileInput = $("#excel_file")[0];
+                if (!fileInput.files.length) {
+                    $("#alert-container").html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-exclamation-circle me-2"></i>
+                            Please select a file to import!
+                        </div>
+                    `);
+                    return;
+                }
+
+                // Show loading
+                $("#alert-container").html(`
+                    <div class="alert alert-info">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        Importing courses, please wait...
+                    </div>
+                `);
+
+                const formData = new FormData();
+                formData.append("excel_file", fileInput.files[0]);
+                formData.append("csrfmiddlewaretoken", csrftoken);
+
+                $.ajax({
+                    url: `/scheduler/import_courses/${vendorId}/`,
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    success: function (response) {
+                        $("#alert-container").html(`
+                            <div class="alert alert-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                ✅ ${response.message}
+                            </div>
+                        `);
+                        refreshCourses();
+                        // Reset file input
+                        $('#excel_file').val('');
+                        $('#file-name-display').html('');
+                        $('#file-drop-area').css({
+                            'border-color': '#dee2e6',
+                            'background-color': '#f8f9fa'
+                        });
+                        $('#file-icon-default').attr('class', 'fas fa-file-csv');
+                    },
+                    error: function (xhr) {
+                        let msg = "Error importing courses.";
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            msg = xhr.responseJSON.message;
+                        }
+                        $("#alert-container").html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                ❌ ${msg}
+                            </div>
+                        `);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

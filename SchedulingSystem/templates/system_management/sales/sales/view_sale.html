@@ -1,0 +1,892 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Sale Details</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" 
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-orange: #FF6B35;
+      --primary-orange-dark: #e55a00;
+      --primary-orange-light: #ff8c33;
+      --primary-orange-bg: #fff5eb;
+      --success-green: #28a745;
+      --warning-yellow: #ffc107;
+      --danger-red: #dc3545;
+      --info-blue: #17a2b8;
+      --gray-light: #f8f9fa;
+      --gray-medium: #6c757d;
+      --border-color: #dee2e6;
+    }
+    
+    body {
+      background-color: #f0f2f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 20px 0;
+      min-height: 100vh;
+    }
+    
+    .container {
+      max-width: 1000px;
+    }
+    
+    /* Back Button */
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+      color: white;
+      text-decoration: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      margin-bottom: 25px;
+      border: none;
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+    }
+    
+    .back-button:hover {
+      background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+      color: white;
+      text-decoration: none;
+      transform: translateX(-3px);
+      box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+    }
+    
+    /* Main Card */
+    .detail-card {
+      border: none;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      background: white;
+    }
+    
+    /* Card Header */
+    .detail-header {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+      padding: 1.8rem 2rem;
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .detail-header h4 {
+      margin: 0;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .detail-header h4 i {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 1.5rem;
+    }
+    
+    .sale-id-badge {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(5px);
+      padding: 8px 20px;
+      border-radius: 30px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .sale-id-badge i {
+      font-size: 0.9rem;
+    }
+    
+    /* Card Body */
+    .detail-body {
+      padding: 2.5rem;
+    }
+    
+    /* Status Banner */
+    .status-banner {
+      background: linear-gradient(145deg, var(--gray-light), white);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    
+    .status-info {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .status-label {
+      font-size: 1rem;
+      color: var(--gray-medium);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .status-label i {
+      color: var(--primary-orange);
+    }
+    
+    .status-value {
+      font-size: 1.2rem;
+      font-weight: 700;
+      padding: 6px 16px;
+      border-radius: 30px;
+      display: inline-block;
+    }
+    
+    .status-approved {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    
+    .status-rejected {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .status-default {
+      background: var(--gray-light);
+      color: var(--gray-medium);
+    }
+    
+    .created-info {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      color: var(--gray-medium);
+      font-size: 0.95rem;
+    }
+    
+    .created-info i {
+      color: var(--primary-orange);
+    }
+    
+    /* Section Headers */
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 2rem 0 1.5rem 0;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--primary-orange-light);
+    }
+    
+    .section-header i {
+      font-size: 1.5rem;
+      color: var(--primary-orange);
+      background: var(--primary-orange-bg);
+      padding: 10px;
+      border-radius: 12px;
+    }
+    
+    .section-header h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+    
+    /* Info Grid */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .info-item {
+      background: var(--gray-light);
+      border-radius: 16px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      transition: all 0.3s ease;
+    }
+    
+    .info-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(255, 107, 53, 0.1);
+      border-color: var(--primary-orange-light);
+    }
+    
+    .info-item-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+    
+    .info-item-header i {
+      font-size: 1.2rem;
+      color: var(--primary-orange);
+      background: white;
+      padding: 10px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    
+    .info-item-header h4 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--gray-medium);
+      margin: 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .info-item-content {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #333;
+      padding-left: 44px;
+    }
+    
+    .info-item-sub {
+      font-size: 0.9rem;
+      color: var(--gray-medium);
+      margin-top: 0.3rem;
+      padding-left: 44px;
+    }
+    
+    /* Financial Items Special Styling */
+    .info-item.financial {
+      background: linear-gradient(145deg, #f0f9ff, white);
+    }
+    
+    .info-item.financial .info-item-header i {
+      color: var(--success-green);
+    }
+    
+    .info-item.financial.highlight {
+      background: linear-gradient(145deg, #d4edda, white);
+      border-color: var(--success-green);
+    }
+    
+    .info-item.financial.highlight .info-item-content {
+      color: #155724;
+      font-size: 1.5rem;
+    }
+    
+    /* Status Options Grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    
+    .status-option {
+      background: white;
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .status-option i {
+      font-size: 1.2rem;
+      color: var(--primary-orange);
+    }
+    
+    .status-option .status-text {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .status-option .status-badge-sm {
+      font-size: 0.8rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--gray-light);
+      color: var(--gray-medium);
+      margin-left: auto;
+    }
+    
+    .status-option.active-true {
+      background: #d4edda;
+      border-color: var(--success-green);
+    }
+    
+    .status-option.active-true .status-badge-sm {
+      background: var(--success-green);
+      color: white;
+    }
+    
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2.5rem;
+      padding-top: 1.5rem;
+      border-top: 2px dashed var(--border-color);
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      padding: 0.9rem 2rem;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      text-decoration: none;
+      min-width: 160px;
+    }
+    
+    .btn-edit {
+      background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+    }
+    
+    .btn-edit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(255, 107, 53, 0.4);
+      color: white;
+    }
+    
+    .btn-back {
+      background: var(--gray-light);
+      color: var(--gray-medium);
+      border: 2px solid var(--border-color);
+    }
+    
+    .btn-back:hover {
+      background: #e9ecef;
+      color: #333;
+      border-color: #adb5bd;
+      transform: translateY(-2px);
+    }
+    
+    .btn-print {
+      background: white;
+      color: var(--info-blue);
+      border: 2px solid var(--info-blue);
+    }
+    
+    .btn-print:hover {
+      background: var(--info-blue);
+      color: white;
+      transform: translateY(-2px);
+    }
+    
+    /* Additional Info Section */
+    .additional-info {
+      background: var(--gray-light);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-top: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+    
+    .additional-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .additional-item i {
+      color: var(--primary-orange);
+      font-size: 1rem;
+      width: 20px;
+    }
+    
+    .additional-item-label {
+      color: var(--gray-medium);
+      font-size: 0.95rem;
+    }
+    
+    .additional-item-value {
+      font-weight: 600;
+      color: #333;
+      margin-left: auto;
+    }
+    
+    /* Timeline */
+    .timeline {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+    
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+    
+    .timeline-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--primary-orange-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-orange);
+    }
+    
+    .timeline-content {
+      flex: 1;
+    }
+    
+    .timeline-title {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .timeline-date {
+      font-size: 0.85rem;
+      color: var(--gray-medium);
+    }
+    
+    @media (max-width: 768px) {
+      .detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .status-banner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!-- Back Button -->
+    <a href="{% url 'sales_view' %}" class="back-button">
+      <i class="fas fa-arrow-left"></i> Back to Sales
+    </a>
+
+    <!-- Main Detail Card -->
+    <div class="detail-card">
+      <!-- Header -->
+      <div class="detail-header">
+        <h4>
+          <i class="fas fa-receipt"></i>
+          Sale Details
+        </h4>
+        <div class="sale-id-badge">
+          <i class="fas fa-hashtag"></i>
+          Sale ID: {{ sale.id }}
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="detail-body">
+        <!-- Status Banner -->
+        <div class="status-banner">
+          <div class="status-info">
+            <div class="status-label">
+              <i class="fas fa-circle"></i>
+              Current Status:
+            </div>
+            <span class="status-value 
+              {% if sale.status == 'approved' %}status-approved
+              {% elif sale.status == 'pending' %}status-pending
+              {% elif sale.status == 'rejected' %}status-rejected
+              {% else %}status-default{% endif %}">
+              <i class="fas 
+                {% if sale.status == 'approved' %}fa-check-circle
+                {% elif sale.status == 'pending' %}fa-clock
+                {% elif sale.status == 'rejected' %}fa-times-circle
+                {% else %}fa-question-circle{% endif %} me-1">
+              </i>
+              {{ sale.get_status_display|default:"Draft" }}
+            </span>
+          </div>
+          <div class="created-info">
+            <i class="fas fa-calendar-alt"></i>
+            <span>Created: {{ sale.created_at|date:"d M Y, H:i"|default:"Not recorded" }}</span>
+            <i class="fas fa-user ms-3"></i>
+            <span>By: {{ sale.user|default:"System" }}</span>
+          </div>
+        </div>
+
+        <!-- Company & Sales Person Section -->
+        <div class="section-header">
+          <i class="fas fa-building"></i>
+          <h3>Client Information</h3>
+        </div>
+
+        <div class="info-grid">
+          <!-- Company -->
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-building"></i>
+              <h4>Company</h4>
+            </div>
+            <div class="info-item-content">{{ sale.company|default:"Not specified" }}</div>
+            <div class="info-item-sub">Client organization</div>
+          </div>
+
+          <!-- Sales Person -->
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-user-tie"></i>
+              <h4>Sales Person</h4>
+            </div>
+            <div class="info-item-content">{{ sale.sales_person|default:"Not assigned" }}</div>
+            <div class="info-item-sub">Responsible sales representative</div>
+          </div>
+
+          <!-- Client Type (if available) -->
+          {% if sale.client_type %}
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-users"></i>
+              <h4>Client Type</h4>
+            </div>
+            <div class="info-item-content">{{ sale.client_type }}</div>
+            <div class="info-item-sub">Client classification</div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Course Details Section -->
+        <div class="section-header">
+          <i class="fas fa-book-open"></i>
+          <h3>Course Information</h3>
+        </div>
+
+        <div class="info-grid">
+          <!-- Vendor -->
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-building"></i>
+              <h4>Vendor</h4>
+            </div>
+            <div class="info-item-content">{{ sale.vendor|default:"Not specified" }}</div>
+          </div>
+
+          <!-- Course Name -->
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-book"></i>
+              <h4>Course Name</h4>
+            </div>
+            <div class="info-item-content">{{ sale.course_name|default:"Not specified" }}</div>
+            {% if sale.course_code %}
+            <div class="info-item-sub">Code: {{ sale.course_code }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Class Type (if available) -->
+          {% if sale.class_type %}
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-chalkboard"></i>
+              <h4>Class Type</h4>
+            </div>
+            <div class="info-item-content">{{ sale.class_type }}</div>
+            {% if sale.training_location %}
+            <div class="info-item-sub">Location: {{ sale.training_location }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+
+          <!-- Number of Students -->
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-users"></i>
+              <h4>Students</h4>
+            </div>
+            <div class="info-item-content">{{ sale.number_of_students|default:"0" }}</div>
+            <div class="info-item-sub">Number of attendees</div>
+          </div>
+        </div>
+
+        <!-- Training Dates (if available) -->
+        {% if sale.proposed_date or sale.training_end_date %}
+        <div class="info-grid">
+          {% if sale.proposed_date %}
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-calendar-alt"></i>
+              <h4>Start Date</h4>
+            </div>
+            <div class="info-item-content">{{ sale.proposed_date|date:"d M Y" }}</div>
+          </div>
+          {% endif %}
+          
+          {% if sale.training_end_date %}
+          <div class="info-item">
+            <div class="info-item-header">
+              <i class="fas fa-calendar-check"></i>
+              <h4>End Date</h4>
+            </div>
+            <div class="info-item-content">{{ sale.training_end_date|date:"d M Y" }}</div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Financial Section -->
+        <div class="section-header">
+          <i class="fas fa-chart-line"></i>
+          <h3>Financial Summary</h3>
+        </div>
+
+        <div class="info-grid">
+          <!-- Total Cost -->
+          <div class="info-item financial">
+            <div class="info-item-header">
+              <i class="fas fa-coins"></i>
+              <h4>Total Cost</h4>
+            </div>
+            <div class="info-item-content">R{{ sale.total_cost|floatformat:2|default:"0.00" }}</div>
+          </div>
+
+          <!-- Revenue -->
+          <div class="info-item financial highlight">
+            <div class="info-item-header">
+              <i class="fas fa-chart-line"></i>
+              <h4>Revenue</h4>
+            </div>
+            <div class="info-item-content">R{{ sale.revenue|floatformat:2|default:"0.00" }}</div>
+          </div>
+
+          <!-- GP Percentage -->
+          <div class="info-item financial">
+            <div class="info-item-header">
+              <i class="fas fa-percentage"></i>
+              <h4>Gross Profit</h4>
+            </div>
+            <div class="info-item-content">{{ sale.gp|floatformat:2|default:"0.00" }}%</div>
+          </div>
+        </div>
+
+        <!-- Status Options -->
+        {% if sale.sales_pack_uploaded or sale.existing_account or sale.confirmed_training or sale.proof_of_payment or sale.accepted_pricing %}
+        <div class="section-header">
+          <i class="fas fa-tasks"></i>
+          <h3>Status Options</h3>
+        </div>
+
+        <div class="status-grid">
+          {% if sale.accepted_pricing is not None %}
+          <div class="status-option {% if sale.accepted_pricing %}active-true{% endif %}">
+            <i class="fas fa-tag"></i>
+            <span class="status-text">Accepted Pricing</span>
+            <span class="status-badge-sm">
+              {% if sale.accepted_pricing %}Yes{% else %}No{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if sale.sales_pack_uploaded is not None %}
+          <div class="status-option {% if sale.sales_pack_uploaded %}active-true{% endif %}">
+            <i class="fas fa-upload"></i>
+            <span class="status-text">Sales Pack</span>
+            <span class="status-badge-sm">
+              {% if sale.sales_pack_uploaded %}Uploaded{% else %}Pending{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if sale.existing_account is not None %}
+          <div class="status-option {% if sale.existing_account %}active-true{% endif %}">
+            <i class="fas fa-database"></i>
+            <span class="status-text">Existing Account</span>
+            <span class="status-badge-sm">
+              {% if sale.existing_account %}Yes{% else %}No{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if sale.confirmed_training is not None %}
+          <div class="status-option {% if sale.confirmed_training %}active-true{% endif %}">
+            <i class="fas fa-check-circle"></i>
+            <span class="status-text">Confirmed Training</span>
+            <span class="status-badge-sm">
+              {% if sale.confirmed_training %}Yes{% else %}No{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if sale.proof_of_payment is not None %}
+          <div class="status-option {% if sale.proof_of_payment %}active-true{% endif %}">
+            <i class="fas fa-file-invoice"></i>
+            <span class="status-text">Proof of Payment</span>
+            <span class="status-badge-sm">
+              {% if sale.proof_of_payment %}Received{% else %}Pending{% endif %}
+            </span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Additional Information -->
+        {% if sale.order_purchased or sale.pricing_approved_by or sale.dietary_option or sale.specify or sale.proposed_date_alternative or sale.is_training_scheduled is not None %}
+        <div class="section-header">
+          <i class="fas fa-ellipsis-h"></i>
+          <h3>Additional Information</h3>
+        </div>
+
+        <div class="additional-info">
+          {% if sale.order_purchased %}
+          <div class="additional-item">
+            <i class="fas fa-shopping-cart"></i>
+            <span class="additional-item-label">Order Purchased:</span>
+            <span class="additional-item-value">{{ sale.order_purchased }}</span>
+          </div>
+          {% endif %}
+
+          {% if sale.pricing_approved_by %}
+          <div class="additional-item">
+            <i class="fas fa-user-check"></i>
+            <span class="additional-item-label">Approved By:</span>
+            <span class="additional-item-value">{{ sale.pricing_approved_by }}</span>
+          </div>
+          {% endif %}
+
+          {% if sale.is_training_scheduled is not None %}
+          <div class="additional-item">
+            <i class="fas fa-calendar"></i>
+            <span class="additional-item-label">Training Scheduled:</span>
+            <span class="additional-item-value">
+              {% if sale.is_training_scheduled %}Yes{% else %}No{% endif %}
+            </span>
+          </div>
+          {% endif %}
+
+          {% if sale.proposed_date_alternative %}
+          <div class="additional-item">
+            <i class="fas fa-calendar-alt"></i>
+            <span class="additional-item-label">Alt. Date:</span>
+            <span class="additional-item-value">{{ sale.proposed_date_alternative|date:"d M Y" }}</span>
+          </div>
+          {% endif %}
+
+          {% if sale.dietary_option %}
+          <div class="additional-item">
+            <i class="fas fa-utensils"></i>
+            <span class="additional-item-label">Dietary:</span>
+            <span class="additional-item-value">{{ sale.dietary_option }}</span>
+          </div>
+          {% endif %}
+
+          {% if sale.specify %}
+          <div class="additional-item">
+            <i class="fas fa-pencil-alt"></i>
+            <span class="additional-item-label">Specify:</span>
+            <span class="additional-item-value">{{ sale.specify }}</span>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Timeline (if you have created_at/updated_at) -->
+        {% if sale.created_at or sale.updated_at %}
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-icon">
+              <i class="fas fa-plus"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">Sale Created</div>
+              <div class="timeline-date">{{ sale.created_at|date:"d M Y H:i"|default:"Not recorded" }}</div>
+            </div>
+          </div>
+          {% if sale.updated_at and sale.updated_at != sale.created_at %}
+          <div class="timeline-item">
+            <div class="timeline-icon">
+              <i class="fas fa-edit"></i>
+            </div>
+            <div class="timeline-content">
+              <div class="timeline-title">Last Updated</div>
+              <div class="timeline-date">{{ sale.updated_at|date:"d M Y H:i" }}</div>
+            </div>
+          </div>
+          {% endif %}
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <a href="{% url 'edit_sale' sale.id %}" class="btn btn-edit">
+            <i class="fas fa-edit"></i>
+            Edit Sale
+          </a>
+          <a href="{% url 'sales_view' %}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i>
+            Back to List
+          </a>
+          <button onclick="window.print()" class="btn btn-print">
+            <i class="fas fa-print"></i>
+            Print Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

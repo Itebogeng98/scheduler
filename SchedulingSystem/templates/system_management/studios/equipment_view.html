@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IT Equipment — NET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; padding: 2rem; }
+        .page-wrapper { max-width: 800px; margin: 0 auto; }
+
+        /* ── BACK BUTTON ── */
+        .btn-back {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .45rem .95rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: all .2s; margin-bottom: 1.5rem;
+        }
+        .btn-back svg { width: 14px; height: 14px; transition: transform .2s; }
+        .btn-back:hover { background: var(--net-orange); border-color: var(--net-orange); color: #fff; transform: translateX(-2px); box-shadow: 0 4px 14px rgba(255,140,0,.28); }
+        .btn-back:hover svg { transform: translateX(-2px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.5rem 2rem 1.5rem 2.5rem; margin-bottom: 1.75rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden;
+        }
+        .page-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--net-orange); }
+        .page-header-left { display: flex; align-items: center; gap: .85rem; }
+        .page-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: .06em; line-height: 1; }
+        .page-header .tag { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .25rem .65rem; border-radius: 20px; }
+        .header-stat strong { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: var(--net-orange); letter-spacing: .04em; line-height: 1; display: block; text-align: right; }
+        .header-stat span { font-size: .72rem; color: var(--text-muted); }
+
+        /* ── SEARCH ── */
+        .search-wrap { position: relative; margin-bottom: 1rem; }
+        .search-wrap input {
+            width: 100%; background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 9px; color: var(--text-primary);
+            font-family: 'DM Sans', sans-serif; font-size: .9rem;
+            padding: .65rem 2.5rem .65rem .95rem; outline: none;
+            box-shadow: 0 1px 4px rgba(0,0,0,.05);
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .search-wrap input:focus { border-color: var(--net-orange); box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .search-wrap input::placeholder { color: var(--text-muted); }
+        .search-wrap svg { position: absolute; right: .9rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+        /* ── TABLE ── */
+        .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 1.75rem; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .table-card-header { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+        .table-card-header > span:first-child { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+        .count-pill { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .72rem; font-weight: 700; padding: .15rem .6rem; border-radius: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th { font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .1em; color: #fff; padding: .85rem 1.4rem; text-align: left; }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .85rem 1.4rem; font-size: .9rem; color: var(--text-secondary); vertical-align: middle; }
+        tbody td:first-child { color: var(--text-muted); font-size: .78rem; width: 40px; }
+
+        .equip-cell { display: flex; align-items: center; gap: .65rem; }
+        .equip-icon { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; flex-shrink: 0; background: rgba(255,140,0,.1); border-radius: 7px; color: var(--net-orange); font-size: .85rem; border: 1px solid rgba(255,140,0,.18); }
+
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: .9rem; }
+        .empty-state .icon { display: block; font-size: 2.5rem; margin-bottom: .5rem; }
+
+        /* ── FORM ── */
+        .form-section { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.75rem 2rem; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .form-section h3 { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: .08em; color: var(--text-primary); margin-bottom: 1.4rem; display: flex; align-items: center; gap: .6rem; }
+        .form-section h3::before { content: ''; display: inline-block; width: 4px; height: 1.3rem; background: var(--net-orange); border-radius: 2px; }
+        .form-row { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: end; }
+        .field-group { display: flex; flex-direction: column; gap: .3rem; }
+        .field-group label { font-size: .7rem; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--text-muted); }
+        .form-input { background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: .9rem; padding: .65rem .9rem; width: 100%; outline: none; transition: border-color .2s, box-shadow .2s, background .2s; }
+        .form-input::placeholder { color: var(--text-muted); }
+        .form-input:focus { border-color: var(--net-orange); background: #fffbf5; box-shadow: 0 0 0 3px rgba(255,140,0,.1); }
+        .btn-submit { background: var(--net-orange); border: none; border-radius: 8px; color: #fff; font-family: 'DM Sans', sans-serif; font-size: .9rem; font-weight: 700; padding: .68rem 1.4rem; cursor: pointer; white-space: nowrap; height: fit-content; box-shadow: 0 2px 8px rgba(255,140,0,.25); transition: all .2s; }
+        .btn-submit:hover { background: var(--net-orange-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35); }
+
+        @media (max-width: 480px) { body { padding: 1rem; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'dashboard' %}" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back
+    </a>
+
+    <!-- HEADER -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2>IT Equipment</h2>
+            <span class="tag">Inventory</span>
+        </div>
+        <div class="header-stat">
+            <strong>{% if equipment %}{{ equipment|length }}{% else %}0{% endif %}</strong>
+            <span>total items</span>
+        </div>
+    </div>
+
+    <!-- SEARCH -->
+    <div class="search-wrap">
+        <input type="text" id="equipSearch" placeholder="Search equipment…">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span>Equipment Registry</span>
+            <span class="count-pill" id="rowCount">{% if equipment %}{{ equipment|length }}{% else %}0{% endif %} items</span>
+        </div>
+        <table>
+            <thead><tr><th>#</th><th>Equipment Name</th></tr></thead>
+            <tbody id="equipTable">
+                {% for item in equipment %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td><div class="equip-cell"><span class="equip-icon">⚙</span>{{ item.name }}</div></td>
+                </tr>
+                {% empty %}
+                <tr class="empty-row"><td colspan="2"><div class="empty-state"><span class="icon">🖥️</span>No equipment listed yet.</div></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FORM -->
+    <div class="form-section">
+        <h3>Add Equipment</h3>
+        <form method="POST" id="addEquipForm">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="field-group">
+                    <label for="equipName">Equipment Name</label>
+                    <input class="form-input" id="equipName" type="text" name="name" placeholder='e.g. Dell Monitor 27"' required>
+                </div>
+                <button type="submit" class="btn-submit">+ Add</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+<script>
+$(document).ready(function () {
+    $('#equipSearch').on('input', function () {
+        const q = $(this).val().toLowerCase().trim();
+        let visible = 0;
+        $('#equipTable tr:not(.empty-row)').each(function () {
+            const name = $(this).find('.equip-cell').text().toLowerCase();
+            const show = !q || name.includes(q);
+            $(this).toggle(show);
+            if (show) visible++;
+        });
+        $('#rowCount').text(visible + ' item' + (visible !== 1 ? 's' : ''));
+        $('#noSearch').remove();
+        if (visible === 0 && q) {
+            $('#equipTable').append('<tr id="noSearch"><td colspan="2"><div class="empty-state"><span class="icon">🔍</span>No matches found.</div></td></tr>');
+        }
+    });
+    $('#addEquipForm').on('submit', function (e) {
+        const inp = $(this).find('input[required]');
+        if (!inp.val().trim()) {
+            e.preventDefault();
+            inp.css({ borderColor: '#e74c3c', boxShadow: '0 0 0 3px rgba(231,76,60,.1)' });
+            inp.one('input', function () { $(this).css({ borderColor: '', boxShadow: '' }); });
+        }
+    });
+    $('#equipTable tr:not(.empty-row)').each(function (i) {
+        $(this).css({ opacity: 0 }).delay(i * 55).animate({ opacity: 1 }, 280);
+    });
+});
+</script>
+</body>
+</html>

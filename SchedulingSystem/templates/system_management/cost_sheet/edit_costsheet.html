@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Cost Sheet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f8fafc;
+            padding: 20px;
+            color: #334155;
+        }
+
+        .edit-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .edit-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+            border-left: 6px solid #FF8C00;
+            margin-bottom: 30px;
+        }
+
+        .edit-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .edit-title i {
+            color: #FF8C00;
+            font-size: 26px;
+        }
+
+        .warning-alert {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #f59e0b;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .warning-alert i {
+            color: #f59e0b;
+            font-size: 20px;
+            margin-top: 2px;
+        }
+
+        .warning-content {
+            color: #92400e;
+        }
+
+        .warning-content strong {
+            color: #b45309;
+        }
+
+        .form-container {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: #94a3b8;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #475569;
+            margin: 24px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 16px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 20px;
+        }
+
+        .btn-save, .btn-cancel {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-save {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-cancel {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-cancel:hover {
+            background: #475569;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(100, 116, 139, 0.2);
+        }
+
+        .field-info {
+            font-size: 12px;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 4px;
+        }
+
+        .disabled-field {
+            background-color: #f1f5f9 !important;
+            color: #94a3b8 !important;
+            cursor: not-allowed !important;
+            border-color: #e2e8f0 !important;
+        }
+
+        .disabled-field::placeholder {
+            color: #cbd5e1;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-save, .btn-cancel {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Custom SweetAlert styling */
+        .swal2-popup {
+            border-radius: 16px !important;
+            font-family: 'Inter', sans-serif !important;
+            border-left: 6px solid #f59e0b !important;
+        }
+
+        .swal2-title {
+            color: #1e293b !important;
+            font-size: 24px !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            color: #475569 !important;
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+
+        .swal2-icon {
+            border-color: #f59e0b !important;
+            color: #f59e0b !important;
+        }
+
+        .swal2-confirm {
+            background: #10b981 !important;
+            border-radius: 8px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+            border: none !important;
+        }
+
+        .swal2-confirm:hover {
+            background: #059669 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .swal2-deny {
+            background: #ef4444 !important;
+            border-radius: 8px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+            border: none !important;
+        }
+
+        .swal2-deny:hover {
+            background: #dc2626 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .swal2-cancel {
+            background: #64748b !important;
+            border-radius: 8px !important;
+            padding: 12px 24px !important;
+            font-weight: 600 !important;
+            font-family: 'Inter', sans-serif !important;
+            border: none !important;
+        }
+
+        .swal2-cancel:hover {
+            background: #475569 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(100, 116, 139, 0.2) !important;
+        }
+
+        .swal2-actions {
+            gap: 12px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="edit-container">
+        <div class="edit-card">
+            <h2 class="edit-title">
+                <i class="fas fa-edit"></i>
+                Edit Cost Sheet #{{ costsheet.id }}
+            </h2>
+
+            {% if costsheet.is_approved %}
+                <div class="warning-alert">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="warning-content">
+                        <strong>Important:</strong> Editing this CostSheet will reset approval to <strong>Pending</strong>.
+                        All changes must be reviewed and approved again by the CEO.
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="post" class="form-container" id="editForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                    {% for field in form %}
+                        {% comment %} Define category arrays directly in the template {% endcomment %}
+                        {% with basic_costs="instructor_cost,courseware,exam,lab_fees,lms_license,data" %}
+                        {% with management_admin="project_man_fee,corporate_cost_content_dev,admin_cost" %}
+                        {% with fees_licensing="set_up_fee,license_fee,per_user_fee" %}
+                        {% with consulting_services="consulting,analysis,design,development,implementation,evaluation" %}
+                        {% with learning_venue="e_learning_courseware,daily_venue_cost,refreshment,consumables" %}
+                        {% with corporate_assessment="corporate_costs_content_dev,qcto_seta_consumables,assessor_fees" %}
+                        {% with resources="sme_hour,recruitment,labs,welcome_packs" %}
+                        {% with travel_expenses="travel_flights,accomodation,per_diem,international,driving_travel" %}
+                        {% with marketing="marketing_fee" %}
+                        {% with summary="total_cost,per_learner,days" %}
+                        
+                        {% comment %} Basic Costs {% endcomment %}
+                        {% if field.name == "instructor_cost" or field.name == "courseware" or field.name == "exam" or field.name == "lab_fees" or field.name == "lms_license" or field.name == "data" %}
+                            {% if forloop.first or field.name == "instructor_cost" %}
+                                <h4 class="section-title">Basic Costs</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Management & Admin {% endcomment %}
+                        {% if field.name == "project_man_fee" or field.name == "corporate_cost_content_dev" or field.name == "admin_cost" %}
+                            {% if field.name == "project_man_fee" %}
+                                <h4 class="section-title">Management & Admin</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Fees & Licensing {% endcomment %}
+                        {% if field.name == "set_up_fee" or field.name == "license_fee" or field.name == "per_user_fee" %}
+                            {% if field.name == "set_up_fee" %}
+                                <h4 class="section-title">Fees & Licensing</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Consulting Services {% endcomment %}
+                        {% if field.name == "consulting" or field.name == "analysis" or field.name == "design" or field.name == "development" or field.name == "implementation" or field.name == "evaluation" %}
+                            {% if field.name == "consulting" %}
+                                <h4 class="section-title">Consulting Services</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Learning & Venue {% endcomment %}
+                        {% if field.name == "e_learning_courseware" or field.name == "daily_venue_cost" or field.name == "refreshment" or field.name == "consumables" %}
+                            {% if field.name == "e_learning_courseware" %}
+                                <h4 class="section-title">Learning & Venue</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Corporate & Assessment {% endcomment %}
+                        {% if field.name == "corporate_costs_content_dev" or field.name == "qcto_seta_consumables" or field.name == "assessor_fees" %}
+                            {% if field.name == "corporate_costs_content_dev" %}
+                                <h4 class="section-title">Corporate & Assessment</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Resources {% endcomment %}
+                        {% if field.name == "sme_hour" or field.name == "recruitment" or field.name == "labs" or field.name == "welcome_packs" %}
+                            {% if field.name == "sme_hour" %}
+                                <h4 class="section-title">Resources</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Travel & Expenses {% endcomment %}
+                        {% if field.name == "travel_flights" or field.name == "accomodation" or field.name == "per_diem" or field.name == "international" or field.name == "driving_travel" %}
+                            {% if field.name == "travel_flights" %}
+                                <h4 class="section-title">Travel & Expenses</h4>
+                            {% endif %}
+                        {% endif %}
+                        
+                        {% comment %} Marketing {% endcomment %}
+                        {% if field.name == "marketing_fee" %}
+                            <h4 class="section-title">Marketing</h4>
+                        {% endif %}
+                        
+                        {% comment %} Summary {% endcomment %}
+                        {% if field.name == "total_cost" or field.name == "per_learner" or field.name == "days" %}
+                            {% if field.name == "total_cost" %}
+                                <h4 class="section-title">Summary</h4>
+                            {% endif %}
+                        {% endif %}
+
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">
+                                {{ field.label }}
+                                {% if field.field.required %}
+                                    <span style="color: #ef4444;">*</span>
+                                {% endif %}
+                            </label>
+                            
+                            {% if field.name in allowed_fields %}
+                                {{ field }}
+                                {% if field.help_text %}
+                                    <span class="field-info">{{ field.help_text }}</span>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <div style="color: #ef4444; font-size: 12px; margin-top: 4px;">
+                                        {{ field.errors }}
+                                    </div>
+                                {% endif %}
+                            {% else %}
+                                <input type="text" 
+                                       value="{{ field.value|default:'' }}" 
+                                       class="disabled-field"
+                                       placeholder="Not available for this client type"
+                                       disabled>
+                                <span class="field-info">This field is not available for the selected client type</span>
+                            {% endif %}
+                        </div>
+                        
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                        {% endwith %}
+                    {% endfor %}
+                </div>
+
+                <div class="form-actions">
+                    <a href="{% url 'cost_sheet_view' %}" class="btn-cancel">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                    <button type="submit" class="btn-save" id="saveButton">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Format currency fields on input
+        document.addEventListener('DOMContentLoaded', function() {
+            const currencyFields = document.querySelectorAll('input[type="number"]');
+            
+            currencyFields.forEach(field => {
+                // Add currency symbol if not present
+                const parent = field.parentElement;
+                const label = parent.querySelector('label');
+                if (label && (label.textContent.toLowerCase().includes('cost') || 
+                    label.textContent.toLowerCase().includes('fee') ||
+                    label.textContent.toLowerCase().includes('price'))) {
+                    
+                    // Add R prefix for South African Rand
+                    field.addEventListener('focus', function() {
+                        if (!this.value.startsWith('R')) {
+                            this.value = 'R' + (this.value || '');
+                        }
+                    });
+                    
+                    field.addEventListener('blur', function() {
+                        if (this.value === 'R') {
+                            this.value = '';
+                        }
+                    });
+                }
+            });
+
+            // Add confirmation for approved sheets
+            const saveButton = document.getElementById('saveButton');
+            const editForm = document.getElementById('editForm');
+            const approvedWarning = document.querySelector('.warning-alert');
+            
+            if (approvedWarning && saveButton) {
+                saveButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    Swal.fire({
+                        title: '<i class="fas fa-exclamation-triangle" style="color: #f59e0b; font-size: 40px;"></i><br>Confirm Edit',
+                        html: `
+                            <div style="text-align: center;">
+                                <p style="font-size: 18px; color: #475569; margin-bottom: 8px;">
+                                    <strong>This cost sheet is currently approved.</strong>
+                                </p>
+                                <p style="color: #64748b; margin-bottom: 16px;">
+                                    Editing will reset the approval status to <span style="color: #f59e0b; font-weight: 600;">PENDING</span>.
+                                </p>
+                                <div style="background: #fffbeb; padding: 12px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                                    <p style="color: #92400e; margin: 0; font-size: 14px;">
+                                        <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                                        All changes must be reviewed and approved again by the CEO.
+                                    </p>
+                                </div>
+                            </div>
+                        `,
+                        showDenyButton: true,
+                        showCancelButton: true,
+                        confirmButtonText: '<i class="fas fa-save"></i> Yes, Save Changes',
+                        denyButtonText: '<i class="fas fa-times"></i> No, Keep Approved',
+                        cancelButtonText: '<i class="fas fa-arrow-left"></i> Cancel',
+                        focusDeny: false,
+                        focusCancel: false,
+                        customClass: {
+                            popup: 'swal2-popup',
+                            title: 'swal2-title',
+                            htmlContainer: 'swal2-html-container',
+                            confirmButton: 'swal2-confirm',
+                            denyButton: 'swal2-deny',
+                            cancelButton: 'swal2-cancel'
+                        },
+                        buttonsStyling: false,
+                        reverseButtons: true,
+                        allowOutsideClick: false,
+                        width: '500px',
+                        padding: '2em'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Submit the form
+                            editForm.submit();
+                        } else if (result.isDenied) {
+                            // Don't edit, redirect back
+                            window.location.href = "{% url 'cost_sheet_view' %}";
+                        }
+                        // If cancelled, do nothing (stays on page)
+                    });
+                });
+            } else {
+                // For non-approved sheets, just submit normally
+                saveButton.addEventListener('click', function(e) {
+                    // No confirmation needed for non-approved sheets
+                    return true;
+                });
+            }
+        });
+    </script>
+</body>
+</html>

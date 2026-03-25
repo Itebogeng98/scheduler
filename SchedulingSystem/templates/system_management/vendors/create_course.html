@@ -1,0 +1,423 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Course</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-orange-dark: #E55A2B;
+            --primary-orange-light: #FF8C5A;
+            --orange-hover: rgba(255, 107, 53, 0.1);
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-orange);
+            border-color: var(--primary-orange);
+            padding: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-orange-dark);
+            border-color: var(--primary-orange-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-orange-light);
+            box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+        }
+        
+        .text-primary {
+            color: var(--primary-orange) !important;
+        }
+        
+        .alert-success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-color: rgba(40, 167, 69, 0.2);
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-color: rgba(220, 53, 69, 0.2);
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .alert {
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+        
+        /* Back Button Styles */
+        .back-button-container {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+        }
+        
+        .btn-back {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-back:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+            text-decoration: none;
+        }
+        
+        .btn-back-orange {
+            background-color: transparent;
+            border: 2px solid var(--primary-orange);
+            color: var(--primary-orange);
+        }
+        
+        .btn-back-orange:hover {
+            background-color: var(--primary-orange);
+            color: white;
+            border-color: var(--primary-orange);
+        }
+        
+        .header-container {
+            position: relative;
+            text-align: center;
+            padding: 10px 0;
+        }
+        
+        .card-header {
+            background-color: var(--primary-orange);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .card-header h3 {
+            margin: 0;
+            font-weight: 700;
+        }
+        
+        .card-body {
+            padding: 30px;
+        }
+        
+        .container {
+            max-width: 800px;
+        }
+        
+        /* Alternative header design */
+        .alternative-header {
+            background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
+            padding: 25px;
+            border-radius: 12px 12px 0 0;
+            color: white;
+            text-align: center;
+            position: relative;
+        }
+        
+        .alternative-header .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .alternative-header .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) translateX(-2px);
+            text-decoration: none;
+        }
+        
+        /* Submit button loading state */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .btn-loading .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+<div class="container mt-5">
+    <div class="card shadow">
+
+        <div class="card-header">
+            <div class="d-flex align-items-center justify-content-between">
+                <a href="{% url 'vendors_view' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <h3 class="mb-0">Create Course</h3>
+                <div style="width:120px;"></div>
+            </div>
+        </div>
+
+        <div class="card-body">
+
+            <div id="alert-container"></div>
+
+            <form id="course-form">
+                {% csrf_token %}
+
+                <input type="hidden" id="vendor_id" value="{{ vendor_id }}">
+
+                <div class="mb-3">
+                    <label class="form-label">Course Code *</label>
+                    <input type="text" class="form-control" id="course_code">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="course_description"></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Exam</label>
+                    <select class="form-control" id="exam">
+                        <option value="">-- Select Exam --</option>
+                        <option value="Included">Included</option>
+                        <option value="Excluded">Excluded</option>
+                        <option value="NA">NA</option>
+                        <option value="Assessment">Assessment</option>
+                        <option value="No Exam">No Exam</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Duration</label>
+                        <input type="text" class="form-control" id="duration">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Price</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R</span>
+                            <input type="number" step="0.01" class="form-control" id="price">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Status</label>
+                    <select class="form-control" id="is_active">
+                        <option value="true">Active</option>
+                        <option value="false" selected>Inactive</option>
+                    </select>
+                </div>
+
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus-circle me-2"></i> Create Course
+                    </button>
+
+                    <a href="{% url 'vendors_view' %}" class="btn btn-outline-secondary cancel-btn">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+// ✅ CSRF helper
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$(document).ready(function () {
+
+    $("#course-form").on("submit", function (e) {
+        e.preventDefault();
+
+        let vendorId = $("#vendor_id").val();
+        if (!vendorId) {
+            showError("Vendor ID is missing.");
+            return;
+        }
+
+        let courseCode = $("#course_code").val().trim();
+        if (!courseCode) {
+            showError("Course Code is required.");
+            return;
+        }
+
+        let submitBtn = $(this).find("button[type='submit']");
+        let originalText = submitBtn.html();
+        submitBtn.prop("disabled", true).html("Creating...");
+
+        let payload = {
+            course_code: courseCode,
+            course_description: $("#course_description").val() || null,
+            exam: $("#exam").val() || null,
+            duration: $("#duration").val() || null,
+            price: $("#price").val() || null,
+            is_active: $("#is_active").val() === "true"
+        };
+
+        $.ajax({
+            url: `/scheduler_api/create_course_api/${vendorId}/`,
+            type: "POST",
+            headers: {
+                "X-CSRFToken": getCookie("csrftoken")
+            },
+            data: JSON.stringify(payload),
+            contentType: "application/json",
+
+            success: function (response) {
+                showSuccess(response.message);
+                $("#course-form")[0].reset();
+            },
+
+            error: function (xhr) {
+                let message = "Something went wrong.";
+
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.errors) {
+                        message = Object.values(xhr.responseJSON.errors)
+                            .flat()
+                            .join("<br>");
+                    } else if (xhr.responseJSON.message) {
+                        message = xhr.responseJSON.message;
+                    }
+                }
+
+                showError(message);
+            },
+
+            complete: function () {
+                submitBtn.prop("disabled", false).html(originalText);
+            }
+        });
+    });
+
+    $(".cancel-btn").on("click", function (e) {
+        let hasData = false;
+
+        $("#course-form input, #course-form textarea, #course-form select").each(function () {
+            if ($(this).val() && $(this).attr("id") !== "vendor_id") {
+                hasData = true;
+                return false;
+            }
+        });
+
+        if (hasData) {
+            if (!confirm("You have unsaved changes. Leave anyway?")) {
+                e.preventDefault();
+            }
+        }
+    });
+
+    function showSuccess(message) {
+        $("#alert-container").html(`
+            <div class="alert alert-success alert-dismissible fade show">
+                <strong>Success:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+    }
+
+    function showError(message) {
+        $("#alert-container").html(`
+            <div class="alert alert-danger alert-dismissible fade show">
+                <strong>Error:</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `);
+    }
+
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+
+</html>

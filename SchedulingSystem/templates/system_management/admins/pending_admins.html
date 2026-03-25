@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin approvals · dashboard</title>
+    <!-- Bootstrap Icons + Font Awesome (kept for icon variety) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- SweetAlert2 (already present) -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #f97316;
+            --orange-dark: #ea580c;
+            --orange-soft: #ffedd5;
+            --gray-bg: #f9fafc;
+            --card-white: #ffffff;
+            --text-primary: #1e293b;
+            --text-muted: #64748b;
+            --border-light: #e9eef2;
+            --shadow-sm: 0 8px 20px rgba(0,0,0,0.02), 0 2px 6px rgba(0,20,40,0.04);
+            --shadow-hover: 0 20px 30px -10px rgba(249, 115, 22, 0.12), 0 8px 18px rgba(0,0,0,0.02);
+            --radius-xl: 20px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+        }
+
+        body {
+            background-color: var(--gray-bg);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 1200px;
+            padding: 0 1rem;
+        }
+
+        /* go back – subtle but refined */
+        .go-back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            color: var(--text-muted);
+            padding: 0.7rem 1.5rem;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(2px);
+            margin-bottom: 2rem;
+        }
+
+        .go-back-btn i {
+            font-size: 1.2rem;
+            color: var(--orange);
+        }
+
+        .go-back-btn:hover {
+            background: white;
+            border-color: var(--orange);
+            color: var(--orange-dark);
+            transform: translateX(-4px);
+            box-shadow: 0 12px 24px -12px rgba(249, 115, 22, 0.3);
+        }
+
+        /* modern page header – no gradient overload, clean */
+        .page-header {
+            background: var(--card-white);
+            border-radius: var(--radius-lg);
+            padding: 1.2rem 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-light);
+        }
+
+        .page-header h3 {
+            font-weight: 600;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+
+        .page-header h3 i {
+            color: var(--orange);
+            background: var(--orange-soft);
+            padding: 10px;
+            border-radius: 14px;
+            font-size: 1.4rem;
+        }
+
+        .pending-badge {
+            background: var(--orange-soft);
+            color: var(--orange-dark);
+            font-weight: 600;
+            padding: 0.6rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(249,115,22,0.2);
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: var(--orange);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(249,115,22,0.3);
+        }
+
+        /* card & table redesign */
+        .card {
+            background: var(--card-white);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+        }
+
+        .card-header {
+            background: transparent;
+            border-bottom: 1px solid var(--border-light);
+            padding: 1.5rem 2rem;
+        }
+
+        .card-header h5 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-primary);
+        }
+
+        .card-header h5 i {
+            color: var(--orange);
+        }
+
+        /* elegant table */
+        .table {
+            margin: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            background: #f8fafd;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            border-top: none;
+        }
+
+        .table tbody td {
+            padding: 1.3rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-light);
+            background: white;
+            font-size: 0.95rem;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* avatar minimal */
+        .avatar-initials {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(145deg, #f97316, #fb923c);
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 12px rgba(249,115,22,0.2);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .user-name {
+            font-weight: 650;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .user-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-role {
+            background: #eef2ff;
+            color: #1e3a8a;
+            padding: 0.35rem 1rem;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 0.8rem;
+            display: inline-block;
+            border: 1px solid #cbd5e1;
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        /* action buttons – softer, outlined */
+        .action-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .btn-approve, .btn-decline {
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.15s ease;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+
+        .btn-approve {
+            background: #f0fdf4;
+            color: #166534;
+            border-color: #bbf7d0;
+        }
+
+        .btn-approve:hover {
+            background: #166534;
+            color: white;
+            border-color: #166534;
+            transform: scale(1.02);
+        }
+
+        .btn-decline {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #fecaca;
+        }
+
+        .btn-decline:hover {
+            background: #991b1b;
+            color: white;
+            border-color: #991b1b;
+            transform: scale(1.02);
+        }
+
+        /* empty state – nicer */
+        .empty-state-modern {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .empty-state-modern i {
+            font-size: 4.5rem;
+            color: #fcd34d;
+            background: #fffbeb;
+            padding: 1.2rem;
+            border-radius: 60px;
+            box-shadow: 0 10px 20px -10px #fcd34d;
+            margin-bottom: 1.8rem;
+        }
+
+        .empty-state-modern h4 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.6rem;
+        }
+
+        .empty-state-modern p {
+            color: var(--text-muted);
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-outline-orange {
+            background: white;
+            border: 1px solid var(--orange);
+            color: var(--orange-dark);
+            border-radius: 40px;
+            padding: 0.7rem 2rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 1.5rem;
+            transition: 0.2s;
+        }
+
+        .btn-outline-orange:hover {
+            background: var(--orange);
+            color: white;
+        }
+
+        /* alert styling */
+        .alert-custom {
+            background: #fff2f0;
+            border-left: 5px solid #dc2626;
+            border-radius: var(--radius-md);
+            padding: 1rem 1.8rem;
+            color: #7f1d1d;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            border: 1px solid #fecaca;
+        }
+
+        /* mobile tighten */
+        @media (max-width: 600px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .action-group {
+                justify-content: flex-start;
+            }
+            .table tbody td {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- refined go back -->
+        <a href="{% url 'dashboard' %}" class="go-back-btn">
+            <i class="bi bi-arrow-left-short"></i> Go back to dashboard
+        </a>
+
+        <!-- sleeker header -->
+        <div class="page-header">
+            <h3>
+                <i class="fas fa-user-check"></i> 
+                Pending approvals
+            </h3>
+            <div class="pending-badge">
+                <span class="status-dot"></span>
+                <span>{{ admins|length }} request{{ admins|length|pluralize:'s' }} pending</span>
+            </div>
+        </div>
+
+        <!-- error / alert with cleaner look -->
+        {% if error %}
+        <div class="alert-custom d-flex align-items-center" role="alert">
+            <i class="fas fa-exclamation-circle me-3 fs-5"></i>
+            <div>{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <!-- main card: approvals list -->
+        {% if admins %}
+        <div class="card">
+            <div class="card-header">
+                <h5>
+                    <i class="fas fa-clipboard-list me-2"></i> 
+                    Approval requests · {{ admins|length }}
+                </h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name & contact</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for admin in admins %}
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="avatar-initials">
+                                        {{ admin.first_name|first }}{{ admin.last_name|first }}
+                                    </div>
+                                    <div>
+                                        <div class="user-name">{{ admin.first_name }} {{ admin.last_name }}</div>
+                                        <div class="user-meta">
+                                            <i class="bi bi-person-badge" style="font-size: 0.75rem;"></i> ID: {{ admin.id }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span >{{ admin.work_email }}</span>
+                            </td>
+                            <td>
+                                <span class="badge-role">
+                                    <i class="fas fa-shield-alt me-1" style="font-size: 0.7rem;"></i>
+                                    {{ admin.role }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <a href="{% url 'approve_admin_view' admin.id %}" class="btn-approve">
+                                        <i class="fas fa-check-circle"></i> Approve
+                                    </a>
+                                    <a href="{% url 'decline_admin_view' admin.id %}" class="btn-decline">
+                                        <i class="fas fa-times-circle"></i> Decline
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% else %}
+        <!-- Empty state – much more polished, keeping original link but styled -->
+        <div class="card">
+            <div class="empty-state-modern">
+                <i class="fas fa-users-slash"></i>
+                <h4>All caught up</h4>
+                <p>No pending admin approvals. New requests will appear here as soon as they come in.</p>
+                <a href="#" class="btn-outline-orange">
+                    <i class="fas fa-sync-alt me-2"></i>Check for new requests
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- SweetAlert2 remains unchanged (functionality untouched) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const approveButtons = document.querySelectorAll('a[href*="approve_admin_view"]');
+            const declineButtons = document.querySelectorAll('a[href*="decline_admin_view"]');
+
+            approveButtons.forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+
+                    Swal.fire({
+                        title: 'Confirm approval',
+                        text: "Grant admin rights to this user?",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#f97316',
+                        cancelButtonColor: '#94a3b8',
+                        confirmButtonText: 'Yes, approve',
+                        background: '#ffffff',
+                        backdrop: 'rgba(100,116,139,0.2)'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+
+            declineButtons.forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const url = this.href;
+
+                    Swal.fire({
+                        title: 'Decline request?',
+                        text: "This user will be removed from the pending list.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#b91c1c',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Decline',
+                        background: '#ffffff'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = url;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+    <!-- Font fallback: Inter (optional but nice) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
+</body>
+</html>

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Sheet Management — NET</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --net-orange:       #FF8C00;
+            --net-orange-light: #FFA500;
+            --net-orange-dark:  #CC7000;
+            --net-dark:         #212529;
+            --net-light:        #f8f9fa;
+            --net-gray:         #e9ecef;
+            --bg:               #f4f5f7;
+            --surface:          #ffffff;
+            --surface-2:        #fafbfc;
+            --border:           #e4e6ea;
+            --text-primary:     #1a1d23;
+            --text-secondary:   #6b7280;
+            --text-muted:       #9ca3af;
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; padding: 2rem; }
+        .page-wrapper { max-width: 1200px; margin: 0 auto; }
+
+        /* ── BACK BUTTON ── */
+        .btn-back {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--surface); border: 1.5px solid var(--border);
+            border-radius: 8px; color: var(--text-secondary);
+            font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 600;
+            padding: .45rem .95rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: all .2s; margin-bottom: 1.5rem;
+        }
+        .btn-back svg { width: 14px; height: 14px; transition: transform .2s; }
+        .btn-back:hover { background: var(--net-orange); border-color: var(--net-orange); color: #fff; transform: translateX(-2px); box-shadow: 0 4px 14px rgba(255,140,0,.28); }
+        .btn-back:hover svg { transform: translateX(-2px); }
+
+        /* ── PAGE HEADER ── */
+        .page-header {
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.5rem 2rem 1.5rem 2.5rem; margin-bottom: 1.75rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,.06); position: relative; overflow: hidden;
+        }
+        .page-header::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px; background: var(--net-orange); }
+        .page-header-left { display: flex; align-items: center; gap: .85rem; }
+        .page-header h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: .06em; line-height: 1; }
+        .page-header .tag { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: .25rem .65rem; border-radius: 20px; }
+
+        /* ── STATS ── */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.75rem; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1.3rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex; align-items: center; gap: 1rem;
+            transition: transform .2s, box-shadow .2s; position: relative; overflow: hidden;
+        }
+        .stat-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; opacity: 0; transition: opacity .2s; }
+        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 6px 24px rgba(0,0,0,.1); }
+        .stat-card:hover::after { opacity: 1; }
+        .stat-card.orange::after { background: var(--net-orange); }
+        .stat-card.blue::after   { background: #3b82f6; }
+        .stat-card.amber::after  { background: #f59e0b; }
+        .stat-card.green::after  { background: #10b981; }
+        .stat-icon { width: 46px; height: 46px; flex-shrink: 0; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+        .stat-icon.orange { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.2); color: var(--net-orange); }
+        .stat-icon.blue   { background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.2); color: #3b82f6; }
+        .stat-icon.amber  { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.2); color: #f59e0b; }
+        .stat-icon.green  { background: rgba(16,185,129,.1); border: 1px solid rgba(16,185,129,.2); color: #10b981; }
+        .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 1.9rem; color: var(--text-primary); letter-spacing: .04em; line-height: 1; }
+        .stat-label { font-size: .75rem; color: var(--text-muted); font-weight: 500; margin-top: .1rem; }
+
+        /* ── TOOLBAR ── */
+        .toolbar {
+            background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+            padding: 1rem 1.4rem; margin-bottom: 1.75rem; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+            display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem;
+        }
+        .toolbar-left { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; flex: 1; }
+        .search-wrap { position: relative; }
+        .search-wrap input {
+            background: var(--bg); border: 1.5px solid var(--border); border-radius: 25px;
+            color: var(--text-primary); font-family: 'DM Sans', sans-serif; font-size: .875rem;
+            padding: .55rem 1rem .55rem 2.5rem; outline: none; width: 240px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+        .search-wrap input:focus { border-color: var(--net-orange); box-shadow: 0 0 0 3px rgba(255,140,0,.1); background: #fffbf5; }
+        .search-wrap input::placeholder { color: var(--text-muted); }
+        .search-wrap svg { position: absolute; left: .85rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+        .filter-select {
+            background: var(--bg); border: 1.5px solid var(--border); border-radius: 25px;
+            color: var(--text-secondary); font-family: 'DM Sans', sans-serif; font-size: .82rem; font-weight: 500;
+            padding: .5rem 1rem; outline: none; cursor: pointer; transition: border-color .2s;
+        }
+        .filter-select:focus { border-color: var(--net-orange); }
+
+        /* ── TABLE ── */
+        .table-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 1.75rem; box-shadow: 0 2px 14px rgba(0,0,0,.07); }
+        .table-card-header { display: flex; align-items: center; justify-content: space-between; padding: .9rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--surface-2); }
+        .table-card-header > span:first-child { font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); }
+        .count-pill { background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.22); color: var(--net-orange-dark); font-size: .72rem; font-weight: 700; padding: .15rem .6rem; border-radius: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead tr { background: var(--net-orange); }
+        thead th { font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .1em; color: #fff; padding: .85rem 1.4rem; text-align: left; white-space: nowrap; cursor: pointer; user-select: none; }
+        thead th:hover { background: var(--net-orange-dark); }
+        tbody tr { border-bottom: 1px solid var(--border); transition: background .15s; }
+        tbody tr:last-child { border-bottom: none; }
+        tbody tr:hover { background: #fffbf5; }
+        tbody td { padding: .85rem 1.4rem; font-size: .9rem; color: var(--text-secondary); vertical-align: middle; }
+        tbody td:first-child { color: var(--text-muted); font-size: .78rem; width: 40px; }
+
+        .client-cell { display: flex; align-items: center; gap: .65rem; }
+        .client-icon { width: 32px; height: 32px; flex-shrink: 0; background: rgba(255,140,0,.1); border: 1px solid rgba(255,140,0,.18); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--net-orange); font-size: .8rem; }
+        .client-name { font-weight: 600; color: var(--text-primary); }
+        .cost-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--text-primary); letter-spacing: .03em; }
+
+        /* Status badges */
+        .status-badge { display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 700; padding: .28rem .75rem; border-radius: 20px; white-space: nowrap; }
+        .status-badge::before { content: ''; width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+        .status-badge.approved { background: #ecfdf5; border: 1px solid #6ee7b7; color: #059669; }
+        .status-badge.approved::before { background: #10b981; }
+        .status-badge.pending  { background: #fffbeb; border: 1px solid #fde68a; color: #d97706; }
+        .status-badge.pending::before  { background: #f59e0b; }
+        .status-badge.declined { background: #fff5f5; border: 1px solid #fca5a5; color: #dc2626; }
+        .status-badge.declined::before { background: #ef4444; }
+
+        /* Action buttons */
+        .action-buttons { display: flex; gap: .4rem; align-items: center; flex-wrap: wrap; }
+        .btn-action {
+            display: inline-flex; align-items: center; gap: .3rem;
+            border-radius: 6px; border: 1.5px solid var(--border); background: var(--surface);
+            color: var(--text-secondary); font-family: 'DM Sans', sans-serif;
+            font-size: .78rem; font-weight: 600; padding: .3rem .7rem;
+            text-decoration: none; transition: all .18s; white-space: nowrap; cursor: pointer;
+        }
+        .btn-action.review:hover { border-color: var(--net-orange); color: var(--net-orange); background: rgba(255,140,0,.06); }
+        .btn-action.edit:hover   { border-color: #8b5cf6; color: #8b5cf6; background: rgba(139,92,246,.06); }
+        .btn-action.delete:hover { border-color: #ef4444; color: #ef4444; background: rgba(239,68,68,.06); }
+        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 3px 10px rgba(0,0,0,.08); }
+
+        /* Create button */
+        .btn-create {
+            display: inline-flex; align-items: center; gap: .45rem;
+            background: var(--net-orange); border: none; border-radius: 8px; color: #fff;
+            font-family: 'DM Sans', sans-serif; font-size: .875rem; font-weight: 700;
+            padding: .6rem 1.3rem; text-decoration: none; cursor: pointer;
+            box-shadow: 0 2px 8px rgba(255,140,0,.25); transition: all .2s;
+        }
+        .btn-create:hover { background: var(--net-orange-light); color: #fff; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,140,0,.35); }
+
+        /* Empty state */
+        .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); font-size: .9rem; }
+        .empty-state .icon { display: block; font-size: 3rem; margin-bottom: .75rem; }
+        .empty-state h5 { color: var(--text-secondary); font-weight: 600; margin-bottom: .4rem; }
+        .empty-state p { font-size: .85rem; margin-bottom: 1.25rem; }
+
+        /* Pagination */
+        .pagination-wrap { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .75rem; }
+        .pagination-info { font-size: .78rem; color: var(--text-muted); }
+        .pagination-info strong { color: var(--text-secondary); }
+        .pagination-btns { display: flex; gap: .35rem; }
+        .page-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 7px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text-secondary); font-family: 'DM Sans', sans-serif; font-size: .85rem; font-weight: 600; text-decoration: none; transition: all .18s; cursor: pointer; }
+        .page-btn:hover, .page-btn.active { background: var(--net-orange); border-color: var(--net-orange); color: #fff; box-shadow: 0 3px 10px rgba(255,140,0,.3); }
+        .page-btn.disabled { opacity: .4; pointer-events: none; }
+        .page-btn.wide { width: auto; padding: 0 .85rem; }
+
+        @media (max-width: 900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 768px) { body { padding: 1rem; } .stats-row { grid-template-columns: 1fr; } .search-wrap input { width: 100%; } .toolbar { flex-direction: column; align-items: stretch; } }
+    </style>
+</head>
+<body>
+<div class="page-wrapper">
+
+    <!-- BACK BUTTON -->
+    <a href="{% url 'dashboard' %}" class="btn-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        Back to Dashboard
+    </a>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+        <div class="page-header-left">
+            <h2>Cost Sheets</h2>
+            <span class="tag">Management</span>
+        </div>
+        <a href="{% url 'client_type_cost_sheet_view' %}" class="btn-create">
+            <i class="fas fa-plus"></i> Add New Cost Sheet
+        </a>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+        <div class="stat-card orange">
+            <div class="stat-icon orange"><i class="fas fa-users"></i></div>
+            <div>
+                <div class="stat-number" id="totalClientTypes">0</div>
+                <div class="stat-label">Client Types</div>
+            </div>
+        </div>
+        <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fas fa-file-invoice"></i></div>
+            <div>
+                <div class="stat-number" id="totalSheets">0</div>
+                <div class="stat-label">Total Cost Sheets</div>
+            </div>
+        </div>
+        <div class="stat-card amber">
+            <div class="stat-icon amber"><i class="fas fa-hourglass-half"></i></div>
+            <div>
+                <div class="stat-number" id="pendingSheets">0</div>
+                <div class="stat-label">Pending Approval</div>
+            </div>
+        </div>
+        <div class="stat-card green">
+            <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+            <div>
+                <div class="stat-number" id="approvedSheets">0</div>
+                <div class="stat-label">Approved</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+        <div class="toolbar-left">
+            <div class="search-wrap">
+                <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                <input type="text" id="searchInput" placeholder="Search cost sheets…">
+            </div>
+            <select class="filter-select" id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="approved">Approved</option>
+                <option value="pending">Pending</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <div class="table-card-header">
+            <span>All Cost Sheets</span>
+            <span class="count-pill" id="rowCount">{% if costdata %}{{ costdata|length }}{% else %}0{% endif %} records</span>
+        </div>
+        <div style="overflow-x:auto;">
+            <table id="costSheetsTable">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Client Type</th>
+                        <th>Total Cost</th>
+                        <th>Created</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    {% if costdata %}
+                    {% for sheet in costdata %}
+                    <tr data-id="{{ sheet.id }}" data-client-type="{{ sheet.client_type }}"
+                        data-status="{% if sheet.is_approved %}approved{% else %}pending{% endif %}">
+                        <td>{{ forloop.counter }}</td>
+                        <td>
+                            <div class="client-cell">
+                                <div class="client-icon"><i class="fas fa-building"></i></div>
+                                <span class="client-name">{{ sheet.client_type }}</span>
+                            </div>
+                        </td>
+                        <td><span class="cost-val">R{{ sheet.total_cost }}</span></td>
+                        <td class="created-at">{{ sheet.created_at }}</td>
+                        <td>
+                            {% if sheet.is_approved %}
+                            <span class="status-badge approved">Approved</span>
+                            {% else %}
+                            <span class="status-badge pending">Pending</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="action-buttons">
+                                <a href="{% url 'ceo_approval_cost_sheet' sheet.id %}" class="btn-action review">
+                                    <i class="fas fa-check-circle"></i> Review
+                                </a>
+                                <a href="{% url 'edit_costsheet' sheet.id %}" class="btn-action edit">
+                                    <i class="fas fa-edit"></i> Edit
+                                </a>
+                                <button type="button" class="btn-action delete delete-btn-modal"
+                                    data-id="{{ sheet.id }}"
+                                    data-client-type="{{ sheet.client_type }}"
+                                    data-total-cost="{{ sheet.total_cost }}">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr id="noDataRow">
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <span class="icon">📋</span>
+                                <h5>No cost sheets found</h5>
+                                <p>Create your first cost sheet to get started.</p>
+                                <a href="{% url 'client_type_cost_sheet_view' %}" class="btn-create">
+                                    <i class="fas fa-plus"></i> Add New Cost Sheet
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination-wrap">
+        <div class="pagination-info">
+            Showing <strong id="visibleCount">{% if costdata %}{{ costdata|length }}{% else %}0{% endif %}</strong>
+            of <strong>{% if costdata %}{{ costdata|length }}{% else %}0{% endif %}</strong> records
+        </div>
+        <div class="pagination-btns">
+            {% if costdata.has_other_pages %}
+                {% if costdata.has_previous %}
+                <a class="page-btn wide" href="?page={{ costdata.previous_page_number }}">← Prev</a>
+                {% else %}
+                <span class="page-btn wide disabled">← Prev</span>
+                {% endif %}
+                {% for i in costdata.paginator.page_range %}
+                    {% if costdata.number == i %}
+                    <span class="page-btn active">{{ i }}</span>
+                    {% else %}
+                    <a class="page-btn" href="?page={{ i }}">{{ i }}</a>
+                    {% endif %}
+                {% endfor %}
+                {% if costdata.has_next %}
+                <a class="page-btn wide" href="?page={{ costdata.next_page_number }}">Next →</a>
+                {% else %}
+                <span class="page-btn wide disabled">Next →</span>
+                {% endif %}
+            {% else %}
+                <span class="page-btn wide disabled">← Prev</span>
+                <span class="page-btn active">1</span>
+                <span class="page-btn wide disabled">Next →</span>
+            {% endif %}
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function getCookie(name) {
+        let c = null;
+        if (document.cookie) {
+            document.cookie.split(';').forEach(function(s) {
+                s = s.trim();
+                if (s.startsWith(name + '=')) c = decodeURIComponent(s.substring(name.length + 1));
+            });
+        }
+        return c;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    $(document).ready(function () {
+
+        /* ── Format dates ── */
+        $("td.created-at").each(function () {
+            const d = new Date($(this).text());
+            if (!isNaN(d)) $(this).text(d.toLocaleString("en-GB", { day:"2-digit", month:"short", year:"numeric", hour:"2-digit", minute:"2-digit" }));
+        });
+
+        /* ── Counter update ── */
+        function updateCounters() {
+            const visible = $('#tableBody tr:visible').not('#noDataRow').length;
+            const approved = $('#tableBody tr:visible .status-badge.approved').length;
+            const pending  = $('#tableBody tr:visible .status-badge.pending').length;
+            const types = new Set();
+            $('#tableBody tr:visible').not('#noDataRow').each(function () {
+                const ct = $(this).data('client-type');
+                if (ct) types.add(ct);
+            });
+            $('#totalClientTypes').text(types.size);
+            $('#totalSheets').text(visible);
+            $('#approvedSheets').text(approved);
+            $('#pendingSheets').text(pending);
+            $('#rowCount').text(visible + ' record' + (visible !== 1 ? 's' : ''));
+            $('#visibleCount').text(visible);
+        }
+        updateCounters();
+
+        /* ── Filter ── */
+        function filterTable() {
+            const q = $('#searchInput').val().toLowerCase().trim();
+            const s = $('#statusFilter').val().toLowerCase();
+            $('#tableBody tr').not('#noDataRow').each(function () {
+                const text   = $(this).text().toLowerCase();
+                const status = $(this).data('status') || '';
+                const show   = (!q || text.includes(q)) && (!s || status === s);
+                $(this).toggle(show);
+            });
+            updateCounters();
+            /* row numbers */
+            let n = 1;
+            $('#tableBody tr:visible').not('#noDataRow').each(function () { $(this).find('td:first').text(n++); });
+        }
+        $('#searchInput, #statusFilter').on('input change', filterTable);
+
+        /* ── Row fade-in ── */
+        $('#tableBody tr').not('#noDataRow').each(function (i) {
+            $(this).css({ opacity: 0 }).delay(i * 50).animate({ opacity: 1 }, 260);
+        });
+
+        /* ── Column sort ── */
+        $('thead th').click(function () {
+            const idx = $(this).index();
+            const asc = !$(this).hasClass('asc');
+            $('thead th').removeClass('asc desc');
+            $(this).addClass(asc ? 'asc' : 'desc');
+            const rows = $('#tableBody tr').not('#noDataRow').toArray().sort(function (a, b) {
+                const va = $(a).find('td').eq(idx).text().trim();
+                const vb = $(b).find('td').eq(idx).text().trim();
+                return $.isNumeric(va) && $.isNumeric(vb)
+                    ? (asc ? va - vb : vb - va)
+                    : (asc ? va.localeCompare(vb) : vb.localeCompare(va));
+            });
+            rows.forEach(r => $('#tableBody').append(r));
+            updateCounters();
+        });
+
+        /* ── Delete with SweetAlert ── */
+        $(document).on('click', '.delete-btn-modal', function (e) {
+            e.preventDefault();
+            const btn        = $(this);
+            const sheetId    = btn.data('id');
+            const clientType = btn.data('client-type');
+            const totalCost  = btn.data('total-cost');
+            const row        = btn.closest('tr');
+
+            Swal.fire({
+                title: 'Delete Cost Sheet?',
+                html: `<p style="color:#6b7280;margin:.5rem 0;">You are about to delete the cost sheet for</p>
+                       <div style="background:#fffbeb;border:1px solid #fde68a;color:#d97706;font-weight:700;padding:.5rem 1rem;border-radius:8px;display:inline-block;margin:.5rem 0;">${clientType}</div>
+                       <p style="color:#6b7280;margin:.5rem 0;">Total cost: <strong style="color:#1a1d23;">R${totalCost}</strong></p>
+                       <div style="background:#fff5f5;border-left:4px solid #ef4444;padding:.75rem;border-radius:6px;margin-top:1rem;font-size:.85rem;color:#dc2626;text-align:left;">
+                           ⚠ This action cannot be undone.
+                       </div>`,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-trash"></i> Yes, Delete',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                reverseButtons: true,
+                focusCancel: true,
+                width: '460px',
+                borderRadius: '14px',
+            }).then(result => {
+                if (!result.isConfirmed) return;
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+                $.ajax({
+                    url: `/scheduler/costsheet/delete/${sheetId}/`,
+                    type: 'POST',
+                    headers: { 'X-CSRFToken': csrftoken, 'X-Requested-With': 'XMLHttpRequest' },
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.success) {
+                            row.fadeOut(300, function () {
+                                $(this).remove();
+                                updateCounters();
+                                Swal.fire({ icon: 'success', title: 'Deleted!', text: `${clientType} cost sheet removed.`, timer: 2000, showConfirmButton: false });
+                            });
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Error', text: res.message || 'Failed to delete.' });
+                            btn.prop('disabled', false).html('<i class="fas fa-trash"></i> Delete');
+                        }
+                    },
+                    error: function () {
+                        Swal.fire({ icon: 'error', title: 'Error', text: 'Could not complete the request.' });
+                        btn.prop('disabled', false).html('<i class="fas fa-trash"></i> Delete');
+                    }
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

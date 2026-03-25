@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Client Type Form</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        :root {
+            --primary-orange: #FF8C00;
+            --primary-orange-dark: #FF8C00;
+            --primary-orange-light: #FF8C5A;
+            --orange-hover: rgba(255, 107, 53, 0.1);
+            --card-shadow: 0 6px 20px rgba(255, 107, 53, 0.15);
+            --gradient-orange: linear-gradient(135deg, #FF8C00 0%, #FF8C00 100%);
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 600px;
+            position: relative;
+        }
+        
+        /* Back Button - SIMPLIFIED */
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--gradient-orange);
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.25);
+            margin-bottom: 20px;
+        }
+        
+        .back-button:hover {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            color: white;
+            text-decoration: none;
+            transform: translateX(-3px);
+            box-shadow: 0 6px 18px rgba(255, 107, 53, 0.35);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid rgba(255, 107, 53, 0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(255, 107, 53, 0.2);
+        }
+        
+        .card-header {
+            background: var(--gradient-orange);
+            color: white;
+            border-bottom: none;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30%, -30%);
+            z-index: 0; /* Make sure it's behind content */
+        }
+        
+        .card-header h4 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 24px;
+            position: relative;
+            z-index: 1; /* Make sure text is above the pseudo-element */
+        }
+        
+        .card-body {
+            padding: 40px 35px;
+            background-color: white;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 12px;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-label i {
+            color: var(--primary-orange);
+        }
+        
+        .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='%23FF6B35' stroke='%23FF6B35' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px 12px;
+            cursor: pointer;
+        }
+        
+        .form-select:focus {
+            border-color: var(--primary-orange);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+            background-color: white;
+            outline: none;
+            transform: translateY(-1px);
+        }
+        
+        .form-select option {
+            padding: 12px;
+            font-size: 15px;
+        }
+        
+        .form-select option:hover {
+            background-color: var(--orange-hover);
+        }
+        
+        .btn-success {
+            background: var(--gradient-orange);
+            border: none;
+            border-radius: 10px;
+            padding: 16px 32px;
+            font-weight: 600;
+            font-size: 17px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 53, 0.25);
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 25px;
+        }
+        
+        .btn-success:hover, .btn-success:focus {
+            background: linear-gradient(135deg, var(--primary-orange-dark) 0%, var(--primary-orange) 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 53, 0.35);
+        }
+        
+        .btn-success:active {
+            transform: translateY(-1px);
+        }
+        
+        #message {
+            margin-top: 25px;
+            text-align: center;
+        }
+        
+        .text-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            border-left: 4px solid #dc3545;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        /* Selection info */
+        .selection-info {
+            background-color: var(--orange-hover);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px dashed var(--primary-orange-light);
+            display: none;
+        }
+        
+        .selection-info i {
+            color: var(--primary-orange);
+            margin-right: 10px;
+        }
+        
+        /* Button Container */
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+        
+        .button-container .btn {
+            flex: 1;
+            padding: 14px 24px;
+            font-weight: 600;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+            color: white;
+            box-shadow: 0 4px 12px rgba(108, 117, 125, 0.25);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 18px rgba(108, 117, 125, 0.35);
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px;
+            }
+            
+            .container {
+                margin-top: 20px;
+            }
+            
+            .card-header {
+                padding: 20px;
+            }
+            
+            .card-header h4 {
+                font-size: 20px;
+            }
+            
+            .card-body {
+                padding: 25px 20px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .button-container .btn {
+                width: 100%;
+            }
+        }
+        
+        /* Animation for selection */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .form-select:valid {
+            animation: pulse 0.3s ease;
+        }
+        
+        /* SIMPLIFIED Back button inside header - FIXED */
+        .header-back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            z-index: 2; /* Make sure it's above the ::before element */
+        }
+        
+        .header-back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-decoration: none;
+            transform: translateY(-50%) translateX(-3px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+      
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <!-- Alternative Back Button inside Header - FIXED -->
+                <a href="{% url 'cost_sheet_view' %}" class="header-back-btn d-none d-md-inline-flex">
+                    <i class="fas fa-arrow-left"></i> Back
+                </a>
+                <h4><i class="fas fa-hand-pointer me-2"></i>Select Client Type for Billing</h4>
+            </div>
+            <div class="card-body">
+                <form id="client-type-form">
+                    <!-- Client Type -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-users"></i>
+                            Client Type
+                        </label>
+                        <select name="client_type" class="form-select" required>
+                            <option value="" disabled selected>-- Please select a client type --</option>
+                            {% for ct in client_types %}
+                            <option value="{{ ct.id }}">{{ ct.client_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Selection Info -->
+                    <div id="selectionInfo" class="selection-info">
+                        <i class="fas fa-info-circle"></i>
+                        <span id="selectedClientText"></span>
+                    </div>
+
+                    <!-- Buttons Container -->
+                    <div class="button-container">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-arrow-right me-2"></i> Continue to Billing
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Message Display -->
+                <div id="message" class="mt-3"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Show selection info when client type is selected
+            $("select[name='client_type']").change(function() {
+                const selectedText = $(this).find("option:selected").text();
+                const selectedValue = $(this).val();
+                
+                if (selectedValue) {
+                    $("#selectedClientText").text("Selected: " + selectedText);
+                    $("#selectionInfo").fadeIn(300);
+                } else {
+                    $("#selectionInfo").fadeOut(300);
+                }
+            });
+            
+            // Form submission
+            $("#client-type-form").submit(function(e) {
+                e.preventDefault();
+                
+                let clientTypeId = $("select[name='client_type']").val();
+                let clientTypeName = $("select[name='client_type'] option:selected").text();
+
+                if (!clientTypeId) {
+                    $("#message").html(
+                        '<div class="text-danger">' +
+                        '<i class="fas fa-exclamation-circle me-2"></i>' +
+                        'Please select a client type to continue.' +
+                        '</div>'
+                    );
+                    // Add shake animation to select
+                    $("select[name='client_type']").addClass('is-invalid');
+                    setTimeout(() => {
+                        $("select[name='client_type']").removeClass('is-invalid');
+                    }, 1000);
+                    return;
+                }
+
+                // Show loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                const originalHtml = submitBtn.html();
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i> Processing...');
+                submitBtn.prop('disabled', true);
+
+                // Simulate loading for better UX
+                setTimeout(function() {
+                    // Redirect to the billing page for the selected client type
+                    window.location.href = `/scheduler/client_type_cost_sheet/${clientTypeId}/`;
+                }, 800);
+            });
+            
+            // Add focus effect
+            $("select[name='client_type']").focus(function() {
+                $(this).parent().css('transform', 'translateY(-2px)');
+            }).blur(function() {
+                $(this).parent().css('transform', 'translateY(0)');
+            });
+            
+            // SIMPLE Back button handler - NO JavaScript interference
+            $('.back-button, .header-back-btn').on('click', function(e) {
+                const selectedValue = $("select[name='client_type']").val();
+                
+                // If user has selected something, ask for confirmation
+                if (selectedValue && selectedValue !== "") {
+                    if (!confirm('You have selected a client type. Are you sure you want to leave?')) {
+                        e.preventDefault(); // Only prevent if user cancels
+                        return false; // Stop further execution
+                    }
+                }
+                // If nothing selected or user confirms, let the link work naturally
+            });
+            
+            // Add CSS for invalid state
+            $('<style>').text('.is-invalid { border-color: #dc3545 !important; animation: shake 0.5s; } @keyframes shake { 0%, 100% { transform: translateX(0); } 10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); } 20%, 40%, 60%, 80% { transform: translateX(5px); } }').appendTo('head');
+        });
+    </script>
+</body>
+</html>
